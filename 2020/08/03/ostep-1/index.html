@@ -261,12 +261,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1><em>Operating Systems: Three Easy Pieces</em></h1>
+        <h1 id="operating-systems-three-easy-pieces"><a class="markdownIt-Anchor" href="#operating-systems-three-easy-pieces"></a> <em>Operating Systems: Three Easy Pieces</em></h1>
 <blockquote>
 <p>Notes	-	Part One</p>
 <p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
 </blockquote>
-<h2 id="Introduction">Introduction</h2>
+<h2 id="introduction"><a class="markdownIt-Anchor" href="#introduction"></a> Introduction</h2>
 <blockquote>
 <p>What an OS actually does</p>
 </blockquote>
@@ -309,8 +309,8 @@
 <p>Modern Era</p>
 </li>
 </ol>
-<h2 id="Virtualization">Virtualization</h2>
-<h3 id="The-Abstraction-The-Process">The Abstraction: The Process</h3>
+<h2 id="virtualization"><a class="markdownIt-Anchor" href="#virtualization"></a> Virtualization</h2>
+<h3 id="the-abstraction-the-process"><a class="markdownIt-Anchor" href="#the-abstraction-the-process"></a> The Abstraction: The Process</h3>
 <p>The definition of a process	-&gt;	( informally ) a running program</p>
 <p>A program	-&gt;	a lifeless thing: sits on the disk, a bunch of instructions and maybe some static data, waiting to spring into action</p>
 <img src="/2020/08/03/ostep-1/process.png" alt="process" style="zoom:60%;" />
@@ -398,7 +398,7 @@
 <p>Determine which program should the OS run.</p>
 </li>
 </ul>
-<h3 id="Key-Process-API">Key Process API</h3>
+<h3 id="key-process-api"><a class="markdownIt-Anchor" href="#key-process-api"></a> Key Process API</h3>
 <ul>
 <li>The <strong>fork()</strong> system call is used in Unix systems to create a new process. The creator is called the <strong>parent</strong>; the newly created process is called the <strong>child</strong>.</li>
 <li>The <strong>wait()</strong> system call allows a parent to wait for its child to complex execution.</li>
@@ -408,7 +408,7 @@
 <p>Why the separation of <strong>fork()</strong> and <strong>exec()</strong> is essential in building a Unix shell</p>
 </blockquote>
 <p>It lets the shell run code <em>after</em> the call to <strong>fork()</strong> but <em>before</em> the call to <strong>exec()</strong>; this code can alter the environment of the about-to-be-run program, and thus enables a variety of interesting features to be readily built.</p>
-<h3 id="Mechanism-Limited-Direct-Execution">Mechanism: Limited Direct Execution</h3>
+<h3 id="mechanism-limited-direct-execution"><a class="markdownIt-Anchor" href="#mechanism-limited-direct-execution"></a> Mechanism: Limited Direct Execution</h3>
 <blockquote>
 <p>Challenges</p>
 </blockquote>
@@ -591,7 +591,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">Operating Systems: Three Easy Pieces</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Virtualization"><span class="nav-number">1.2.</span> <span class="nav-text">Virtualization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#The-Abstraction-The-Process"><span class="nav-number">1.2.1.</span> <span class="nav-text">The Abstraction: The Process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Key-Process-API"><span class="nav-number">1.2.2.</span> <span class="nav-text">Key Process API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mechanism-Limited-Direct-Execution"><span class="nav-number">1.2.3.</span> <span class="nav-text">Mechanism: Limited Direct Execution</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#operating-systems-three-easy-pieces"><span class="nav-number">1.</span> <span class="nav-text"> Operating Systems: Three Easy Pieces</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.1.</span> <span class="nav-text"> Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtualization"><span class="nav-number">1.2.</span> <span class="nav-text"> Virtualization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#the-abstraction-the-process"><span class="nav-number">1.2.1.</span> <span class="nav-text"> The Abstraction: The Process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key-process-api"><span class="nav-number">1.2.2.</span> <span class="nav-text"> Key Process API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mechanism-limited-direct-execution"><span class="nav-number">1.2.3.</span> <span class="nav-text"> Mechanism: Limited Direct Execution</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
