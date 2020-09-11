@@ -380,6 +380,330 @@
       </tags>
   </entry>
   <entry>
+    <title>Interprocess Communications</title>
+    <url>/2020/08/25/interprocess-communication/</url>
+    <content><![CDATA[<h2 id="消息传递"><a class="markdownIt-Anchor" href="#消息传递"></a> 消息传递</h2>
+<h3 id="管道"><a class="markdownIt-Anchor" href="#管道"></a> 管道</h3>
+<blockquote>
+<p>匿名管道随进程的创建而建立，随进程的结束而销毁</p>
+</blockquote>
+<p>管道是基于Linux &amp; Unix的操作系统的核心概念之一。管道允许您以一种非常优雅的方式 <code>|</code> 将命令链接在一起，将一个程序的输出传递为另一个程序的输入。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ls -la | sort | less</span><br></pre></td></tr></table></figure>
+<p><code>bash</code> 的执行过程</p>
+<ol>
+<li><code>bash</code> 创建2个管道，一个从 <code>ls</code> 到 <code>sort</code>，一个从 <code>sort</code> 到 <code>less</code></li>
+<li><code>bash</code>  <code>fork</code> 三个子进程分别用于每个命令</li>
+<li>子进程1 <code>ls</code> 设置 <code>stdout</code> 为 <code>pipe A</code> 的写端</li>
+<li>子进程2 <code>sort</code> 设置 <code>stdin</code> 为 <code>pipe A</code> 的读端，设置 <code>stdout</code> 为 <code>pipe B</code> 的写端</li>
+<li>子进程3 <code>less</code> 设置 <code>stdin</code> 为 <code>pipe B</code> 的读端</li>
+</ol>
+<blockquote>
+<p>Linux has a VFS (virtual file system) module called <code>pipefs</code>, that gets mounted in kernel space during boot. <code>pipefs</code> is mounted <strong>alongside the root file system</strong> (/), not in it (pipe’s root is <code>pipe:</code> ). <code>pipefs</code> is stored using an in-memory file system.</p>
+<p><code>pipefs</code> cannot be directly examined by the user unlike most file systems. The entry point to <code>pipefs</code> is the <strong><code>pipe</code> syscall</strong>. The <strong><code>pipe</code> syscall</strong> is used by shells and other programs to implement piping, and just creates a new file in pipefs, returning two file descriptors (one for the read end, opening using <code>O_RDONLY</code>, and one for the write end, opened using <code>O_WRONLY</code>).</p>
+<img src="/2020/08/25/interprocess-communication/pipe_impl.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<img src="/2020/08/25/interprocess-communication/pipe.png" alt="pipe" style="zoom: 33%;" />
+<p>使用 <code>fork</code> 创建子进程，<strong>创建的子进程会复制父进程的文件描述符</strong>，这样就做到了两个进程各有两个 <code>fd[0]</code> 与 <code>fd[1]</code>，两个进程就可以通过各自的 fd 写入和读取同一个管道文件实现跨进程通信。</p>
+<p>父子进程间的单向数据流（半双工管道）</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd[0]);</span></span><br><span class="line">        <span class="comment">// TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd[1]);</span></span><br><span class="line"></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>父子进程间的双向数据流的两个管道（全双工管道，有两个半双工管道构成）</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pipe_fd1[<span class="number">2</span>],pipe_fd2[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd1);</span><br><span class="line">    pipe(pipe_fd2);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd1[<span class="number">1</span>]);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd2[<span class="number">0</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd1[0]);</span></span><br><span class="line">        <span class="comment">//close(pipe_fd2[1]);</span></span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="built_in">close</span>(pipe_fd1[<span class="number">0</span>]);</span><br><span class="line">	<span class="built_in">close</span>(pipe_fd2[<span class="number">1</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd1[1]);</span></span><br><span class="line">	<span class="comment">//close(pipe_fd2[0]);</span></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="fifo"><a class="markdownIt-Anchor" href="#fifo"></a> FIFO</h4>
+<blockquote>
+<p>名字空间</p>
+<p>当两个或多个无亲缘关系的进程使用某种类型的IPC对象来彼此交换信息时，该IPC对象必须有一个某种形式的 <strong>名字(name)</strong> 或 <strong>标识符(identifier)</strong> ，这样其中一个进程（往往是服务器）可以创建该IPC对象，其余进程则可以指定同一个IPC对象</p>
+</blockquote>
+<p>管道没有名字，因此它们的最大劣势就是智能用于有一个共同祖先进程的各个进程之间。而 <strong>FIFO（指代first in, first out）</strong> 类似于管道（单向数据流），且有一个文件路径名与之关联从而实现无亲缘关系进程访问同一个FIFO，所以也被称为 <strong>命名管道(named pipe)</strong></p>
+<blockquote>
+<p>Any FIFO is much like a pipe: rather than owning disk blocks in the filesystems, an opened FIFO is associated with a kernel buffer that temporarily stores the data exchanged by two or more processes. Thanks to the disk inode, however, a FIFO can be accessed by any process, since the FIFO filename is included in the system’s directory tree. FIFO inodes <strong>appear on the system directory tree rather than on the pipefs special filesystem</strong>.</p>
+<img src="/2020/08/25/interprocess-communication/fifo.png" alt="impl" style="zoom:50%;" />
+<p>Allocates a <code>pipe_inode_info</code> object (the actual pipe) for providing buffer space when fifo_open(…)</p>
+<img src="/2020/08/25/interprocess-communication/linux_pipe.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<p>通过 <code>mkfifo</code> 命令来创建并指定管道名字</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkfifo myFifo</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example: write first</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> * myfifo = <span class="string">"/tmp/myfifo"</span>; </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Creating the named file(FIFO) </span></span><br><span class="line">    <span class="comment">// mkfifo(&lt;pathname&gt;, &lt;permission&gt;) </span></span><br><span class="line">    mkfifo(myfifo, <span class="number">0666</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">char</span> arr1[<span class="number">80</span>], arr2[<span class="number">80</span>]; </span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="comment">// Open FIFO for write only </span></span><br><span class="line">        fd = <span class="built_in">open</span>(myfifo, O_WRONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Take an input arr2ing from user. </span></span><br><span class="line">        <span class="comment">// 80 is maximum length </span></span><br><span class="line">        fgets(arr2, <span class="number">80</span>, <span class="built_in">stdin</span>); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Write the input arr2ing on FIFO </span></span><br><span class="line">        <span class="comment">// and close it </span></span><br><span class="line">        <span class="built_in">write</span>(fd, arr2, <span class="built_in">strlen</span>(arr2)+<span class="number">1</span>); </span><br><span class="line">        <span class="built_in">close</span>(fd); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Open FIFO for Read only </span></span><br><span class="line">        fd = <span class="built_in">open</span>(myfifo, O_RDONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Read from FIFO </span></span><br><span class="line">        <span class="built_in">read</span>(fd, arr1, <span class="keyword">sizeof</span>(arr1)); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Print the read message </span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"User2: %s\n"</span>, arr1); </span><br><span class="line">        <span class="built_in">close</span>(fd); </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="消息队列"><a class="markdownIt-Anchor" href="#消息队列"></a> 消息队列</h3>
+<blockquote>
+<p>随内核的持续性</p>
+</blockquote>
+<p>消息队列可认为时一个<strong>消息链表</strong>，有足够写权限的线程可往队列中放置消息，有足够读权限的线程可从队列中取走消息。</p>
+<p>每个消息都具有如下属性：</p>
+<ul>
+<li>一个无符号整数优先级（Posix） / 	一个长整数类型（System V）</li>
+<li>消息的数据部分长度</li>
+<li>数据本身</li>
+</ul>
+<h4 id="system-v-消息队列"><a class="markdownIt-Anchor" href="#system-v-消息队列"></a> System V 消息队列</h4>
+<blockquote>
+<img src="/2020/08/25/interprocess-communication/SystemVmq.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"><span class="comment">// structure for message queue</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msg_buffer</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">long</span> msg_type;</span><br><span class="line">    <span class="keyword">char</span> msg[<span class="number">100</span>];</span><br><span class="line">&#125; message;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">key_t</span> my_key;</span><br><span class="line">    <span class="keyword">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">"progfile"</span>, <span class="number">65</span>);             <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT); <span class="comment">//create message queue and return id</span></span><br><span class="line">    message.msg_type = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Write Message : "</span>);</span><br><span class="line">    fgets(message.msg, <span class="number">100</span>, <span class="built_in">stdin</span>);</span><br><span class="line">    msgsnd(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">0</span>); <span class="comment">//send message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Sent message is : %s \n"</span>, message.msg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">key_t</span> my_key;</span><br><span class="line">    <span class="keyword">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">"progfile"</span>, <span class="number">65</span>);                   <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT);       <span class="comment">//create message queue and return id</span></span><br><span class="line">    msgrcv(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">1</span>, <span class="number">0</span>); <span class="comment">//used to receive message</span></span><br><span class="line">    <span class="comment">// display the message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Received Message is : %s \n"</span>, message.msg);</span><br><span class="line">    msgctl(msg_id, IPC_RMID, <span class="literal">NULL</span>); <span class="comment">//destroy the message queue</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="posix-消息队列"><a class="markdownIt-Anchor" href="#posix-消息队列"></a> Posix 消息队列</h4>
+<blockquote>
+<p>POSIX message queues implement <strong>priority-ordered</strong> messages. Each message written by a sender process is associated with an integer number which is interpreted as message priority; messages with a higher number are considered higher in priority.</p>
+<img src="/2020/08/25/interprocess-communication/Posixmq.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mqueue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_SIZE 1024</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> QUEUE_NAME <span class="meta-string">"/test"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createAndReceive</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">mqd_t</span> mq;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mq_attr</span> <span class="title">attr</span>;</span></span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">buffer</span>[MAX_SIZE + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* initialize the queue attributes */</span></span><br><span class="line">    attr.mq_flags = <span class="number">0</span>;</span><br><span class="line">    attr.mq_maxmsg = <span class="number">10</span>;</span><br><span class="line">    attr.mq_msgsize = MAX_SIZE;</span><br><span class="line">    attr.mq_curmsgs = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* create the message queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY, <span class="number">0644</span>, &amp;attr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">ssize_t</span> bytes_read;</span><br><span class="line">    <span class="comment">/* receive the message */</span></span><br><span class="line">    bytes_read = mq_receive(mq, <span class="built_in">buffer</span>, MAX_SIZE, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    mq_close(mq);</span><br><span class="line">    mq_unlink(QUEUE_NAME);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">mqd_t</span> mq;</span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">buffer</span>[MAX_SIZE];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* open the mail queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_WRONLY);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(<span class="built_in">buffer</span>, <span class="number">0</span>, MAX_SIZE);</span><br><span class="line">    fgets(<span class="built_in">buffer</span>, MAX_SIZE, <span class="built_in">stdin</span>);</span><br><span class="line"></span><br><span class="line">    mq_send(mq, <span class="built_in">buffer</span>, MAX_SIZE, <span class="number">0</span>);</span><br><span class="line">    mq_close(mq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="区别"><a class="markdownIt-Anchor" href="#区别"></a> 区别</h4>
+<ul>
+<li>对Posix消息队列的读总是返回最高优先级的最早消息，对SystemV消息队列的读则可以返回任意优先级的消息</li>
+<li>当往一个空队列放置一个消息时，Posix消息队列允许产生一个信号或启动一个线程，SystemV消息队列则不提供类似机制</li>
+</ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<p><a href="">Unix 网络编程 卷2: 进程间通信</a></p>
+<p><a href="https://www.slideshare.net/divyekapoor/linux-kernel-implementation-of-pipes-and-fifos" target="_blank" rel="noopener">Slide - Linux Kernel Implementation of Pipes FIFOs</a></p>
+<p><a href="https://mp.weixin.qq.com/s/mblyh6XrLj1bCwL0Evs-Vg" target="_blank" rel="noopener">进程间通信</a></p>
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>Operating System</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Notes for OSTEP</title>
+    <url>/2020/08/03/ostep-1/</url>
+    <content><![CDATA[<h1 id="operating-systems-three-easy-pieces"><a class="markdownIt-Anchor" href="#operating-systems-three-easy-pieces"></a> <em>Operating Systems: Three Easy Pieces</em></h1>
+<blockquote>
+<p>Notes	-	Part One</p>
+<p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
+</blockquote>
+<h2 id="introduction"><a class="markdownIt-Anchor" href="#introduction"></a> Introduction</h2>
+<blockquote>
+<p>What an OS actually does</p>
+</blockquote>
+<p>It takes physical resources, such as a CPU, memory, or disk, and <strong>virtualizes</strong> them. It handles tough and tricky issues related to <strong>concurrency</strong>. And it stores files <strong>persistently</strong>, thus making them safe over the long-term.</p>
+<blockquote>
+<p>Design goal</p>
+</blockquote>
+<ul>
+<li>build up some <strong>abstractions</strong> in order to make the system convenient and easy to use</li>
+<li>provide high <strong>performance</strong> / <strong>minimize the overheads</strong> of the OS</li>
+<li>provide <strong>protections</strong> between applications, as well as the OS and applications.</li>
+<li>strive to provide a high degree of <strong>reliability</strong>. ( run non-stop )</li>
+<li>energy-efficiency / security / mobility…</li>
+</ul>
+<blockquote>
+<p>History of how OS developed</p>
+</blockquote>
+<ol>
+<li>
+<p>Just Libraries: a set of libraries of commonly-used functions</p>
+<p>Batch Processing: a number of jobs were set up and then run in a “batch” by the operator</p>
+</li>
+<li>
+<p>Protection</p>
+<p>if allow any program read any file?	-&gt;	the code run on behalf of the OS was special	-&gt;	<strong>system call</strong></p>
+<blockquote>
+<p>Key difference between a system call and a procedure call</p>
+<p>A system call transfer control into the OS while simultaneously raising the <strong>hardware privilege level</strong>. User applications run in what is referred to an <strong>user mode</strong> which means the hardware restricts what applications can do.</p>
+<p>When a system call is initiated( usually through a special hardware instruction called a <strong>trap</strong>), the hardware transfers control to a pre-specified <strong>trap handler</strong>( that the OS set up previously) and simultaneously raises the privilege level to <strong>kernel mode</strong>( In kernel mode, the OS has full access to the hardware of system). When the OS is done servicing the request, it passed control back to the user via a special <strong>return-from-trap</strong> instruction, which reverts to user mode while simultaneously passing control back to where the application let off.</p>
+</blockquote>
+</li>
+<li>
+<p>Era of Multiprogramming</p>
+<p>desire to make better use of machine resources	-&gt;</p>
+<p><strong>multiprogramming</strong>: load a number of jobs into memory and switch rapidly between them for improving CPU utilization	-&gt;</p>
+<p>don’t want one program to be able to access the memory of another program	-&gt;</p>
+<p><strong>memory protection</strong> &amp; other <strong>concurrency</strong> issues</p>
+</li>
+<li>
+<p>Modern Era</p>
+</li>
+</ol>
+<h2 id="virtualization"><a class="markdownIt-Anchor" href="#virtualization"></a> Virtualization</h2>
+<h3 id="the-abstraction-the-process"><a class="markdownIt-Anchor" href="#the-abstraction-the-process"></a> The Abstraction: The Process</h3>
+<p>The definition of a process	-&gt;	( informally ) a running program</p>
+<p>A program	-&gt;	a lifeless thing: sits on the disk, a bunch of instructions and maybe some static data, waiting to spring into action</p>
+<img src="/2020/08/03/ostep-1/process.png" alt="process" style="zoom:60%;" />
+<blockquote>
+<p>Summarize a process by taking an inventory of the different pieces of the system it accesses or affects</p>
+</blockquote>
+<ul>
+<li>
+<p>the memory that the process can address</p>
+<p>Instructions / the data it reads or writes sits in memory</p>
+</li>
+<li>
+<p>registers、</p>
+<p>Many instructions explicitly read or update registers. (includes some special registers like IP/SP…)</p>
+</li>
+<li>
+<p>access persistent storage devices</p>
+<p>Might include a list of the files it currently has open.</p>
+</li>
+</ul>
+<blockquote>
+<p>Process creation</p>
+</blockquote>
+<ol>
+<li>
+<p>load its code and any static data (e.g., initialized variables) into memory, into the address space of the process</p>
+<p>from eager (Early OS: <strong>all at once</strong> before running) to lazy (Modern OS: <strong>load pieces</strong> when needed during execution)</p>
+</li>
+<li>
+<p>allocate memory for program’s <strong>run-time stack</strong></p>
+</li>
+<li>
+<p>allocate memory for program’s <strong>heap</strong></p>
+</li>
+<li>
+<p>other work as related to <strong>I/O setup</strong></p>
+<p>e.g., in Unix systems, each process by default has 3 open file descriptors for standard input/output/error.</p>
+</li>
+</ol>
+<blockquote>
+<p>Process state in a simplified view</p>
+</blockquote>
+<img src="/2020/08/03/ostep-1/process_state.png" alt="process state" style="zoom:60%;" />
+<ul>
+<li>running: runing on a processor and executing instructions.</li>
+<li>ready: ready to run but for some reason the OS has chosen not to run it at this given moment.</li>
+<li>blocked: has performed some kind of operation that makes it not ready to run until some other event takes place</li>
+</ul>
+<p>other state:</p>
+<ul>
+<li>initial: begin created</li>
+<li>final: has exited but has not yet been cleaned up (zombie state)</li>
+</ul>
+<blockquote>
+<p>Key data structures to track information</p>
+</blockquote>
+<p>track state of each process 	-&gt;	process list</p>
+<p>individual structure stores information about a process	-&gt;	process control block:</p>
+<img src="/2020/08/03/ostep-1/pcb.png" alt="PCB" style="zoom: 33%;" />
+<blockquote>
+<p>How can the OS provide the illusion of a nearly-endless supply of CPUs</p>
+</blockquote>
+<p>By <strong>virtualizing</strong> the CPU. By running one process, then stopping it and running another, and so forth, it can promote the illusion.</p>
+<p><strong>Mechanisms</strong></p>
+<blockquote>
+<p>low-level methods or protocols that implement a needed piece of functionality.	-&gt; 	how</p>
+</blockquote>
+<ul>
+<li>
+<p>Time sharing</p>
+<p>It is a basic technique used by an OS to share a resource. By allowing the resource to be used for a little while by one entity, and then a little while by another, and so forth, the resources in question can be shared by many.</p>
+</li>
+<li>
+<p>Context switch</p>
+<p>Give the OS the ability to stop running one program and start running another on a given CPU.</p>
+</li>
+</ul>
+<p><strong>Policies</strong></p>
+<blockquote>
+<p>On top of the mechanisms (high-level), algorithms for making some kind of decision	-&gt;	which</p>
+</blockquote>
+<ul>
+<li>
+<p>scheduling policy</p>
+<p>Determine which program should the OS run.</p>
+</li>
+</ul>
+<h3 id="key-process-api"><a class="markdownIt-Anchor" href="#key-process-api"></a> Key Process API</h3>
+<ul>
+<li>The <strong>fork()</strong> system call is used in Unix systems to create a new process. The creator is called the <strong>parent</strong>; the newly created process is called the <strong>child</strong>.</li>
+<li>The <strong>wait()</strong> system call allows a parent to wait for its child to complex execution.</li>
+<li>The <strong>exec()</strong> family of system calls allows a child to break free from its similarity to its parent and execute an entirely new program.</li>
+</ul>
+<blockquote>
+<p>Why the separation of <strong>fork()</strong> and <strong>exec()</strong> is essential in building a Unix shell</p>
+</blockquote>
+<p>It lets the shell run code <em>after</em> the call to <strong>fork()</strong> but <em>before</em> the call to <strong>exec()</strong>; this code can alter the environment of the about-to-be-run program, and thus enables a variety of interesting features to be readily built.</p>
+<h3 id="mechanism-limited-direct-execution"><a class="markdownIt-Anchor" href="#mechanism-limited-direct-execution"></a> Mechanism: Limited Direct Execution</h3>
+<blockquote>
+<p>Challenges</p>
+</blockquote>
+<ul>
+<li>performance	- 	implement virtualization without adding excessive overhead to system</li>
+<li>control	-	run process efficiently while retaining control over the CPU</li>
+</ul>
+<blockquote>
+<p>Direct Execution Protocol (Without Limits)</p>
+</blockquote>
+<ol>
+<li>
+<p>OS:</p>
+<p>Create entry for process list	-&gt;	Allocate memory for program	-&gt;	Load program into memory	-&gt;	Set up stack with argc / argv	-&gt;	Clear registers	-&gt;	Execute call main()</p>
+</li>
+<li>
+<p>Program:</p>
+<p>Run main	-&gt;	Execute return from main</p>
+</li>
+<li>
+<p>OS:</p>
+<p>Free memory of process	-&gt;	Remove from process list</p>
+</li>
+</ol>
+<p>Advantage: fast</p>
+<p>Problems:</p>
+<ol>
+<li>
+<p>Restricted Operations</p>
+<blockquote>
+<p>A process must be able to perform I/O and some other restricted operations, but without giving the process complete control over the system.</p>
+</blockquote>
+<p>Approach: a new process mode</p>
+<p>Code that runs in <strong>user mode</strong> is <strong>restricted</strong> in what it can do. In contrast to user mode is <strong>kernel mode</strong>, which the operating system (or kernel) runs in. In this mode, code that runs can <strong>do what it likes</strong>, including privileged operations.</p>
+<p>To make a user process perform some kind of privileged operation when it wishes, the <strong>system call</strong> is provided. To execute a system call, a program must execute a special <strong>trap</strong> instruction. This instruction simultaneously jumps into the kernel and raises the privilege level to <strong>kernel mode</strong>; once in kernel, the system can now perform whatever privileged operations are needed, and thus <strong>do the required work for the calling process</strong>. When finished, the OS calls a special <strong>return-from-trap</strong> instruction to return into the calling user program while simultaneously reducing the privilege level <strong>back to user mode</strong>.</p>
+<p>In order to be able to return correctly when the OS issues the return-from-trap instruction, it must make sure to <strong>save enough of the caller’s registers</strong>. For example, on x86, the processor will push them onto <strong>per-process kernel stack</strong> and the return-from-trap will pop them off and resume execution of the user-mode process.</p>
+<blockquote>
+<p>How does the trap know which code to run inside the OS</p>
+</blockquote>
+<p>Clearly, if the calling process does this by <strong>specifying an address to jump to</strong>, it will allow programs to jump anywhere into the kernel which is a <strong>very bad idea</strong>.</p>
+<p>The kernel does so by setting up a trap table at boot time. When the machine boot up, it does so in privileged (kernel) mode, and thus is free to configure machine hardware as need be.</p>
+<p>One of the first things the OS thus does is to tell the hardware what code to run (<strong>location of trap handlers</strong>) when certain exceptional events occur. Once the hardware is informed, it remembers the location of these handlers until the machine is <strong>next rebooted</strong>.</p>
+<p>To specify the exact system call, a <strong>system-call number</strong> is usually assigned to each system call. The user code is thus responsible for placing the desired system-call number in a <strong>register</strong> or at a specified location on the <strong>stack</strong>; the OS,when handling the system call inside the trap handler, <strong>examines this number</strong>, ensures it is valid, and if it is, executes the corresponding code.</p>
+<p>One last aside: being able to execute the instruction to tell the hardware <strong>where the trap tables are</strong> is also a <strong>privileged operation</strong>.</p>
+<blockquote>
+<p>Limited Direct Execution Protocol (two phases)</p>
+</blockquote>
+<p>In the first (at boot time), the kernel initializes the trap table, and the CPU remembers its location for subsequent use. The kernel does so via a privileged instruction (highlighted).</p>
+<img src="/2020/08/03/ostep-1/lde_1.png" alt="lde1" style="zoom:60%;" />
+<p>In the second (when running a process), <strong>the kernel sets up</strong> a few things such as allocation before using a return-from-trap instruction to start the execution of the process; this <strong>switches the CPU to user mode</strong> and begins running the process. When the process wishes to <strong>issue a system call</strong>, it <strong>traps back</strong> into the OS, which <strong>handles</strong> it and once again <strong>return control via a return-from-trap</strong> to the process. The process then completes its work, and returns from main(); this usually will return into some stub code which will properly <strong>exit the program (by calling the exit() system call)</strong>. At this point, the OS cleans up.</p>
+<img src="/2020/08/03/ostep-1/lde_2.png" alt="lde" style="zoom:60%;" />
+</li>
+<li>
+<p>Switching Between Process</p>
+<blockquote>
+<p>If a process is running on the CPU, this by definition means the OS is not running. So how can the operating system <strong>regain control</strong> of the CPU so that it can switch between process?</p>
+</blockquote>
+<p><strong>A cooperative approach: wait for system calls</strong></p>
+<p>In this style, the OS <strong>trusts the processes</strong> of the system to <strong>behave reasonably</strong>. Processes that run for too long are assumed to periodically give up the CPU so that the OS can decide to run some other task.</p>
+<p>In a cooperative scheduling system, the OS regains control of the CPU by <strong>waiting for a system call or an illegal operation</strong> of some kind to take place. This passive approach is too ideal.</p>
+<p><strong>A non-cooperative approach: the OS takes control</strong></p>
+<p>Without some additional help from the hardware, it turns out that the OS can’t do much at all when a process refuses to make system calls (or mistakes) and thus return control to the OS.</p>
+<p>The answer to how to gain control <strong>without cooperation</strong> is simple: a <strong>timer interrupt</strong>. A timer device can be programmed to raise an interrupt every so many milliseconds; when the interrupt is raised,the currently running process is <strong>halted</strong>, and a <strong>pre-configured interrupt handler</strong> in the OS runs. At this point, the OS has regained control of the CPU, and thus can do what it pleases: stop the current process, and start a different one.</p>
+<img src="/2020/08/03/ostep-1/timer.png" alt="timer" style="zoom:60%;" />
+<blockquote>
+<p>Saving and Restoring Context</p>
+</blockquote>
+<p>It is made by a part of the operating system known as the scheduler to decide whether to continue running the currently-running process, or switch to a different one.</p>
+<p>If the decision is made to switch, the OS then executes a low-level piece of code which we refer to as a <strong>context switch</strong>. A context switch is conceptually simple: all the OS has to do is <strong>save a few register values</strong> for the currently-running process (onto its kernel stack, for example), and <strong>restore a few</strong> (from its kernel stack), and <strong>switch to the kernel stack</strong> for the soon-to-be-executing process. By switching stacks, the kernel enters the call to the switch code in the context of one process (the one that was interrupted) and returns in the context of another (the soon-to-be-executing one). When the OS finally executes a return-from-trap instructions, the soon-to-be-executing process becomes the currently-running process. And thus the context switch is complete.</p>
+<img src="/2020/08/03/ostep-1/switch.png" alt="context switch" style="zoom:60%;" />
+<p>two types of register saves/restores</p>
+<ol>
+<li>When <strong>interrupt occurs</strong>, the <strong>user registers</strong> of the running process are implicitly saved by the <strong>hardware</strong>, using the <strong>kernel stack</strong> of that process.</li>
+<li>When the OS <strong>decides to switch</strong>, the <strong>kernel registers</strong> are explicitly saved by the <strong>software</strong> (i.e., the OS) , into memory in the <strong>process structure</strong> of the process.</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>What happen if, during interrupt or trap handling, another interrupt occurs. (Detailed discussion is defer until second piece)</p>
+</blockquote>
+<p>One simple thing an OS might do is <strong>disable interrupts</strong> during interrupt processing; doing so ensures that when one interrupt is being handled, no other one will be delivered to the CPU. But disabling interrupts for too long could <strong>lead to lost interrupts</strong>.</p>
+<p>Operating systems also have developed a number of <strong>sophisticated locking schemes</strong> to protect concurrent access to internal data structures. This enables <strong>multiple activities to be on-going</strong> within the kernel at the same time, particularly useful on multiprocessors.</p>
+]]></content>
+      <categories>
+        <category>Notes</category>
+      </categories>
+      <tags>
+        <tag>Operating System</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Notes for OSTEP</title>
     <url>/2020/09/10/ostep-2/</url>
     <content><![CDATA[<h1 id="operating-systems-three-easy-pieces"><a class="markdownIt-Anchor" href="#operating-systems-three-easy-pieces"></a> <em>Operating Systems: Three Easy Pieces</em></h1>
@@ -723,330 +1047,6 @@
 <p>O(1) scheduler is a priority-based scheduler (similar to the MLFQ), changing a process’s priority over time and then scheduling those with highest priority in order to meet various scheduling objectives.</p>
 <p>CFS, in contrast, is a deterministic proportional-share approach (more like stride scheduling).</p>
 <p>BFS, is also proportional-share, but based on a more complicated scheme known as Earliest Eligible Virtual Deadline First (EEVDF).</p>
-]]></content>
-      <categories>
-        <category>Notes</category>
-      </categories>
-      <tags>
-        <tag>Operating System</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Interprocess Communications</title>
-    <url>/2020/08/25/interprocess-communication/</url>
-    <content><![CDATA[<h2 id="消息传递"><a class="markdownIt-Anchor" href="#消息传递"></a> 消息传递</h2>
-<h3 id="管道"><a class="markdownIt-Anchor" href="#管道"></a> 管道</h3>
-<blockquote>
-<p>匿名管道随进程的创建而建立，随进程的结束而销毁</p>
-</blockquote>
-<p>管道是基于Linux &amp; Unix的操作系统的核心概念之一。管道允许您以一种非常优雅的方式 <code>|</code> 将命令链接在一起，将一个程序的输出传递为另一个程序的输入。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ls -la | sort | less</span><br></pre></td></tr></table></figure>
-<p><code>bash</code> 的执行过程</p>
-<ol>
-<li><code>bash</code> 创建2个管道，一个从 <code>ls</code> 到 <code>sort</code>，一个从 <code>sort</code> 到 <code>less</code></li>
-<li><code>bash</code>  <code>fork</code> 三个子进程分别用于每个命令</li>
-<li>子进程1 <code>ls</code> 设置 <code>stdout</code> 为 <code>pipe A</code> 的写端</li>
-<li>子进程2 <code>sort</code> 设置 <code>stdin</code> 为 <code>pipe A</code> 的读端，设置 <code>stdout</code> 为 <code>pipe B</code> 的写端</li>
-<li>子进程3 <code>less</code> 设置 <code>stdin</code> 为 <code>pipe B</code> 的读端</li>
-</ol>
-<blockquote>
-<p>Linux has a VFS (virtual file system) module called <code>pipefs</code>, that gets mounted in kernel space during boot. <code>pipefs</code> is mounted <strong>alongside the root file system</strong> (/), not in it (pipe’s root is <code>pipe:</code> ). <code>pipefs</code> is stored using an in-memory file system.</p>
-<p><code>pipefs</code> cannot be directly examined by the user unlike most file systems. The entry point to <code>pipefs</code> is the <strong><code>pipe</code> syscall</strong>. The <strong><code>pipe</code> syscall</strong> is used by shells and other programs to implement piping, and just creates a new file in pipefs, returning two file descriptors (one for the read end, opening using <code>O_RDONLY</code>, and one for the write end, opened using <code>O_WRONLY</code>).</p>
-<img src="/2020/08/25/interprocess-communication/pipe_impl.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<img src="/2020/08/25/interprocess-communication/pipe.png" alt="pipe" style="zoom: 33%;" />
-<p>使用 <code>fork</code> 创建子进程，<strong>创建的子进程会复制父进程的文件描述符</strong>，这样就做到了两个进程各有两个 <code>fd[0]</code> 与 <code>fd[1]</code>，两个进程就可以通过各自的 fd 写入和读取同一个管道文件实现跨进程通信。</p>
-<p>父子进程间的单向数据流（半双工管道）</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd[0]);</span></span><br><span class="line">        <span class="comment">// TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="built_in">close</span>(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd[1]);</span></span><br><span class="line"></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>父子进程间的双向数据流的两个管道（全双工管道，有两个半双工管道构成）</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pipe_fd1[<span class="number">2</span>],pipe_fd2[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd1);</span><br><span class="line">    pipe(pipe_fd2);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd1[<span class="number">1</span>]);</span><br><span class="line">        <span class="built_in">close</span>(pipe_fd2[<span class="number">0</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd1[0]);</span></span><br><span class="line">        <span class="comment">//close(pipe_fd2[1]);</span></span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="built_in">close</span>(pipe_fd1[<span class="number">0</span>]);</span><br><span class="line">	<span class="built_in">close</span>(pipe_fd2[<span class="number">1</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd1[1]);</span></span><br><span class="line">	<span class="comment">//close(pipe_fd2[0]);</span></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="fifo"><a class="markdownIt-Anchor" href="#fifo"></a> FIFO</h4>
-<blockquote>
-<p>名字空间</p>
-<p>当两个或多个无亲缘关系的进程使用某种类型的IPC对象来彼此交换信息时，该IPC对象必须有一个某种形式的 <strong>名字(name)</strong> 或 <strong>标识符(identifier)</strong> ，这样其中一个进程（往往是服务器）可以创建该IPC对象，其余进程则可以指定同一个IPC对象</p>
-</blockquote>
-<p>管道没有名字，因此它们的最大劣势就是智能用于有一个共同祖先进程的各个进程之间。而 <strong>FIFO（指代first in, first out）</strong> 类似于管道（单向数据流），且有一个文件路径名与之关联从而实现无亲缘关系进程访问同一个FIFO，所以也被称为 <strong>命名管道(named pipe)</strong></p>
-<blockquote>
-<p>Any FIFO is much like a pipe: rather than owning disk blocks in the filesystems, an opened FIFO is associated with a kernel buffer that temporarily stores the data exchanged by two or more processes. Thanks to the disk inode, however, a FIFO can be accessed by any process, since the FIFO filename is included in the system’s directory tree. FIFO inodes <strong>appear on the system directory tree rather than on the pipefs special filesystem</strong>.</p>
-<img src="/2020/08/25/interprocess-communication/fifo.png" alt="impl" style="zoom:50%;" />
-<p>Allocates a <code>pipe_inode_info</code> object (the actual pipe) for providing buffer space when fifo_open(…)</p>
-<img src="/2020/08/25/interprocess-communication/linux_pipe.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<p>通过 <code>mkfifo</code> 命令来创建并指定管道名字</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkfifo myFifo</span><br></pre></td></tr></table></figure>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example: write first</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> * myfifo = <span class="string">"/tmp/myfifo"</span>; </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Creating the named file(FIFO) </span></span><br><span class="line">    <span class="comment">// mkfifo(&lt;pathname&gt;, &lt;permission&gt;) </span></span><br><span class="line">    mkfifo(myfifo, <span class="number">0666</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">char</span> arr1[<span class="number">80</span>], arr2[<span class="number">80</span>]; </span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="comment">// Open FIFO for write only </span></span><br><span class="line">        fd = <span class="built_in">open</span>(myfifo, O_WRONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Take an input arr2ing from user. </span></span><br><span class="line">        <span class="comment">// 80 is maximum length </span></span><br><span class="line">        fgets(arr2, <span class="number">80</span>, <span class="built_in">stdin</span>); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Write the input arr2ing on FIFO </span></span><br><span class="line">        <span class="comment">// and close it </span></span><br><span class="line">        <span class="built_in">write</span>(fd, arr2, <span class="built_in">strlen</span>(arr2)+<span class="number">1</span>); </span><br><span class="line">        <span class="built_in">close</span>(fd); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Open FIFO for Read only </span></span><br><span class="line">        fd = <span class="built_in">open</span>(myfifo, O_RDONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Read from FIFO </span></span><br><span class="line">        <span class="built_in">read</span>(fd, arr1, <span class="keyword">sizeof</span>(arr1)); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Print the read message </span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"User2: %s\n"</span>, arr1); </span><br><span class="line">        <span class="built_in">close</span>(fd); </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="消息队列"><a class="markdownIt-Anchor" href="#消息队列"></a> 消息队列</h3>
-<blockquote>
-<p>随内核的持续性</p>
-</blockquote>
-<p>消息队列可认为时一个<strong>消息链表</strong>，有足够写权限的线程可往队列中放置消息，有足够读权限的线程可从队列中取走消息。</p>
-<p>每个消息都具有如下属性：</p>
-<ul>
-<li>一个无符号整数优先级（Posix） / 	一个长整数类型（System V）</li>
-<li>消息的数据部分长度</li>
-<li>数据本身</li>
-</ul>
-<h4 id="system-v-消息队列"><a class="markdownIt-Anchor" href="#system-v-消息队列"></a> System V 消息队列</h4>
-<blockquote>
-<img src="/2020/08/25/interprocess-communication/SystemVmq.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"><span class="comment">// structure for message queue</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msg_buffer</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">long</span> msg_type;</span><br><span class="line">    <span class="keyword">char</span> msg[<span class="number">100</span>];</span><br><span class="line">&#125; message;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">key_t</span> my_key;</span><br><span class="line">    <span class="keyword">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">"progfile"</span>, <span class="number">65</span>);             <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT); <span class="comment">//create message queue and return id</span></span><br><span class="line">    message.msg_type = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Write Message : "</span>);</span><br><span class="line">    fgets(message.msg, <span class="number">100</span>, <span class="built_in">stdin</span>);</span><br><span class="line">    msgsnd(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">0</span>); <span class="comment">//send message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Sent message is : %s \n"</span>, message.msg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">key_t</span> my_key;</span><br><span class="line">    <span class="keyword">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">"progfile"</span>, <span class="number">65</span>);                   <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT);       <span class="comment">//create message queue and return id</span></span><br><span class="line">    msgrcv(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">1</span>, <span class="number">0</span>); <span class="comment">//used to receive message</span></span><br><span class="line">    <span class="comment">// display the message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Received Message is : %s \n"</span>, message.msg);</span><br><span class="line">    msgctl(msg_id, IPC_RMID, <span class="literal">NULL</span>); <span class="comment">//destroy the message queue</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="posix-消息队列"><a class="markdownIt-Anchor" href="#posix-消息队列"></a> Posix 消息队列</h4>
-<blockquote>
-<p>POSIX message queues implement <strong>priority-ordered</strong> messages. Each message written by a sender process is associated with an integer number which is interpreted as message priority; messages with a higher number are considered higher in priority.</p>
-<img src="/2020/08/25/interprocess-communication/Posixmq.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mqueue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_SIZE 1024</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> QUEUE_NAME <span class="meta-string">"/test"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createAndReceive</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">mqd_t</span> mq;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mq_attr</span> <span class="title">attr</span>;</span></span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">buffer</span>[MAX_SIZE + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* initialize the queue attributes */</span></span><br><span class="line">    attr.mq_flags = <span class="number">0</span>;</span><br><span class="line">    attr.mq_maxmsg = <span class="number">10</span>;</span><br><span class="line">    attr.mq_msgsize = MAX_SIZE;</span><br><span class="line">    attr.mq_curmsgs = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* create the message queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY, <span class="number">0644</span>, &amp;attr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">ssize_t</span> bytes_read;</span><br><span class="line">    <span class="comment">/* receive the message */</span></span><br><span class="line">    bytes_read = mq_receive(mq, <span class="built_in">buffer</span>, MAX_SIZE, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    mq_close(mq);</span><br><span class="line">    mq_unlink(QUEUE_NAME);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">mqd_t</span> mq;</span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">buffer</span>[MAX_SIZE];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* open the mail queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_WRONLY);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(<span class="built_in">buffer</span>, <span class="number">0</span>, MAX_SIZE);</span><br><span class="line">    fgets(<span class="built_in">buffer</span>, MAX_SIZE, <span class="built_in">stdin</span>);</span><br><span class="line"></span><br><span class="line">    mq_send(mq, <span class="built_in">buffer</span>, MAX_SIZE, <span class="number">0</span>);</span><br><span class="line">    mq_close(mq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="区别"><a class="markdownIt-Anchor" href="#区别"></a> 区别</h4>
-<ul>
-<li>对Posix消息队列的读总是返回最高优先级的最早消息，对SystemV消息队列的读则可以返回任意优先级的消息</li>
-<li>当往一个空队列放置一个消息时，Posix消息队列允许产生一个信号或启动一个线程，SystemV消息队列则不提供类似机制</li>
-</ul>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<p><a href="">Unix 网络编程 卷2: 进程间通信</a></p>
-<p><a href="https://www.slideshare.net/divyekapoor/linux-kernel-implementation-of-pipes-and-fifos" target="_blank" rel="noopener">Slide - Linux Kernel Implementation of Pipes FIFOs</a></p>
-<p><a href="https://mp.weixin.qq.com/s/mblyh6XrLj1bCwL0Evs-Vg" target="_blank" rel="noopener">进程间通信</a></p>
-]]></content>
-      <categories>
-        <category>Concepts</category>
-      </categories>
-      <tags>
-        <tag>Operating System</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Notes for OSTEP</title>
-    <url>/2020/08/03/ostep-1/</url>
-    <content><![CDATA[<h1 id="operating-systems-three-easy-pieces"><a class="markdownIt-Anchor" href="#operating-systems-three-easy-pieces"></a> <em>Operating Systems: Three Easy Pieces</em></h1>
-<blockquote>
-<p>Notes	-	Part One</p>
-<p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
-</blockquote>
-<h2 id="introduction"><a class="markdownIt-Anchor" href="#introduction"></a> Introduction</h2>
-<blockquote>
-<p>What an OS actually does</p>
-</blockquote>
-<p>It takes physical resources, such as a CPU, memory, or disk, and <strong>virtualizes</strong> them. It handles tough and tricky issues related to <strong>concurrency</strong>. And it stores files <strong>persistently</strong>, thus making them safe over the long-term.</p>
-<blockquote>
-<p>Design goal</p>
-</blockquote>
-<ul>
-<li>build up some <strong>abstractions</strong> in order to make the system convenient and easy to use</li>
-<li>provide high <strong>performance</strong> / <strong>minimize the overheads</strong> of the OS</li>
-<li>provide <strong>protections</strong> between applications, as well as the OS and applications.</li>
-<li>strive to provide a high degree of <strong>reliability</strong>. ( run non-stop )</li>
-<li>energy-efficiency / security / mobility…</li>
-</ul>
-<blockquote>
-<p>History of how OS developed</p>
-</blockquote>
-<ol>
-<li>
-<p>Just Libraries: a set of libraries of commonly-used functions</p>
-<p>Batch Processing: a number of jobs were set up and then run in a “batch” by the operator</p>
-</li>
-<li>
-<p>Protection</p>
-<p>if allow any program read any file?	-&gt;	the code run on behalf of the OS was special	-&gt;	<strong>system call</strong></p>
-<blockquote>
-<p>Key difference between a system call and a procedure call</p>
-<p>A system call transfer control into the OS while simultaneously raising the <strong>hardware privilege level</strong>. User applications run in what is referred to an <strong>user mode</strong> which means the hardware restricts what applications can do.</p>
-<p>When a system call is initiated( usually through a special hardware instruction called a <strong>trap</strong>), the hardware transfers control to a pre-specified <strong>trap handler</strong>( that the OS set up previously) and simultaneously raises the privilege level to <strong>kernel mode</strong>( In kernel mode, the OS has full access to the hardware of system). When the OS is done servicing the request, it passed control back to the user via a special <strong>return-from-trap</strong> instruction, which reverts to user mode while simultaneously passing control back to where the application let off.</p>
-</blockquote>
-</li>
-<li>
-<p>Era of Multiprogramming</p>
-<p>desire to make better use of machine resources	-&gt;</p>
-<p><strong>multiprogramming</strong>: load a number of jobs into memory and switch rapidly between them for improving CPU utilization	-&gt;</p>
-<p>don’t want one program to be able to access the memory of another program	-&gt;</p>
-<p><strong>memory protection</strong> &amp; other <strong>concurrency</strong> issues</p>
-</li>
-<li>
-<p>Modern Era</p>
-</li>
-</ol>
-<h2 id="virtualization"><a class="markdownIt-Anchor" href="#virtualization"></a> Virtualization</h2>
-<h3 id="the-abstraction-the-process"><a class="markdownIt-Anchor" href="#the-abstraction-the-process"></a> The Abstraction: The Process</h3>
-<p>The definition of a process	-&gt;	( informally ) a running program</p>
-<p>A program	-&gt;	a lifeless thing: sits on the disk, a bunch of instructions and maybe some static data, waiting to spring into action</p>
-<img src="/2020/08/03/ostep-1/process.png" alt="process" style="zoom:60%;" />
-<blockquote>
-<p>Summarize a process by taking an inventory of the different pieces of the system it accesses or affects</p>
-</blockquote>
-<ul>
-<li>
-<p>the memory that the process can address</p>
-<p>Instructions / the data it reads or writes sits in memory</p>
-</li>
-<li>
-<p>registers、</p>
-<p>Many instructions explicitly read or update registers. (includes some special registers like IP/SP…)</p>
-</li>
-<li>
-<p>access persistent storage devices</p>
-<p>Might include a list of the files it currently has open.</p>
-</li>
-</ul>
-<blockquote>
-<p>Process creation</p>
-</blockquote>
-<ol>
-<li>
-<p>load its code and any static data (e.g., initialized variables) into memory, into the address space of the process</p>
-<p>from eager (Early OS: <strong>all at once</strong> before running) to lazy (Modern OS: <strong>load pieces</strong> when needed during execution)</p>
-</li>
-<li>
-<p>allocate memory for program’s <strong>run-time stack</strong></p>
-</li>
-<li>
-<p>allocate memory for program’s <strong>heap</strong></p>
-</li>
-<li>
-<p>other work as related to <strong>I/O setup</strong></p>
-<p>e.g., in Unix systems, each process by default has 3 open file descriptors for standard input/output/error.</p>
-</li>
-</ol>
-<blockquote>
-<p>Process state in a simplified view</p>
-</blockquote>
-<img src="/2020/08/03/ostep-1/process_state.png" alt="process state" style="zoom:60%;" />
-<ul>
-<li>running: runing on a processor and executing instructions.</li>
-<li>ready: ready to run but for some reason the OS has chosen not to run it at this given moment.</li>
-<li>blocked: has performed some kind of operation that makes it not ready to run until some other event takes place</li>
-</ul>
-<p>other state:</p>
-<ul>
-<li>initial: begin created</li>
-<li>final: has exited but has not yet been cleaned up (zombie state)</li>
-</ul>
-<blockquote>
-<p>Key data structures to track information</p>
-</blockquote>
-<p>track state of each process 	-&gt;	process list</p>
-<p>individual structure stores information about a process	-&gt;	process control block:</p>
-<img src="/2020/08/03/ostep-1/pcb.png" alt="PCB" style="zoom: 33%;" />
-<blockquote>
-<p>How can the OS provide the illusion of a nearly-endless supply of CPUs</p>
-</blockquote>
-<p>By <strong>virtualizing</strong> the CPU. By running one process, then stopping it and running another, and so forth, it can promote the illusion.</p>
-<p><strong>Mechanisms</strong></p>
-<blockquote>
-<p>low-level methods or protocols that implement a needed piece of functionality.	-&gt; 	how</p>
-</blockquote>
-<ul>
-<li>
-<p>Time sharing</p>
-<p>It is a basic technique used by an OS to share a resource. By allowing the resource to be used for a little while by one entity, and then a little while by another, and so forth, the resources in question can be shared by many.</p>
-</li>
-<li>
-<p>Context switch</p>
-<p>Give the OS the ability to stop running one program and start running another on a given CPU.</p>
-</li>
-</ul>
-<p><strong>Policies</strong></p>
-<blockquote>
-<p>On top of the mechanisms (high-level), algorithms for making some kind of decision	-&gt;	which</p>
-</blockquote>
-<ul>
-<li>
-<p>scheduling policy</p>
-<p>Determine which program should the OS run.</p>
-</li>
-</ul>
-<h3 id="key-process-api"><a class="markdownIt-Anchor" href="#key-process-api"></a> Key Process API</h3>
-<ul>
-<li>The <strong>fork()</strong> system call is used in Unix systems to create a new process. The creator is called the <strong>parent</strong>; the newly created process is called the <strong>child</strong>.</li>
-<li>The <strong>wait()</strong> system call allows a parent to wait for its child to complex execution.</li>
-<li>The <strong>exec()</strong> family of system calls allows a child to break free from its similarity to its parent and execute an entirely new program.</li>
-</ul>
-<blockquote>
-<p>Why the separation of <strong>fork()</strong> and <strong>exec()</strong> is essential in building a Unix shell</p>
-</blockquote>
-<p>It lets the shell run code <em>after</em> the call to <strong>fork()</strong> but <em>before</em> the call to <strong>exec()</strong>; this code can alter the environment of the about-to-be-run program, and thus enables a variety of interesting features to be readily built.</p>
-<h3 id="mechanism-limited-direct-execution"><a class="markdownIt-Anchor" href="#mechanism-limited-direct-execution"></a> Mechanism: Limited Direct Execution</h3>
-<blockquote>
-<p>Challenges</p>
-</blockquote>
-<ul>
-<li>performance	- 	implement virtualization without adding excessive overhead to system</li>
-<li>control	-	run process efficiently while retaining control over the CPU</li>
-</ul>
-<blockquote>
-<p>Direct Execution Protocol (Without Limits)</p>
-</blockquote>
-<ol>
-<li>
-<p>OS:</p>
-<p>Create entry for process list	-&gt;	Allocate memory for program	-&gt;	Load program into memory	-&gt;	Set up stack with argc / argv	-&gt;	Clear registers	-&gt;	Execute call main()</p>
-</li>
-<li>
-<p>Program:</p>
-<p>Run main	-&gt;	Execute return from main</p>
-</li>
-<li>
-<p>OS:</p>
-<p>Free memory of process	-&gt;	Remove from process list</p>
-</li>
-</ol>
-<p>Advantage: fast</p>
-<p>Problems:</p>
-<ol>
-<li>
-<p>Restricted Operations</p>
-<blockquote>
-<p>A process must be able to perform I/O and some other restricted operations, but without giving the process complete control over the system.</p>
-</blockquote>
-<p>Approach: a new process mode</p>
-<p>Code that runs in <strong>user mode</strong> is <strong>restricted</strong> in what it can do. In contrast to user mode is <strong>kernel mode</strong>, which the operating system (or kernel) runs in. In this mode, code that runs can <strong>do what it likes</strong>, including privileged operations.</p>
-<p>To make a user process perform some kind of privileged operation when it wishes, the <strong>system call</strong> is provided. To execute a system call, a program must execute a special <strong>trap</strong> instruction. This instruction simultaneously jumps into the kernel and raises the privilege level to <strong>kernel mode</strong>; once in kernel, the system can now perform whatever privileged operations are needed, and thus <strong>do the required work for the calling process</strong>. When finished, the OS calls a special <strong>return-from-trap</strong> instruction to return into the calling user program while simultaneously reducing the privilege level <strong>back to user mode</strong>.</p>
-<p>In order to be able to return correctly when the OS issues the return-from-trap instruction, it must make sure to <strong>save enough of the caller’s registers</strong>. For example, on x86, the processor will push them onto <strong>per-process kernel stack</strong> and the return-from-trap will pop them off and resume execution of the user-mode process.</p>
-<blockquote>
-<p>How does the trap know which code to run inside the OS</p>
-</blockquote>
-<p>Clearly, if the calling process does this by <strong>specifying an address to jump to</strong>, it will allow programs to jump anywhere into the kernel which is a <strong>very bad idea</strong>.</p>
-<p>The kernel does so by setting up a trap table at boot time. When the machine boot up, it does so in privileged (kernel) mode, and thus is free to configure machine hardware as need be.</p>
-<p>One of the first things the OS thus does is to tell the hardware what code to run (<strong>location of trap handlers</strong>) when certain exceptional events occur. Once the hardware is informed, it remembers the location of these handlers until the machine is <strong>next rebooted</strong>.</p>
-<p>To specify the exact system call, a <strong>system-call number</strong> is usually assigned to each system call. The user code is thus responsible for placing the desired system-call number in a <strong>register</strong> or at a specified location on the <strong>stack</strong>; the OS,when handling the system call inside the trap handler, <strong>examines this number</strong>, ensures it is valid, and if it is, executes the corresponding code.</p>
-<p>One last aside: being able to execute the instruction to tell the hardware <strong>where the trap tables are</strong> is also a <strong>privileged operation</strong>.</p>
-<blockquote>
-<p>Limited Direct Execution Protocol (two phases)</p>
-</blockquote>
-<p>In the first (at boot time), the kernel initializes the trap table, and the CPU remembers its location for subsequent use. The kernel does so via a privileged instruction (highlighted).</p>
-<img src="/2020/08/03/ostep-1/lde_1.png" alt="lde1" style="zoom:60%;" />
-<p>In the second (when running a process), <strong>the kernel sets up</strong> a few things such as allocation before using a return-from-trap instruction to start the execution of the process; this <strong>switches the CPU to user mode</strong> and begins running the process. When the process wishes to <strong>issue a system call</strong>, it <strong>traps back</strong> into the OS, which <strong>handles</strong> it and once again <strong>return control via a return-from-trap</strong> to the process. The process then completes its work, and returns from main(); this usually will return into some stub code which will properly <strong>exit the program (by calling the exit() system call)</strong>. At this point, the OS cleans up.</p>
-<img src="/2020/08/03/ostep-1/lde_2.png" alt="lde" style="zoom:60%;" />
-</li>
-<li>
-<p>Switching Between Process</p>
-<blockquote>
-<p>If a process is running on the CPU, this by definition means the OS is not running. So how can the operating system <strong>regain control</strong> of the CPU so that it can switch between process?</p>
-</blockquote>
-<p><strong>A cooperative approach: wait for system calls</strong></p>
-<p>In this style, the OS <strong>trusts the processes</strong> of the system to <strong>behave reasonably</strong>. Processes that run for too long are assumed to periodically give up the CPU so that the OS can decide to run some other task.</p>
-<p>In a cooperative scheduling system, the OS regains control of the CPU by <strong>waiting for a system call or an illegal operation</strong> of some kind to take place. This passive approach is too ideal.</p>
-<p><strong>A non-cooperative approach: the OS takes control</strong></p>
-<p>Without some additional help from the hardware, it turns out that the OS can’t do much at all when a process refuses to make system calls (or mistakes) and thus return control to the OS.</p>
-<p>The answer to how to gain control <strong>without cooperation</strong> is simple: a <strong>timer interrupt</strong>. A timer device can be programmed to raise an interrupt every so many milliseconds; when the interrupt is raised,the currently running process is <strong>halted</strong>, and a <strong>pre-configured interrupt handler</strong> in the OS runs. At this point, the OS has regained control of the CPU, and thus can do what it pleases: stop the current process, and start a different one.</p>
-<img src="/2020/08/03/ostep-1/timer.png" alt="timer" style="zoom:60%;" />
-<blockquote>
-<p>Saving and Restoring Context</p>
-</blockquote>
-<p>It is made by a part of the operating system known as the scheduler to decide whether to continue running the currently-running process, or switch to a different one.</p>
-<p>If the decision is made to switch, the OS then executes a low-level piece of code which we refer to as a <strong>context switch</strong>. A context switch is conceptually simple: all the OS has to do is <strong>save a few register values</strong> for the currently-running process (onto its kernel stack, for example), and <strong>restore a few</strong> (from its kernel stack), and <strong>switch to the kernel stack</strong> for the soon-to-be-executing process. By switching stacks, the kernel enters the call to the switch code in the context of one process (the one that was interrupted) and returns in the context of another (the soon-to-be-executing one). When the OS finally executes a return-from-trap instructions, the soon-to-be-executing process becomes the currently-running process. And thus the context switch is complete.</p>
-<img src="/2020/08/03/ostep-1/switch.png" alt="context switch" style="zoom:60%;" />
-<p>two types of register saves/restores</p>
-<ol>
-<li>When <strong>interrupt occurs</strong>, the <strong>user registers</strong> of the running process are implicitly saved by the <strong>hardware</strong>, using the <strong>kernel stack</strong> of that process.</li>
-<li>When the OS <strong>decides to switch</strong>, the <strong>kernel registers</strong> are explicitly saved by the <strong>software</strong> (i.e., the OS) , into memory in the <strong>process structure</strong> of the process.</li>
-</ol>
-</li>
-</ol>
-<blockquote>
-<p>What happen if, during interrupt or trap handling, another interrupt occurs. (Detailed discussion is defer until second piece)</p>
-</blockquote>
-<p>One simple thing an OS might do is <strong>disable interrupts</strong> during interrupt processing; doing so ensures that when one interrupt is being handled, no other one will be delivered to the CPU. But disabling interrupts for too long could <strong>lead to lost interrupts</strong>.</p>
-<p>Operating systems also have developed a number of <strong>sophisticated locking schemes</strong> to protect concurrent access to internal data structures. This enables <strong>multiple activities to be on-going</strong> within the kernel at the same time, particularly useful on multiprocessors.</p>
 ]]></content>
       <categories>
         <category>Notes</category>
