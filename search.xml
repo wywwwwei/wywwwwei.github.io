@@ -1499,7 +1499,7 @@
 <li>Concurrency</li>
 </ol>
 </blockquote>
-<img src="assets/image-20210505021551150.png" alt="image-20210505021551150" style="zoom:50%;" />
+<img src="/2021/05/04/database-outline/image-20210505021551150.png" alt="image-20210505021551150" style="zoom:50%;" />
 <ul>
 <li>
 <p>Data structures designed for <strong>Disk-oriented</strong> database</p>
@@ -1653,7 +1653,7 @@
 </ol>
 </li>
 </ul>
-<img src="assets/image-20210505021640552.png" alt="image-20210505021640552" style="zoom:50%;" />
+<img src="/2021/05/04/database-outline/image-20210505021640552.png" alt="image-20210505021640552" style="zoom:50%;" />
 <ul>
 <li>
 <p>Data structure designed for <strong>in-memory</strong> databases</p>
