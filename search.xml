@@ -1307,10 +1307,9 @@
       </tags>
   </entry>
   <entry>
-    <title>database-outline</title>
+    <title>Database outline</title>
     <url>/2021/05/04/database-outline/</url>
     <content><![CDATA[<h1 id="database-outline"><a class="markdownIt-Anchor" href="#database-outline"></a> Database outline</h1>
-<p>[toc]</p>
 <h2 id="disk-manager"><a class="markdownIt-Anchor" href="#disk-manager"></a> Disk Manager</h2>
 <blockquote>
 <p>Responsibilities:</p>
