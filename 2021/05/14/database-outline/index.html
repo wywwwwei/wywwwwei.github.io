@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Outline of (single node) database basis, no detailed explanation">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Database Outline">
+<meta property="og:url" content="https://wywwwwei.github.io/2021/05/14/database-outline/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="Outline of (single node) database basis, no detailed explanation">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210420164301183.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210420155458047.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210505021551150.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210505021640552.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210421013209998.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210425225047185.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210425235809978.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210427234935009.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210430020350478.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210428031329246.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210429003431694.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210429001556373.png">
+<meta property="article:published_time" content="2021-05-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-06T10:17:03.766Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Database">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2021/05/14/database-outline/image-20210420164301183.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2021/05/14/database-outline/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2021/05/14/database-outline/","path":"2021/05/14/database-outline/","title":"Database Outline"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Database Outline | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">Database Outline</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Disk-Manager"><span class="nav-number">1.1.</span> <span class="nav-text">Disk Manager</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer-Pool-Manager"><span class="nav-number">1.2.</span> <span class="nav-text">Buffer Pool Manager</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Access-Methods"><span class="nav-number">1.3.</span> <span class="nav-text">Access Methods</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Operator-Execution"><span class="nav-number">1.4.</span> <span class="nav-text">Operator Execution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Query-planning"><span class="nav-number">1.5.</span> <span class="nav-text">Query planning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Concurrency-Control"><span class="nav-number">1.6.</span> <span class="nav-text">Concurrency Control</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Transaction"><span class="nav-number">1.6.1.</span> <span class="nav-text">Transaction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pessimistic"><span class="nav-number">1.6.2.</span> <span class="nav-text">Pessimistic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optimistic"><span class="nav-number">1.6.3.</span> <span class="nav-text">Optimistic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVCC"><span class="nav-number">1.6.4.</span> <span class="nav-text">MVCC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Recovery"><span class="nav-number">1.7.</span> <span class="nav-text">Recovery</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Others-Compression"><span class="nav-number">1.8.</span> <span class="nav-text">Others: Compression</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2021/05/14/database-outline/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Database Outline | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Database Outline
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-05-14 00:00:00" itemprop="dateCreated datePublished" datetime="2021-05-14T00:00:00+08:00">2021-05-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Concepts/" itemprop="url" rel="index"><span itemprop="name">Concepts</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>12 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1>Database Outline</h1>
+<h2 id="Disk-Manager">Disk Manager</h2>
+<blockquote>
+<p>Responsibilities:</p>
+<ol>
+<li>represents the database in files on disk</li>
+<li>manages its memory and move data back-and-forth from disk</li>
+</ol>
+</blockquote>
+<img src="image-20210420164301183.png" alt="image-20210420164301183" style="zoom:67%;" />
+<ol>
+<li>
+<p>How the DBMS <strong>represents the database in files on disk</strong></p>
+<ul>
+<li>
+<p>File storage</p>
+<ul>
+<li>
+<p>n-array storage model (row store, apply for OLTP)</p>
+<ul>
+<li>
+<p>advantage:</p>
+<p>fast inserts, updates, and deletes</p>
+<p>good for queries that need the entire tuple</p>
+</li>
+<li>
+<p>disadvantage:</p>
+<p>Not good for scanning large portions of the table and/or a subset of the attributes</p>
+</li>
+</ul>
+</li>
+<li>
+<p>decomposition storage model (column store, apply for OLAP)</p>
+<blockquote>
+<p>Tuple identification</p>
+<ol>
+<li>
+<p>Fixed-length offset</p>
+<p>Each value is the same length for an attribute</p>
+</li>
+<li>
+<p>Embedded tuple ids</p>
+<p>Each value is stored with its tuple id in a column</p>
+</li>
+</ol>
+</blockquote>
+<ul>
+<li>
+<p>advantage:</p>
+<p>reduces the amount wasted I/O because the DBMS only <strong>reads the data that it needs</strong></p>
+<p>better query processing and data compression</p>
+</li>
+<li>
+<p>disadvantage:</p>
+<p>slow for point queries, inserts, updates, and deletes because of tuple splitting/stitching</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Page layout</p>
+<ul>
+<li>
+<p>Slotted pages</p>
+</li>
+<li>
+<p>Log-structed file organization</p>
+<p>Log-structed compaction (level compaction or universe compaction)</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Tuple layout</p>
+<ul>
+<li>
+<p>Data representation</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Type</th>
+<th style="text-align:left">Representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">INTEGER/BIGINT/SMALLINT/TINYINT</td>
+<td style="text-align:left">C/C++ Representation</td>
+</tr>
+<tr>
+<td style="text-align:left">FLOAT/REAL vs. NUMERIC/DECIMAL</td>
+<td style="text-align:left">IEEE-754 Standard / Fixed-point Decimals</td>
+</tr>
+<tr>
+<td style="text-align:left">VARCHAR/VARBINARY/TEXT/BLOB</td>
+<td style="text-align:left">Header with length, followed by data bytes</td>
+</tr>
+<tr>
+<td style="text-align:left">TIME/DATE/TIMESTAMP</td>
+<td style="text-align:left">32/64-bit integer of (micro)seconds since Unix epoch</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>External value storage -&gt; BLOB</p>
+<p>The DBMS <strong>cannot</strong> manipulate the contents of an external file because of without <strong>durability &amp; transaction protections</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>How the DBMS manages its <strong>memory</strong> and move data <strong>back-and-forth from disk</strong></p>
+<ul>
+<li>
+<p>Spatial Control: (where)</p>
+<p>Goal: keep pages that are used together often as physically close together as possible on disk</p>
+</li>
+<li>
+<p>Temporal Control: (when)</p>
+<p>Goal: minimize the number of stalls from having to read data from disk.</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="Buffer-Pool-Manager">Buffer Pool Manager</h2>
+<p>Memory region organized as an <strong>array of fixed-size pages</strong>.</p>
+<p>An array entry is called a <strong>frame</strong>.</p>
+<p>The <strong>page table</strong> keeps track of pages that are currently in memory and also maintains additional meta-data per page.</p>
+<img src="image-20210420155458047.png" alt="image-20210420155458047" style="zoom:50%;" />
+<ol>
+<li>
+<p>Allocation policies</p>
+<ul>
+<li>
+<p>Global policies</p>
+<p>Make decisions for all active txns.</p>
+</li>
+<li>
+<p>Local policies</p>
+<p>Allocate frames to a specific txn without considering the behavior of concurrent txns. Still need to support sharing pages.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Optimization</p>
+<ul>
+<li>
+<p>multiple buffer pools</p>
+<p>Helps reduce latch contention and improve locality. Use <strong>embed object id</strong> or <strong>hashing</strong> for mapping.</p>
+</li>
+<li>
+<p>pre-fetching</p>
+</li>
+<li>
+<p>scan sharing</p>
+</li>
+<li>
+<p>buffer pool bypass</p>
+<p>The sequential scan operator will not store fetched pages in the buffer pool to avoid overhead.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Buffer <strong>replacement polices</strong></p>
+<ul>
+<li>Least-Recently-Used</li>
+<li>Clock</li>
+</ul>
+<p>LRU and CLOCK replacement policies are susceptible to sequential flooding.</p>
+<blockquote>
+<p>sequential flooding</p>
+<p>A query performs a sequential scan that reads every page and this pollutes the buffer pool with pages that are read once and then never again.</p>
+</blockquote>
+<ul>
+<li>LRU-K</li>
+<li>Localization</li>
+<li>Priority hints</li>
+</ul>
+</li>
+</ol>
+<h2 id="Access-Methods">Access Methods</h2>
+<blockquote>
+<p>Responsibilities:</p>
+<ol>
+<li>Data Organization (in memory / pages)</li>
+<li>Concurrency</li>
+</ol>
+</blockquote>
+<img src="image-20210505021551150.png" alt="image-20210505021551150" style="zoom:50%;" />
+<ul>
+<li>
+<p>Data structures designed for <strong>Disk-oriented</strong> database</p>
+<ol>
+<li>hash table
+<ul>
+<li>hash function (how to map)
+<ul>
+<li>CRC-64</li>
+<li>Google CityHash</li>
+<li>…</li>
+</ul>
+</li>
+<li>hashing schema (how to handle key collisions)
+<ul>
+<li>static hashing schema
+<ul>
+<li>Linear probe hashing</li>
+<li>Robin hood hashing</li>
+<li>Cuckoo hashing</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>dynamic hashing schema
+<ul>
+<li>chained hashing</li>
+<li>extendible hashing</li>
+<li>linear hashing</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>B+Tree</li>
+</ol>
+<ul>
+<li>
+<p>leaf node values</p>
+<ul>
+<li>Record Ids -&gt; A pointer to the location of the tuple that the index entry corresponds to.</li>
+<li>Tuple Data -&gt; The actual contents of the tuple is stored in the leaf node.</li>
+</ul>
+</li>
+<li>
+<p>duplicate keys</p>
+<ul>
+<li>Append record id</li>
+<li>Overflow leaf nodes</li>
+</ul>
+</li>
+<li>
+<p>node size</p>
+<p>The slower the storage device, the larger the optimal node size for a B+Tree.</p>
+</li>
+<li>
+<p>merge threshold</p>
+<p>Delaying a merge operation may reduce the amount of reorganization.</p>
+</li>
+<li>
+<p>variable length keys</p>
+<ul>
+<li>
+<p>pointers</p>
+</li>
+<li>
+<p>variable length nodes (requires careful memory management)</p>
+</li>
+<li>
+<p>padding</p>
+</li>
+<li>
+<p>key map / indirection</p>
+<p>Embed an array of pointers that map to the key + value list within the node.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>intra-node search</p>
+<ul>
+<li>
+<p>linear</p>
+</li>
+<li>
+<p>binary</p>
+</li>
+<li>
+<p>interpolation</p>
+<p>Approximate location of desired key based on known distribution of key.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>optimization</p>
+<ul>
+<li>
+<p>prefix compression</p>
+<p>Instead of storing the entire key each time, extract common prefix and store only unique suffix for each key.</p>
+</li>
+<li>
+<p>deduplication</p>
+<p>The leaf node can store the key once and then a maintain a list of record ids with that key.</p>
+</li>
+<li>
+<p>suffix truncation</p>
+<p>Store a minimum prefix that is needed to correctly route probes into the index.</p>
+</li>
+<li>
+<p>bulk insert</p>
+<p>to build a new B+Tree for an existing table, first sort the keys and then build the index from the bottom up.</p>
+</li>
+<li>
+<p>pointer swizzling</p>
+<p>If a page is pinned in the buffer pool, then we can store raw pointers instead of page ids.</p>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>
+<p>Trie tree</p>
+<ul>
+<li>
+<p>Trie key span</p>
+<p>The span of a trie level is the number of bits that each partial key / digit represents.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Radix tree</p>
+</li>
+<li>
+<p>Trie variant</p>
+<ul>
+<li>Judy Arrays (HP)
+<ul>
+<li>Linear Node</li>
+<li>Bitmap Node</li>
+<li>Uncompressed Node</li>
+</ul>
+</li>
+<li>ART Index (HyPer)</li>
+<li>Masstree (Silo)</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<img src="image-20210505021640552.png" alt="image-20210505021640552" style="zoom:50%;" />
+<ul>
+<li>
+<p>Data structure designed for <strong>in-memory</strong> databases</p>
+<ol>
+<li>
+<p>T Trees</p>
+<p>Based on AVL Trees. Instead of storing keys in nodes, <strong>store pointers to their original values</strong>.</p>
+<p>Advantages:</p>
+<ul>
+<li>Uses less memory because it does not store keys inside of each node.</li>
+<li>The DBMS evaluates all predicates on a table at the same time when accessing a tuple (i.e., not just the predicates on indexed attributes).</li>
+</ul>
+<p>Disadvantages:</p>
+<ul>
+<li>Difficult to rebalance.</li>
+<li>Difficult to implement safe concurrent access.</li>
+<li>Must chase pointers when scanning range or performing binary search inside of a node. (greatly hurts cache locality)</li>
+</ul>
+</li>
+<li>
+<p>BW Tree</p>
+<p>Latch-free B+Tree index built for the Microsoft Hekaton project.</p>
+<ul>
+<li>garbage collection</li>
+<li>Optimization (CMU open BW Tree)
+<ul>
+<li>Pre-Allocated Delta Records</li>
+<li>Mapping Table Expansion</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Index types</p>
+<ul>
+<li>
+<p>Partial index <a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/12/indexes-partial.html">PostgreSQL: Documentation: 12: 11.8. Partial Indexes</a></p>
+</li>
+<li>
+<p>Covering index <a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/11/indexes-index-only-scans.html">PostgreSQL: Documentation: 11: 11.9. Index-Only Scans and Covering Indexes</a></p>
+</li>
+<li>
+<p>index include column</p>
+</li>
+<li>
+<p>functional / expression index <a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/12/indexes-expressional.html">PostgreSQL: Documentation: 12: 11.7. Indexes on Expressions</a></p>
+</li>
+<li>
+<p>Inverted index -&gt; good at keyword searches</p>
+<p>An inverted index stores a mapping of words to records that contain those words in the target attribute.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Index concurrency control</p>
+<blockquote>
+<p>A protocol’s correctness criteria can vary:</p>
+<ol>
+<li>Logical Correctness: can a thread see the data that it is supposed to see</li>
+<li>Physical Correctness: is the internal representation of the object found</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<img src="image-20210421013209998.png" alt="image-20210421013209998" style="zoom:50%;" />
+<ul>
+<li>
+<p>Latch implement</p>
+<ul>
+<li>Blocking OS mutex</li>
+<li>Test-and-Set Spin Latch (TAS)</li>
+<li>Reader-Writer Locks</li>
+<li>Adaptive Spinlock</li>
+<li>Queue-based Spinlock (MCS)</li>
+</ul>
+</li>
+<li>
+<p>Hash table latching</p>
+<ul>
+<li>Page latches</li>
+<li>Slot latches</li>
+</ul>
+</li>
+<li>
+<p>B+ tree latching</p>
+<ul>
+<li>
+<p>latch crabbing / coupling</p>
+<p>Basic Idea:</p>
+<ol>
+<li>Get latch for parent</li>
+<li>Get latch for child</li>
+<li>Release latch for parent if “safe”. (A safe node is one that will not split or merge when updated.)</li>
+</ol>
+</li>
+<li>
+<p>better latching algorithm</p>
+<p>Instead of assuming that there will be a split/merge, optimistically traverse the tree using read latches. If you guess wrong, repeat traversal with the pessimistic algorithm.</p>
+</li>
+<li>
+<p>B link-Tree Optimization</p>
+<p>When a leaf node overflows, delay updating its parent node.</p>
+</li>
+<li>
+<p>versioned latch coupling</p>
+<p>Optimistic crabbing scheme where writers are not blocked on readers.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Operator-Execution">Operator Execution</h2>
+<ol>
+<li>
+<p>Operator Algorithms</p>
+<ul>
+<li>
+<p>Sort</p>
+<ul>
+<li>
+<p>External merge sort</p>
+<p>Pass #0: Use B buffer pages and Produce ⌈N / B⌉ sorted runs of size B</p>
+<p>Pass #1,2,3…: Merge B-1 runs (i.e., K-way merge)</p>
+</li>
+<li>
+<p>B+ tree sorting (clustered / unclustered)</p>
+</li>
+<li>
+<p>Optimization</p>
+<ul>
+<li>Chunk I/O into large blocks to amortize costs.</li>
+<li>Double-buffering to overlap CPU and I/O.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Aggregations</p>
+<blockquote>
+<p>We don’t always need the data to be ordered, so hashing is a better alternative (only need to remove duplicate, no need for sorting and cheaper computation).</p>
+</blockquote>
+<ul>
+<li>
+<p>Sorting</p>
+</li>
+<li>
+<p>Hashing</p>
+<ul>
+<li>
+<p>External hashing aggregation</p>
+<p>Phase #1: partition</p>
+<p>Divide tuples into buckets based on hash key and write them out to disk when they get full.</p>
+<p>Phase #2: reHash</p>
+<p>Build in-memory hash table for each partition and compute the aggregation</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Join</p>
+<blockquote>
+<p>Join vs Cross-Product</p>
+<p>Join is the most common operation and thus must be carefully optimized.</p>
+<p>Cross-Product followed by a selection is inefficient because the cross-product is large.</p>
+</blockquote>
+<ul>
+<li>
+<p>Cost Analysis Criteria (determine whether one join algorithm is better than another)</p>
+<p>Metric: # of IOs to compute join</p>
+</li>
+<li>
+<p>Join Algorithm</p>
+<ul>
+<li>Nested loop join</li>
+<li>Sort-Merge join</li>
+<li>Hash join</li>
+</ul>
+</li>
+</ul>
+<p>For table R owns M pages m tuples and table S owns N pages n tuples.</p>
+<img src="image-20210425225047185.png" alt="image-20210425225047185" style="zoom:50%;" />
+</li>
+</ul>
+</li>
+<li>
+<p>Query Processing Models</p>
+<ul>
+<li>
+<p>Iterator model (Volcano / Pipeline)</p>
+<p>The operator implements a loop that <strong>calls Next on its children</strong> to retrieve their tuples and then process them.</p>
+</li>
+<li>
+<p>Materialization model (better for OLTP)</p>
+<p>Each operator processes its input all at once and then emits its output all at once.</p>
+</li>
+<li>
+<p>Vectorized / Batch model (better for OLAP)</p>
+<p>Like the iterator model, but each operator emits a batch of tuples instead of a single tuple.</p>
+</li>
+</ul>
+<p>Access method</p>
+<ul>
+<li>
+<p>Sequential Scan</p>
+<p>Optimizations</p>
+<ul>
+<li>
+<p>Prefetching</p>
+</li>
+<li>
+<p>Buffer Pool Bypass</p>
+</li>
+<li>
+<p>Parallelization</p>
+</li>
+<li>
+<p>Heap Clustering</p>
+</li>
+<li>
+<p>Zone Maps</p>
+<p>Pre-computed aggregates for the attribute values in a page.</p>
+</li>
+<li>
+<p>Late Materialization</p>
+<p>Delay stitching together tuples until the upper parts of the query plan.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Index Scan</p>
+<p>Picks an index to find the tuples that the query needs.</p>
+</li>
+<li>
+<p>Multi-Index / “Bitmap” Scan</p>
+<p>If there are multiple indexes that the DBMS can use for a query</p>
+<ul>
+<li>Compute sets of record ids using each matching index</li>
+<li>Combine these sets based on the query’s predicates (union / intersect)</li>
+<li>Retrieve the records and apply any remaining predicates.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Halloween problem</strong> can occur on clustered tables or index scans.</p>
+<blockquote>
+<p>Anomaly where an update operation changes the physical location of a tuple, which causes a scan operator to visit the tuple multiple times.</p>
+</blockquote>
+<p>The DBMS represents a WHERE clause as an <strong>expression tree (flexible but slow)</strong> for expression evaluation.</p>
+</li>
+<li>
+<p>Runtime Architectures</p>
+<ul>
+<li>
+<p>Process per DBMS Worker</p>
+<p>Relies on OS scheduler and shared memory.</p>
+<p>A process crash doesn’t take down entire system.</p>
+</li>
+<li>
+<p>Process pool</p>
+<p>Relies on OS scheduler and shared memory.</p>
+<p>Bad for CPU cache locality.</p>
+</li>
+<li>
+<p>Thread per DBMS Worker</p>
+<p>DBMS manages its own scheduling, may or may not use a dispatcher thread.</p>
+<p>Thread crash (may) kill the entire system.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Parallel Query Execution</p>
+<ul>
+<li>
+<p>Execution Parallelism</p>
+<ul>
+<li>
+<p>Inter-Query (Different queries are executed concurrently)</p>
+<p>If multiple queries are updating the database at the same time, concurrency control is involved</p>
+</li>
+<li>
+<p>Intra-Query (Execute the operations of a single query in parallel)</p>
+<ul>
+<li>
+<p>Intra-Operator (Horizontal)</p>
+<p>Decompose operators into independent fragments that perform the same function on different subsets of data.</p>
+</li>
+<li>
+<p>Inter-Operator (Vertical) (Pipelined parallelism)</p>
+<p>Operations are overlapped in order to pipeline data from one stage to the next without materialization.</p>
+</li>
+<li>
+<p>Bushy</p>
+<p>Extension of inter-operator parallelism. Exchange nodes inserted over essentially independent query plan fragments allow those fragments to execute independently of one another.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>I/O Parallelism</p>
+<ul>
+<li>Multiple Disks per Database</li>
+<li>One Database per Disk</li>
+<li>One Relation per Disk</li>
+<li>Split Relation across Multiple Disks</li>
+</ul>
+<p>Partition</p>
+<blockquote>
+<p><strong>Split single logical table</strong> into disjoint physical segments that are stored/managed separately.</p>
+</blockquote>
+<ul>
+<li>vertical partitioning (store a table’s attributes in a separate location)</li>
+<li>horizontal partitioning (divide the tuples of a table up into disjoint segments based on some partitioning key)
+<ul>
+<li>hash partitioning</li>
+<li>range partitioning</li>
+<li>predicate partitioning</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="Query-planning">Query planning</h2>
+<img src="image-20210425235809978.png" alt="image-20210425235809978" style="zoom:50%;" />
+<ul>
+<li>
+<p>Heuristics / Rules (Rewrite the query to remove stupid / inefficient things)</p>
+<p>Two relational algebra expressions are <strong>equivalent</strong> if they generate the same set of tuples. The DBMS can identify better query plans without a cost model. This is often called <strong>query rewriting</strong>.</p>
+<blockquote>
+<p>An optimizer implemented using <strong>if/then/else clauses or a pattern-matching rule engine</strong>, transforms a query’s expressions (e.g., WHERE clause predicates) into the optimal/minimal set of expressions.</p>
+</blockquote>
+<ul>
+<li>
+<p>Logical query optimization</p>
+<ol>
+<li>
+<p>split conjunctive predicates</p>
+<p>Decompose predicates into their simplest forms to make it easier for the optimizer to move them around.</p>
+</li>
+<li>
+<p>predicate pushdown</p>
+<p>Move the predicate to the lowest point in the plan after Cartesian products.</p>
+</li>
+<li>
+<p>replace cartesian products with joins</p>
+<p>Replace all Cartesian Products with inner joins using the join predicates</p>
+</li>
+<li>
+<p>projection pushdown</p>
+<p>Eliminate redundant attributes before pipeline breakers to reduce materialization cost.</p>
+</li>
+</ol>
+<p>For nested sub-queries</p>
+<ul>
+<li>rewrite to de-correlate / flatten them</li>
+<li>decomposed nested query and store result to temporary table</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Cost-based Search (Use a model to estimate the cost of executing a plan)</p>
+<ul>
+<li>
+<p>cost model component</p>
+<ul>
+<li>Physical costs (predict CPU cycles, I/O, … and it is heavily depends on <strong>hardware</strong>)</li>
+<li>Logical costs (estimate operator result sizes and independency of the operator algorithm)</li>
+<li>Algorithm costs (complexity of the operator algorithm implementation)</li>
+</ul>
+</li>
+<li>
+<p>selectivity estimations</p>
+<p>statistic:</p>
+<p>For each relation R, the DBMS maintains the following information:</p>
+<ul>
+<li>NRNR : Number of tuples in R.</li>
+<li>V(A,R)V(A,R): Number of distinct values for attribute A.</li>
+</ul>
+<p>The selection cardinality SC(A,R) is the average number of records with a value for an attribute A given NR/V(A,R)NR/V(A,R)</p>
+<p>The <em>selectivity</em> (sel) of a predicate P is the fraction of tuples that qualify.</p>
+<p>Formula depends on type of predicate (Equality / Range / Negation / Conjunction / Disjunction) and relies on the following assumptions</p>
+<ul>
+<li>
+<p>Assumption #1: Uniform data</p>
+<p>The distribution of values (except for the heavy hitters) is the same.</p>
+</li>
+<li>
+<p>Assumption #2: Independent predicates</p>
+<p>The predicates on attributes are independent.</p>
+</li>
+<li>
+<p>Assumption #3: Inclusive principle</p>
+<p>The domain of join keys overlap such that each key in the inner relation will also exist in the outer table.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>non-uniform approximation</p>
+<ul>
+<li>equi-width histogram (all buckets have the same width)</li>
+<li>equi-depth histogram (vary the width of buckets so that the total number of occurrences for each bucket is roughly the same)</li>
+<li>sketches (probabilistic data structures that generate approximate statistics about a data set)</li>
+<li>sampling</li>
+</ul>
+</li>
+<li>
+<p>query optimization</p>
+<ul>
+<li>
+<p>Single relation query planning</p>
+<ol>
+<li>Pick the best access method.</li>
+<li>Predicate evaluation ordering.</li>
+</ol>
+</li>
+<li>
+<p>Multiple relation query planning</p>
+<ol>
+<li>Enumerate relation orderings (need to restrict search space)</li>
+<li>Enumerate the plans for each operator</li>
+<li>Enumerate access method choices for each table</li>
+</ol>
+<p>Use dynamic programming to reduce the number of cost estimations.</p>
+</li>
+<li>
+<p>Nested sub-queries</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<img src="image-20210427234935009.png" alt="image-20210427234935009" style="zoom:50%;" />
+<h2 id="Concurrency-Control">Concurrency Control</h2>
+<h3 id="Transaction">Transaction</h3>
+<blockquote>
+<p>Correct criteria</p>
+<p>Atomicity Consistency Isolation Durability</p>
+</blockquote>
+<ul>
+<li>
+<p>Atomicity</p>
+<ul>
+<li>Logging</li>
+<li>Shadow Paging</li>
+</ul>
+</li>
+<li>
+<p>Consistency</p>
+<ul>
+<li>
+<p>database consistency (accurately models the real world and <strong>follows integrity constraints</strong>)</p>
+</li>
+<li>
+<p>transaction consistency</p>
+<p>If the database is consistent before the transaction starts (running alone), it will also be consistent after. It is the <strong>application’s responsibility</strong>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Isolation</p>
+<p>A concurrency control protocol is how the DBMS decides the proper interleaving of operations from multiple transactions.</p>
+<ul>
+<li>pessimistic</li>
+<li>optimistic</li>
+</ul>
+<hr>
+<p>Interleaved execution anomalies</p>
+<ul>
+<li>Read-Write Conflict -&gt; unrepeatable read</li>
+<li>Write-Read Conflict -&gt; dirty read</li>
+<li>Write-Write Conflict -&gt; overwrite uncommitted data</li>
+</ul>
+<hr>
+<p>Schedule correctness judgement</p>
+<blockquote>
+<p>If a schedule is equivalent to some serial execution, we judge it is correct.</p>
+</blockquote>
+<ul>
+<li>
+<p>Serial schedule</p>
+<p>A schedule that does not interleave the actions of different transactions.</p>
+</li>
+<li>
+<p>Equivalent schedule</p>
+<p>For any database state, the effect of executing the first schedule is identical to the effect of executing the second schedule.</p>
+</li>
+<li>
+<p>Serializable schedule</p>
+<p>A schedule that is equivalent to some serial execution of the transactions.</p>
+</li>
+</ul>
+<p>Different levels of serializability</p>
+<ul>
+<li>
+<p>Conflict Serializability (most DBMSs try to support it)</p>
+<p>Verify using either the “swapping” method or dependency graphs.</p>
+</li>
+<li>
+<p>View Serializability (no DBMS can do this)</p>
+<p>No efficient way to verify.</p>
+</li>
+</ul>
+<p>Serial ⫋⫋ Conflict Serializable ⫋⫋ View Serializable ⫋⫋ All Schedules</p>
+</li>
+<li>
+<p>Durability</p>
+<ul>
+<li>logging</li>
+<li>shadow paging</li>
+</ul>
+</li>
+</ul>
+<h3 id="Pessimistic">Pessimistic</h3>
+<ul>
+<li>
+<p>Basic Lock Type:</p>
+<ul>
+<li>S-LOCK</li>
+<li>X-LOCK</li>
+</ul>
+</li>
+<li>
+<p>Two-phase locking</p>
+<p>Phase #1. Growing</p>
+<p>Phase #2. Shrinking</p>
+<p>Problem: it is subject to cascading aborts.</p>
+</li>
+<li>
+<p>Strong strict 2PL</p>
+<p>Release all locks at end of txn.</p>
+<p>Allows only conflict serializable schedules.</p>
+</li>
+<li>
+<p>2PL deadlocks</p>
+<ul>
+<li>
+<p>deadlock detection (waits-for graph)</p>
+<ul>
+<li>deadlock handling:
+<ul>
+<li>victim selection</li>
+<li>rollback length: completely or minimally</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>deadlock prevention</p>
+<p>Assign priorities based on timestamps: Older Timestamp = Higher Priority</p>
+<ul>
+<li>wait-die</li>
+</ul>
+<p>If requesting txn has higher priority than holding txn, then requesting txn waits for holding txn.</p>
+<ul>
+<li>wound-wait</li>
+</ul>
+<p>If requesting txn has higher priority than holding txn, then holding txn aborts and releases lock.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Lock granularities</p>
+<p>Trade-off between parallelism versus overhead.</p>
+<p>Fewer locks, larger granularity vs. more locks, smaller granularity</p>
+<ul>
+<li>
+<p>intention locks</p>
+<ul>
+<li>
+<p>Intention-Shared (IS)</p>
+</li>
+<li>
+<p>Intention-Exclusive (IX)</p>
+</li>
+<li>
+<p>Shared+Intention-Exclusive (SIX)</p>
+<img src="image-20210430020350478.png" alt="image-20210430020350478" style="zoom:50%;" />
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Optimistic">Optimistic</h3>
+<p>Timestamp Ordering (T/O)</p>
+<ul>
+<li>
+<p>timestamp allocation</p>
+<ul>
+<li>system clock</li>
+<li>logical counter</li>
+<li>hybrid</li>
+</ul>
+</li>
+<li>
+<p>Basic Timestamp Ordering (T/O) Protocol</p>
+<p>Thomas Write Rule (reduce abort) :</p>
+<p>If TS(Ti) &lt; W-TS(X), ignore the write to allow the txn to continue executing without aborting.</p>
+</li>
+<li>
+<p>Optimistic Concurrency Control</p>
+<ol>
+<li>Read Phase</li>
+<li>Validation Phase
+<ul>
+<li>Backward validation</li>
+<li>Forward validation</li>
+</ul>
+</li>
+<li>Write Phase</li>
+</ol>
+</li>
+<li>
+<p>Phantom problem</p>
+<ul>
+<li>Re-Execute Scans</li>
+<li>Predicate Locking</li>
+<li>Index Locking</li>
+</ul>
+</li>
+</ul>
+<p><img src="image-20210428031329246.png" alt="image-20210428031329246" style="zoom:50%;" /><img src="image-20210429003431694.png" alt="image-20210429003431694" style="zoom:50%;" /></p>
+<h3 id="MVCC">MVCC</h3>
+<blockquote>
+<p>Snapshot isolation</p>
+<p>Write skew anomaly</p>
+</blockquote>
+<ul>
+<li>
+<p>Concurrency control protocol (the default is Timestamp ordering)</p>
+</li>
+<li>
+<p>Version storage</p>
+<ul>
+<li>
+<p>Append only storage</p>
+<p>chain ordering (oldest to newest / newest to oldest)</p>
+</li>
+<li>
+<p>Time-travel storage</p>
+</li>
+<li>
+<p>Delta storage</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Garbage collection</p>
+<ul>
+<li>
+<p>Look for expired versions</p>
+<ul>
+<li>
+<p>Version tracking</p>
+<ul>
+<li>
+<p>Tuple level</p>
+<p>background vacuuming vs. cooperative cleaning</p>
+</li>
+<li>
+<p>Transaction level</p>
+</li>
+<li>
+<p>Epochs</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Decide when it is safe to reclaim memory</p>
+<ul>
+<li>Frequency
+<ul>
+<li>Periodically</li>
+<li>Continuously</li>
+</ul>
+</li>
+<li>Granularity
+<ul>
+<li>Single version</li>
+<li>Group version</li>
+<li>Tables</li>
+</ul>
+</li>
+<li>Comparison unit (determine whether version(s) are reclaimable)
+<ul>
+<li>Timestamp</li>
+<li>Interval</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Index management</p>
+<ul>
+<li>Logical pointers</li>
+<li>Physical pointers</li>
+</ul>
+</li>
+</ul>
+<p>Modern MVCC Implementation</p>
+<ul>
+<li>Hekaton (SQL Server)</li>
+<li>TUM HyPer</li>
+<li>SAP HANA</li>
+<li>CMU Cicada</li>
+</ul>
+<h2 id="Recovery">Recovery</h2>
+<blockquote>
+<p>Ensure database consistency, transaction atomicity, and durability despite failures</p>
+</blockquote>
+<ol>
+<li>
+<p>Actions during normal txn processing to ensure that the DBMS can recover from a failure.</p>
+<ul>
+<li>
+<p>Failure classification</p>
+<ul>
+<li>
+<p>Transaction failures</p>
+<ul>
+<li>
+<p>logical errors</p>
+<p>Transaction cannot complete due to some internal error condition (e.g., integrity constraint violation).</p>
+</li>
+<li>
+<p>internal state errors</p>
+<p>DBMS must terminate an active transaction due to an error condition (e.g., deadlock).</p>
+</li>
+</ul>
+</li>
+<li>
+<p>System failures</p>
+<ul>
+<li>
+<p>software failure</p>
+<p>Problem with the OS or DBMS implementation (e.g., uncaught divide-by-zero exception).</p>
+</li>
+<li>
+<p>hardware failure</p>
+<p>The computer hosting the DBMS crashes (e.g., power plug gets pulled).</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Storage media failures</p>
+<ul>
+<li>
+<p>non-repairable hardware failure</p>
+<p>A head crash or similar disk failure destroys all or part of non-volatile storage.</p>
+<p>Destruction is assumed to be detectable (e.g., disk controller use checksums to detect failures)</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Undo &amp; Redo</p>
+<p>Undo: The process of removing the effects of an incomplete or aborted txn.</p>
+<p>Redo: The process of re-instating the effects of a committed txn for durability.</p>
+<ul>
+<li>
+<p>Steal Policy</p>
+<blockquote>
+<p>Whether the DBMS allows an uncommitted txn to overwrite the most recent committed value of an object in non-volatile storage</p>
+</blockquote>
+</li>
+<li>
+<p>Force Policy</p>
+<blockquote>
+<p>Whether the DBMS requires that all updates made by a txn are reflected on non-volatile storage before the txn can commit.</p>
+</blockquote>
+</li>
+</ul>
+<p>no-steal + force -&gt; <strong>shadow paging</strong></p>
+<ul>
+<li>
+<p>disadvantages:</p>
+<p>copying the entire page table is expensive</p>
+<p>commit overhead is high</p>
+</li>
+</ul>
+<p>steal + no-force -&gt; <strong>write-ahead log</strong></p>
+</li>
+<li>
+<p>Logging schema</p>
+<ul>
+<li>physical logging</li>
+<li>logical logging</li>
+<li>physiological logging</li>
+</ul>
+</li>
+<li>
+<p>Checkpoints</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Actions after a failure to recover the database to a state that ensures atomicity, consistency, and durability.</p>
+<blockquote>
+<p>Mains ideas of <strong>ARIES</strong></p>
+<ol>
+<li>WAL with steal / no-force</li>
+<li>fuzzy checkpoints (snapshot of dirty page ids)</li>
+<li>Redo everything since the earliest dirty page</li>
+<li>Undo txns that never commit</li>
+<li>Write CLRs when undoing, to survive failures during restarts</li>
+</ol>
+</blockquote>
+<ol>
+<li>
+<p>Write-Ahead Logging</p>
+<ul>
+<li>
+<p>Log Sequence number</p>
+<img src="image-20210429001556373.png" alt="image-20210429001556373" style="zoom:50%;" />
+</li>
+</ul>
+</li>
+<li>
+<p>Fuzzy Checkpointing</p>
+<ul>
+<li>
+<p>Non-fuzzy checkpoints</p>
+<p>The DBMS halts everything when it takes a checkpoint to ensure a consistent snapshot.</p>
+</li>
+<li>
+<p>Slightly better checkpoints</p>
+<ul>
+<li>Active transaction table (ATT)</li>
+<li>Dirty Page Table (DPT)</li>
+</ul>
+</li>
+<li>
+<p>Fuzzy checkpoints</p>
+<p>Allows active txns to continue the run while the system flushes dirty pages to disk</p>
+<p>Checkpoint boundaries</p>
+<ul>
+<li>begin (indicates start of checkpoint)</li>
+<li>end (contains ATT+DPT)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Recovery phase</p>
+<p>Phase #1: Analysis</p>
+<p>Phase #2: Redo</p>
+<p>Phase #3: Undo</p>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="Others-Compression">Others: Compression</h2>
+<ul>
+<li>
+<p>granularity</p>
+<ul>
+<li>block level</li>
+<li>tuple level</li>
+<li>attribute level</li>
+<li>column level</li>
+</ul>
+</li>
+<li>
+<p>columnar compression</p>
+<ul>
+<li>
+<p>null supression</p>
+<p>Consecutive zeros or blanks in the data are replaced with a description of how many there were and where they existed.</p>
+</li>
+<li>
+<p>run-length encoding</p>
+<p>Compress runs of the same value in a single column into triplets:</p>
+<ol>
+<li>the value of the attribute</li>
+<li>the start position in the column segment</li>
+<li>the # of elements in the run</li>
+</ol>
+<p>Requires the columns to be sorted intelligently to maximize compression opportunities.</p>
+</li>
+<li>
+<p>bitmap encoding</p>
+<p>Store a separate bitmap for each unique value for an attribute where an offset in the vector corresponds to a tuple.</p>
+</li>
+<li>
+<p>delta encoding</p>
+<p>Recording the difference between values that follow each other in the same column.</p>
+</li>
+<li>
+<p>incremental encoding</p>
+<p>Type of delta encoding that avoids duplicating common prefixes/suffixes between consecutive tuples. This works best with sorted data.</p>
+</li>
+<li>
+<p>mostly encoding</p>
+<p>When values for an attribute are “mostly” less than the largest size, store them as smaller data type</p>
+</li>
+<li>
+<p>dictionary encoding</p>
+<p>Replace frequent patterns with smaller codes.</p>
+<ul>
+<li>dictionary construction
+<ul>
+<li>all at once</li>
+<li>incremental</li>
+</ul>
+</li>
+<li>dictionary scope
+<ul>
+<li>block level</li>
+<li>table level</li>
+<li>multi-table</li>
+</ul>
+</li>
+<li>dictionary data structures
+<ul>
+<li>array</li>
+<li>hash table</li>
+<li>b+ tree</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1>Reference</h1>
+<p><a target="_blank" rel="noopener" href="https://15445.courses.cs.cmu.edu/fall2020/">CMU 15-445/645 FALL 2020 DATABASE SYSTEMS</a></p>
+<p><a target="_blank" rel="noopener" href="https://15721.courses.cs.cmu.edu/spring2020/">CMU 15-721 SPRING 2020 Advanced Database Systems</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2021/05/14/database-outline/" title="Database Outline">https://wywwwwei.github.io/2021/05/14/database-outline/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Database/" rel="tag"># Database</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/09/10/ostep-2/" rel="prev" title="Notes for OSTEP">
+                  <i class="fa fa-angle-left"></i> Notes for OSTEP
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/08/23/ostep-3/" rel="next" title="Notes for OSTEP">
+                  Notes for OSTEP <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>

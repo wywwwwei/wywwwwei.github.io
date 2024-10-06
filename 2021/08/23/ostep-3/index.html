@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Notes for the book - Part 3 - Memory Virtualization">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes for OSTEP">
+<meta property="og:url" content="https://wywwwwei.github.io/2021/08/23/ostep-3/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="Notes for the book - Part 3 - Memory Virtualization">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/08/23/ostep-3/address_space.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/08/23/ostep-3/HardwareOS.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2021/08/23/ostep-3/pte.png">
+<meta property="article:published_time" content="2021-08-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-06T10:01:42.932Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Operating System">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2021/08/23/ostep-3/address_space.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2021/08/23/ostep-3/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2021/08/23/ostep-3/","path":"2021/08/23/ostep-3/","title":"Notes for OSTEP"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Notes for OSTEP | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">Operating Systems: Three Easy Pieces</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Memory-Virtualization"><span class="nav-number">1.1.</span> <span class="nav-text">Memory Virtualization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstraction-Address-Space"><span class="nav-number">1.1.1.</span> <span class="nav-text">Abstraction: Address Space</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memory-API"><span class="nav-number">1.1.2.</span> <span class="nav-text">Memory API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mechanism-Address-Translation"><span class="nav-number">1.1.3.</span> <span class="nav-text">Mechanism: Address Translation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Segmentation"><span class="nav-number">1.1.4.</span> <span class="nav-text">Segmentation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Free-Space-Management"><span class="nav-number">1.1.5.</span> <span class="nav-text">Free-Space Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Paging"><span class="nav-number">1.1.6.</span> <span class="nav-text">Paging</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Fast-Translation-TLBs"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">Fast Translation (TLBs)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Smaller-Tables"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">Smaller Tables</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Beyond-Physical-Memory"><span class="nav-number">1.1.7.</span> <span class="nav-text">Beyond Physical Memory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Replacement-Policy"><span class="nav-number">1.1.7.1.</span> <span class="nav-text">Replacement Policy</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2021/08/23/ostep-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Notes for OSTEP | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Notes for OSTEP
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-08-23 00:00:00" itemprop="dateCreated datePublished" datetime="2021-08-23T00:00:00+08:00">2021-08-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>4.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>16 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1><em>Operating Systems: Three Easy Pieces</em></h1>
+<blockquote>
+<p>Notes - Part Three</p>
+<p>Links to the book: <a target="_blank" rel="noopener" href="http://pages.cs.wisc.edu/~remzi/OSTEP/">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
+</blockquote>
+<h2 id="Memory-Virtualization">Memory Virtualization</h2>
+<h3 id="Abstraction-Address-Space">Abstraction: Address Space</h3>
+<p>While saving and restoring register-level state is relatively fast, saving the entire contents of memory to disk is brutally non-performant. Thus, we’d rather do is leave processes in memory while switching between them, allowing the OS to implement time sharing efficiently. As new demands (isolation / protection) were placed on the operating system, we need to create an easy to use <strong>abstraction</strong> of physical memory. We call this abstraction the <strong>address space</strong>.</p>
+<p>The address space of a process contains all of the memory state of the running program.</p>
+<ol>
+<li>code of the program have to live in memory somewhere</li>
+<li>while it is running, uses a stack to keep track of where it is in the function call chain as well as to allocate local variables and pass parameters and return values to and from routines.</li>
+<li>heap is used for dynamically-allocated, user-managed memory.</li>
+</ol>
+<img src="address_space.png" alt="address space" style="zoom:50%;" />
+<p>However, this placement of stack and heap is just a convention; you could arrange the address space in a different way if you’d like; as we will see later, when multiple threads co-exist in an address space, no nice way to divide the address space like this works anymore.</p>
+<blockquote>
+<p>Goal</p>
+</blockquote>
+<ol>
+<li>
+<p>Transparency.</p>
+<p>The OS should implement virtual memory in a way that is invisible to the running program.</p>
+</li>
+<li>
+<p>Efficiency</p>
+<p>Make the virtualization as efficient as possible both in terms of time and space.</p>
+</li>
+<li>
+<p>Protection</p>
+<p>The OS should make sure to protect process from one another as well as the OS itself from processes.</p>
+</li>
+</ol>
+<h3 id="Memory-API">Memory API</h3>
+<blockquote>
+<p>Underlying OS Support</p>
+<p>The malloc library manages space within your virtual address space, but itself is built on top of some system calls which call into the OS to ask for more memory or release some back to system.</p>
+</blockquote>
+<ul>
+<li>
+<p><code>brk</code></p>
+<p>Used to change the location of the program’s break: the location of the end of the heap.</p>
+<p>It takes one argument (the address of the new break), and thus either increases or decreases the size of the heap based on whether the new break is larger or smaller than the current break</p>
+</li>
+<li>
+<p><code>mmap</code></p>
+<p>Obtain memory from the operating system via the <code>mmap()</code> call</p>
+<p>It can create an anonymous memory region within your program - a region which is not associated with any particular file but rather with <strong>swap space</strong>. This memory can then also be treated like a heap</p>
+</li>
+</ul>
+<h3 id="Mechanism-Address-Translation">Mechanism: Address Translation</h3>
+<ul>
+<li><strong>Efficiency</strong> dictates that we make use of hardware support, which at first will be quiet rudimentary (e.g. just a few registers) but will grow to be fairly complex (e.g. TLBs, page-table support, and so forth).</li>
+<li><strong>Control</strong> implies that the OS ensures that no application is allowed to access any memory but its own; thus, to protect applications from one another, and the OS from applications, we will need help from the hardware.</li>
+</ul>
+<p>With <strong>hardware-based address translation</strong>, the <strong>hardware transform</strong> each memory access, changing the virtual address provided by the instruction to a physical address where the desired information is actually located.</p>
+<p>But the hardware just provides the low-level mechanism for virtualize memory efficiently. The <strong>OS</strong> must get involved at key point to set up hardware so that the correct translation take place; it must <strong>manage</strong> memory, keeping track of which locations are free and which are in use, and judiciously intervening to maintain control over how memory is used.</p>
+<blockquote>
+<p>Assumptions</p>
+</blockquote>
+<ol>
+<li>The user’s address space must be place contiguously in physical memory.</li>
+<li>It is less than the size of physical memory.</li>
+<li>Each address space is exactly the same size.</li>
+</ol>
+<blockquote>
+<p>Dynamic (Hardware-based) Relocation</p>
+</blockquote>
+<p>Two hardware registers within each CPU: one is called the base register, and the other the bounds/limit register. Sometimes people call the part of the processor that helps with address translation the <strong>memory management unit (MMU)</strong>.</p>
+<ul>
+<li>A small aside about bound register, which can be defined in one of two ways
+<ol>
+<li>It holds the size of the address space and thus the hardware checks the virtual address against it first before adding the base</li>
+<li>It holds the physical address of the end of the address space, and thus the hardware first adds the base and then makes sure the address is within bounds.</li>
+</ol>
+</li>
+</ul>
+<p>Each memory reference generated by the process is a virtual address, the hardware in turn adds the contents of the base register to this address and the result is a physical address that can be issued to the memory system.</p>
+<blockquote>
+<p>Hardware support</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Hardware Requirements</th>
+<th style="text-align:left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Privileged mode</td>
+<td style="text-align:left">Needed to prevent user-mode processes from executing privileged operations</td>
+</tr>
+<tr>
+<td style="text-align:left">Base/bounds registers</td>
+<td style="text-align:left">Need pair of register per CPU to support address translation and bounds checks</td>
+</tr>
+<tr>
+<td style="text-align:left">Ability to translate virtual addresses and check if within bounds</td>
+<td style="text-align:left">Circuitry to do translations and check limits; in this case, quiet simple</td>
+</tr>
+<tr>
+<td style="text-align:left">Privileged instruction to update base/bounds</td>
+<td style="text-align:left">OS must be able to set these values before letting a user program run</td>
+</tr>
+<tr>
+<td style="text-align:left">Privileged instruction to register exception handlers</td>
+<td style="text-align:left">OS must be able to tell hardware what code to run if exception occurs</td>
+</tr>
+<tr>
+<td style="text-align:left">Ability to raise exceptions</td>
+<td style="text-align:left">When processes try to access privileged instructions or out-of-bounds memory</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>OS support</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">OS Requirements</th>
+<th style="text-align:left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Memory management</td>
+<td style="text-align:left">Need to allocate memory for new processes; Reclaim memory from terminated processes; Generally manage memory via free list</td>
+</tr>
+<tr>
+<td style="text-align:left">Base/bounds management</td>
+<td style="text-align:left">Must set base/bounds properly upon context switch</td>
+</tr>
+<tr>
+<td style="text-align:left">Exception handling</td>
+<td style="text-align:left">Code to run when exceptions arise; likely action is to terminate offending process</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Hardware / OS interaction</p>
+</blockquote>
+<img src="HardwareOS.png" alt="Hardware OS interaction" style="zoom:60%;" />
+<p>Unfortunately, this simple technique of dynamic relocation does have its inefficiencies. In current approach, although there might be enough physical memory for more processes, we are currently restricted to placing an address space in a fixed-sized slot and thus <strong>internal fragmentation</strong> can arise.</p>
+<h3 id="Segmentation">Segmentation</h3>
+<blockquote>
+<p>How do we support a large address space with a lot of free space between the stack and the heap?</p>
+</blockquote>
+<p>Instead of having just once base and bounds pair in our MMU, we have a pair per logical segment of the address space. What segmentation allows the OS to do is to <strong>place each one of those segments in difference parts of physical memory</strong>, and thus avoid filling physical memory with unused virtual address space.</p>
+<blockquote>
+<p>Hardware support</p>
+</blockquote>
+<p>A set of three base and bounds register pairs (segment/base/size) is required.</p>
+<blockquote>
+<p>Try to refer to illegal address</p>
+</blockquote>
+<p>The hardware detects that the address is out of bounds, traps into the OS, likely leading to the termination of the offending process. This is the origin of the famous term <strong>segment violation</strong> and <strong>segmentation fault</strong>.</p>
+<blockquote>
+<p>During translation, how does it know which segment an address refers</p>
+</blockquote>
+<p>An common and <strong>explicit</strong> approach is to <strong>chop up the address space into segments based on the top few bits of the virtual address</strong>. But using the top so many bits to select a segment is that it limits use of the virtual address space. To fully utilize the virtual address space and avoid an unused segment, some systems (only have three segments code/heap/stack) put code in the same segment as the heap and thus use only one bit to select which segment to use.</p>
+<p>In the <strong>implicit</strong> approach, the hardware determines the segment by noticing how the address was formed. For example, the address was generated from the program counter, then the address is within the code segment; if the address is based off of the stack or base pointer, it must be in the stack segment; any other address must be in the heap.</p>
+<blockquote>
+<p>What about stack with one critical difference: it grows backwards</p>
+</blockquote>
+<p>We need a little extra hardware support, maybe a bit to indicate which way the segment grows.</p>
+<blockquote>
+<p>Support for sharing</p>
+<p>To save memory, sometimes it is useful to share certain memory segments between address spaces especially code sharing.</p>
+</blockquote>
+<p>To support sharing, we also need a little extra hardware support in the form of <strong>protection bits</strong>. Basic support adds a few bits per segment, indicating whether or not a program can <strong>read or write</strong> a segment, or perhaps <strong>execute</strong> code that lies within the segment.</p>
+<p>If a user process tries to write to a read-only segment, or execute from a non-executable segment, the hardware should <strong>raise an exception</strong>, and thus let the OS deal with the offending process.</p>
+<blockquote>
+<p>OS support</p>
+</blockquote>
+<ul>
+<li>
+<p>What should OS do on a context switch</p>
+<p>The segment registers must be saved and restored.</p>
+</li>
+<li>
+<p>OS interaction when segments grow or perhaps shrink</p>
+<p>A program may call <code>malloc()</code> to <strong>allocate an object from existing heap</strong>.</p>
+<p>When the heap segment itself need to grow, the memory-allocation library will perform a <strong>system call (<code>sbrk()</code>…) to grow the heap</strong>.</p>
+<p>The OS could <strong>reject</strong> the request when no more physical memory is available or if it decides that the calling process already has too much.</p>
+</li>
+<li>
+<p>Managing free space in physical memory</p>
+<p>Allocate different sizes of physical memory for different processes and different segments makes it become full of little holes of free space, which is called <strong>external fragmentation</strong>.</p>
+<p>One solution is to <strong>compact</strong> physical memory by rearranging the existing segments. However, <strong>compaction is expensive</strong>, as copying segment is memory-intensive and generally uses a fair amount of processor time.</p>
+<p>A simpler approach might instead be to use a <strong>free-list management algorithm</strong> that tries to keep large extents of memory available for allocation. No matter how smart the algorithm, <strong>external fragmentation will still exist</strong>; thus, a good algorithm simply attempts to minimize it.</p>
+</li>
+</ul>
+<blockquote>
+<p>Summary</p>
+</blockquote>
+<p>Advantages:</p>
+<p>Beyond just dynamic relocation, segmentation can better support sparse address spaces, by avoiding the huge potential waste of memory between logical segments of the address space.</p>
+<p>Problems:</p>
+<ul>
+<li>external fragmentation is hard to avoid</li>
+<li>segmentation still is <strong>not flexible enough</strong> to support our fully generalized, sparse address space.</li>
+</ul>
+<h3 id="Free-Space-Management">Free-Space Management</h3>
+<p>It is easy when the space you are managing is divided into fixed-sized units; in such a case, you just keep a list of these fixed-sized units; when a client requests one of them, return the first entry. But when the free space you are managing consists of <strong>variable-sized units</strong>, it becomes more difficult.</p>
+<blockquote>
+<p>Low-level mechanisms</p>
+</blockquote>
+<ol>
+<li>
+<p>The basis of splitting and coalescing, common techniques in most any allocator</p>
+<p><strong>Splitting</strong>:</p>
+<p>It will find a free chunk of memory that can satisfy the request and split into two. The first chunk it will return to the caller; the second chunk will remain on the list.</p>
+<p>It is commonly used in allocators when requests are smaller than the size of any particular free chunk.</p>
+<p><strong>Coalesce</strong>:</p>
+<p>When returning a free chunk in memory, look carefully at the address of the chunk you are returning as well as the nearby chunks of free space; if the newly-freed space sits right next to one (or two) existing free chunks, merge them into a single larger free chunk.</p>
+</li>
+<li>
+<p>How one can track the size of allocated regions quickly and with relative ease</p>
+<blockquote>
+<p>The interface to <code>free(void *ptr)</code> does not take a size parameter, so when given a pointer, how the malloc library can quickly determine the size of the region of memory being freed.</p>
+</blockquote>
+<p>Most allocators stores a little bit of extra information in a <strong>header block</strong> which is kept in memory, usually just <strong>before the handed-out chunk of memory</strong>.</p>
+<p>The header minimally contains the size of the allocated region; it may also contain additional pointers to speed up deallocation, a magic number to provide additional integrity checking, and other information.</p>
+<p>Note the small but critical detail in the last sentence: the size of the free region is the size of the header plus the size of the space allocated to the user.</p>
+</li>
+<li>
+<p>How to build a simple list inside the free space to keep track of what is free and what isn’t</p>
+<p>In a more typical list, when allocating a new node, you would just call <code>malloc()</code> when you need space for the node. Instead, you need to **build the list inside the free space itself **within the memory-allocation library.</p>
+<p>The description of a node of the list:</p>
+<ul>
+<li>node
+<ul>
+<li>size</li>
+<li>next</li>
+</ul>
+</li>
+</ul>
+<p><code>malloc()</code>: the library allocates (request size + header size) out of the existing free chunk, returns to a pointer to it, stashes the header information immediately before the allocated space for alter use upon <code>free()</code> , and shrinks the free node in the list to (origin size - (request size + header size))</p>
+<p><code>free()</code>: the library immediately figures out the size of the free region (sptr - header size), and then adds the free chunk back onto the free list.</p>
+</li>
+<li>
+<p>What should you do if the heap runs out of space</p>
+<p>The simplest approach is just to fail.</p>
+<p>Request more memory from the OS by some kind of system call (e.g., <code>sbrk</code> in most unix system)</p>
+</li>
+</ol>
+<blockquote>
+<p>Basic strategies for managing free space</p>
+</blockquote>
+<ul>
+<li>
+<p>Best Fit</p>
+<p>Find chunks of free memory that are as big or bigger than the requested size. Then, return the one that is the smallest in that group of candidates</p>
+<p>By returning a block that is close to what the user asks, best fit tries to <strong>reduce wasted space</strong>. But naive implementations pay a <strong>heavy performance penalty</strong>.</p>
+</li>
+<li>
+<p>Worst Fit</p>
+<p>Find the largest chunk and return the requested amount; keep the remaining chunk on the free list.</p>
+<p>A full search of free space is required and leading to <strong>excess fragmentation</strong> while having <strong>high overheads</strong>.</p>
+</li>
+<li>
+<p>First Fit</p>
+<p>Find the first block that is big enough and returns the requested amount to the user.</p>
+<p><strong>No exhaustive search</strong> of all the free spaces are necessary but sometimes <strong>pollutes</strong> the beginning of the free list with small objects. (Solution: use address-based ordering to make coalescing become easier and fragmentation tends to be reduced)</p>
+</li>
+<li>
+<p>Next Fit</p>
+<p>Instead of always beginning the first-fit search at the beginning of the list, it keeps an extra pointer to the location within the list where one was looking last.</p>
+<p>Spread the searches for free space throughout the list more <strong>uniformly</strong>, thus avoiding splintering of the beginning of the list.</p>
+</li>
+</ul>
+<blockquote>
+<p>A host of suggested techniques and algorithms to improve memory allocation in some way.</p>
+</blockquote>
+<ul>
+<li>
+<p>Segregated lists</p>
+<p>If a particular application has one or a few popular-sized request that it makes, keep a separate list just to manage objects of that size; all other requests are forwarded to a more general memory allocator.</p>
+<blockquote>
+<p>Slab allocator</p>
+</blockquote>
+<p>Specifically, when the kernel boots up, it allocates a number of <strong>object caches for kernel objects</strong> that are likely to be requested frequently (such as locks, file-system inodes, etc.).</p>
+<p>The object caches thus are each segregated free lists of a given size and serve memory allocation and free requests quickly. When a given cache is running low on free space, it requests some slabs of memory from <strong>a more general memory allocator</strong>.</p>
+<p>Conversely, when the <strong>reference counts</strong> of the objects within a given slab all go to <strong>zero</strong>, the general allocator can <strong>reclaim</strong> them from the specialized allocator, which is often done when the VM system needs more memory.</p>
+<p>By keeping free objects in a particular list in their initialized state, the slab allocator thus <strong>avoids frequent initialization and destruction cycles</strong> per objects and thus lowers overheads noticeably.</p>
+</li>
+<li>
+<p>Buddy allocation</p>
+<p>In such a system, free memory is first conceptually thought of as one big <strong>space of size 2^N</strong>. When a request for memory is made, the search for free space recursively divides free space by two until a block that is big enough to accommodate the request is found (and a further split into tow would result in space that is too small).</p>
+<p>Note that this scheme can suffer from internal fragmentation, as you are only allowed to give out power-of-two-sized blocks.</p>
+</li>
+<li>
+<p>Others</p>
+<blockquote>
+<p>Lack of scaling specifically searching lists can be quite slow.</p>
+</blockquote>
+<p>Use more complex data structures to address these costs, trading simplicity for performance. Example include balanced binary trees, splay trees or partially-ordered trees.</p>
+<blockquote>
+<p>Multiple processors and run multi-threaded workloads</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="Paging">Paging</h3>
+<p>The first approach which is to chop things up into <strong>variable-sized pieces</strong>, as we saw with <strong>segmentation</strong> in virtual memory, makes spaces become <strong>fragmented</strong>, thus allocation becomes more challenging over time.</p>
+<p>The second approach is to chop up space into <strong>fixed-sized</strong> pieces. In virtual memory, we call this idea <strong>paging</strong>.</p>
+<blockquote>
+<p>Definition</p>
+</blockquote>
+<p>We divide a process’s address space into fixed-sized units, each of which we call a <strong>page</strong>.</p>
+<p>We view physical memory as an array of fixed-size slots called <strong>page frames</strong>.</p>
+<p>Each of these frames can contain a single virtual-memory page.</p>
+<blockquote>
+<p>Advantage</p>
+</blockquote>
+<ul>
+<li>
+<p>Flexibility</p>
+<p>Regardless of how a process uses the address space. For example, the direction the heap and stack grow and how they are used.</p>
+</li>
+<li>
+<p>Simplicity of free-space management</p>
+</li>
+</ul>
+<blockquote>
+<p>Address Translation</p>
+</blockquote>
+<p>To record where each virtual page of the address space is placed in physical memory, the operating system usually keeps a <strong>per-process</strong> data structure known as a <strong>page table</strong>.</p>
+<p>To translate the virtual address that the process generated, we have to first split it into two components: the <strong>virtual page number (VPN)</strong>, and the <strong>offset</strong> within the page. With our virtual page number, we can now index our page table and find which physical frame page resides within, thus we can translate this virtual address by replacing the VPN with the <strong>PFN (physical frame number)</strong> and then issue the load to physical memory.</p>
+<blockquote>
+<p>Where are page tables stored</p>
+</blockquote>
+<p>Page tables can get terribly large, much bigger than the small segment table or base/bounds pair we have discussed previously. So we don’t keep any special on-chip hard-ware in the MMU to store the page table of the currently-running process. Instead, we store the page table for each process <strong>in memory</strong> somewhere.</p>
+<blockquote>
+<p>Page table organization</p>
+</blockquote>
+<p>The page table is just a data structure that is used to <strong>map</strong> virtual addresses to physical addresses. The simplest form is called a <strong>linear page table</strong>, which is just an array.</p>
+<p>The OS indexes the array by the <strong>virtual page number (VPN)</strong>, and looks up the <strong>page-table entry (PTE)</strong> at that index in order to find the desired <strong>physical frame number (PFN)</strong>.</p>
+<p><img src="pte.png" alt="pte"></p>
+<p>As for the contents of each PTE, we have a number of different bits.</p>
+<p>A <strong>valid bit</strong> is common to indicate whether the particular translation is valid and it is crucial for supporting a sparse address space by simply marking all the unused pages in the address space invalid.</p>
+<p>The <strong>protection bits</strong> indicates whether the page could be read from, written to, or executed from.</p>
+<p>A <strong>present bit</strong> § indicates whether this page is in physical memory or on disk.</p>
+<p>A <strong>dirty bit</strong> (D) indicates whether the page has been modified since it was brought into memory.</p>
+<p>A <strong>reference bit</strong> is sometimes used to track whether a page has been accessed, and is useful in determining which pages are popular and thus should be kept in memory.</p>
+<blockquote>
+<p>Problems</p>
+</blockquote>
+<p>Implementing paging support without care will lead to</p>
+<ul>
+<li>a slower machine (with many extra memory accesses to access the page table)</li>
+<li>memory waste (with memory filled with page tables instead of useful application data)</li>
+</ul>
+<h4 id="Fast-Translation-TLBs">Fast Translation (TLBs)</h4>
+<p>To speed address translation, a <strong>translation-lookaside buffer</strong> or <strong>TLB</strong> is added. A TLB is part of the chip’s <strong>memory-management unit (MMU)</strong>, and is simply a hardware cache of popular virtual-to-physical address translations; thus, a better name would be an <strong>address-translation</strong> cache.</p>
+<p>Upon each virtual memory reference, the hardware <strong>first checks the TLB</strong> to see if the desired translation is held therein; if so, the translation is performed (quickly) without having to consult the page table (which has all translations). Because of their tremendous performance impact, TLBs in a real sense make virtual memory possible.</p>
+<p>The idea behind hardware caches is to take advantage of <strong>locality</strong> in instruction and data references. There are usually two types of locality: <strong>temporal locality</strong> and <strong>spatial locality</strong>.</p>
+<blockquote>
+<p>TLB miss handling</p>
+</blockquote>
+<ul>
+<li>
+<p>Hardware (applied on Complex Instruction Sets)</p>
+<p>On a miss, the hardware would “walk” the page table, find the correct page-table entry and extract the desired translation, update the TLB with translation, and retry the instruction.</p>
+</li>
+<li>
+<p>OS (applied on Reduced Instruction Sets) (flexibility and simplicity)</p>
+<p>On a miss, the hardware simply raises an exception, which pause s the current instruction stream, raises the privilege level to kernel mode, and jumps to a <strong>trap handler</strong>.</p>
+</li>
+</ul>
+<p>The return-from-trap instruction needs to be a little different than the return-from-trap we saw before when servicing a system call.</p>
+<p>In the latter case, the return-from-trap should resume execution at the instruction after the trap after the trap into the OS, just as a return from a procedure call returns to the instruction immediately following the call into the procedure.</p>
+<p>In the former case when returning from a TLB miss-handling trap, the hardware must <strong>resume execution at the instruction that caused the trap</strong>; this retry thus lets the instruction run again, this time resulting in a TLB bit.</p>
+<blockquote>
+<p>Context Switches</p>
+<p>To correctly and efficiently support virtualization across multiple processes.</p>
+</blockquote>
+<ul>
+<li>
+<p>Simply <strong>flush</strong> the TLB on context switches</p>
+<p>Overhead: each time a process runs, it must incur TLB misses as it touches its data and code pages.</p>
+</li>
+<li>
+<p>Provide an <strong>address space identifier</strong> field in the hardware TLB</p>
+<p>With address-space identifiers, the TLB can hold translations from different processes at the same time without any confusion.</p>
+</li>
+</ul>
+<blockquote>
+<p>Replacement policy</p>
+</blockquote>
+<p>We’ll talk about that later.</p>
+<h4 id="Smaller-Tables">Smaller Tables</h4>
+<blockquote>
+<p>With a hundred active processes, we will be allocating hundreds of megabytes of memory just for page tables, so we need to find some techniques to reduce the heavy burden.</p>
+</blockquote>
+<ul>
+<li>
+<p>Bigger pages</p>
+<p>Disadvantage: big pages leads to waste within each page (<strong>Internal fragmentation</strong>)</p>
+</li>
+<li>
+<p>Paging and segments (Hybrid)</p>
+<p>Instead pf having a single page table for the entire address space of the process, it have one per logical segment. Use base register to hold the <strong>physical address of the page table</strong> of that segment, the bound register to indicate the end of the page table.</p>
+<p>Disadvantage: segmentation is not so flexible and cause <strong>external fragmentation</strong>.</p>
+</li>
+<li>
+<p>Multi-level page tables</p>
+<p>Chop up the page table into page-sized units, if an entire page of page-table entries is invalid, don’t allocate that page of the page table at all. Use a new structure, <strong>page directory</strong> to trace where a page of the page table is, or the entire page of the page table contains no valid pages.</p>
+<p>On a TLB miss, two loads from memory will be required to get the right translation information from the page table (one for the page directory, and one for the PTE itself). It is a example of a <strong>time-space trade-off</strong></p>
+</li>
+</ul>
+<h3 id="Beyond-Physical-Memory">Beyond Physical Memory</h3>
+<blockquote>
+<p>To support large address spaces, the OS will need a place to stash away portions of address spaces that currently aren’t in great demand.</p>
+</blockquote>
+<p>Why a single large address space for a process is needed? (Convenience and ease of use)</p>
+<ul>
+<li>Don’t have to worry about if there is room enough in memory for your data structures</li>
+<li>Beyond just a single process, the addition of swap space allows the OS to support the illusion of a large virtual memory for multiple concurrently-running progress.</li>
+</ul>
+<blockquote>
+<p>Page Fault</p>
+</blockquote>
+<p>In either type of system (hardware-managed or software-managed), if a page is not present, the OS is put in charge to handle the page fault. The appropriately-named OS <strong>page-fault handler</strong> runs to determine what to do.</p>
+<p>Why hardware-managed TLBs system doesn’t handle page faults?</p>
+<ol>
+<li>Page faults to disk are slow and the extra overheads of running software are minimal.</li>
+<li>To handle a page fault, the hardware would have to understand swap space, how to issue I/Os to the disk, and a lot of other details which it currently doesn’t know much about.</li>
+</ol>
+<blockquote>
+<p>What if memory is full</p>
+</blockquote>
+<p>We only discussed the <strong>page in</strong> case above, but in fact the memory may be full, thus the OS might like to first <strong>page out</strong> one or more pages to make room for the new page the OS is about to bring in. The process of picking a page to kick out, or replace is known as the <strong>page-replacement policy</strong>.</p>
+<blockquote>
+<p>Thrashing</p>
+<p>What should the OS do when memory is simply oversubscribed, and the memory demands of the set of running processes simply exceeds the available physical memory?</p>
+</blockquote>
+<ul>
+<li>
+<p>Admission control</p>
+<p>Given a set of processes, a system could decide not to run a subset of processes, with the hope that the reduced set of processes’ working sets fit in memory and thus can make progress.</p>
+</li>
+<li>
+<p>Out-of-memory killer</p>
+<p>The daemon choose a memory-intensive process and kills it, thus reducing memory in a non-too-subtle manner.</p>
+</li>
+</ul>
+<blockquote>
+<p>Type of cache misses</p>
+<p>In the computer architecture word, architects sometimes find it useful to characterize misses by type, into one of three categories:</p>
+</blockquote>
+<ul>
+<li>
+<p>Compulsory miss (cold-start miss)</p>
+<p>The cache is empty to begin with and this is the first reference to the item</p>
+</li>
+<li>
+<p>Capacity miss</p>
+<p>the cache ran out of space and had to evict an item to bring a new item into the cache.</p>
+</li>
+<li>
+<p>Conflict miss</p>
+<p>Arises in hardware because of limits on where an item can be placed in a hardware cache, due to something known as <strong>set-associativity</strong>. It does <strong>not</strong> arises in the OS page cache because such caches are always <strong>fully-associative</strong></p>
+</li>
+</ul>
+<h4 id="Replacement-Policy">Replacement Policy</h4>
+<ol>
+<li>
+<p>FIFO</p>
+<blockquote>
+<p>Belady 's anomaly</p>
+<p>In general, you would expect the cache hit rate to increase when the cache gets larger, but with some replacement policies such as FIFO, it gets worse.</p>
+</blockquote>
+</li>
+<li>
+<p>Random</p>
+</li>
+<li>
+<p>LRU</p>
+<p>Lean on the past and use history as our guide to improve our guess at the future.</p>
+<p>Historical information:</p>
+<ul>
+<li>Frequency</li>
+<li>Recency</li>
+</ul>
+<p>To keep track of which pages have least and most recently used, the system has to do some <strong>accounting work</strong> on every memory reference, which could greatly reduce performance.</p>
+</li>
+<li>
+<p>Approximating LRU</p>
+<p>We don’t really find the absolute oldest page to replace and just survive with approximation. The idea requires some hardware support, in the form if a <strong>use bit</strong>.</p>
+<ul>
+<li>
+<p>Clock algorithm</p>
+</li>
+<li>
+<p>Small modification to the clock algorithm</p>
+<p>Use <strong>modified (dirty) bit</strong> to indicate whether a page has been modified or not while in memory. If a page has been modified, it must be written back to disk to evict it and it is expensive.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Other VM Policies</p>
+<ul>
+<li>
+<p>Demand paging (<strong>When</strong> to bring a page into memory)</p>
+<p>The OS brings the page into memory when it is accessed.</p>
+</li>
+<li>
+<p>Clustering / grouping of writes (<strong>How</strong> the OS writes pages out to disk)</p>
+<p>The OS collect a number of pending writes together in memory and write them to disk in one write.</p>
+</li>
+</ul>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2021/08/23/ostep-3/" title="Notes for OSTEP">https://wywwwwei.github.io/2021/08/23/ostep-3/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Operating-System/" rel="tag"># Operating System</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/14/database-outline/" rel="prev" title="Database Outline">
+                  <i class="fa fa-angle-left"></i> Database Outline
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>

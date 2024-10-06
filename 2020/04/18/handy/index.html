@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="yedf&#x2F;handy 简洁易用的C++11网络库&#x2F;支持单机千万并发连接&#x2F;a simple C++11 network server framework">
+<meta property="og:type" content="article">
+<meta property="og:title" content="handy源码分析">
+<meta property="og:url" content="https://wywwwwei.github.io/2020/04/18/handy/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="yedf&#x2F;handy 简洁易用的C++11网络库&#x2F;支持单机千万并发连接&#x2F;a simple C++11 network server framework">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/04/18/handy/includes.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/04/18/handy/httpRequest.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/04/18/handy/httpResponse.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/04/18/handy/reactor.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/04/18/handy/reactor-master.png">
+<meta property="article:published_time" content="2020-04-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-06T09:54:57.834Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Socket">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2020/04/18/handy/includes.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2020/04/18/handy/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2020/04/18/handy/","path":"2020/04/18/handy/","title":"handy源码分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>handy源码分析 | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">Handy网络库分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#slice-h"><span class="nav-number">1.1.</span> <span class="nav-text">slice.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#port-posix-h"><span class="nav-number">1.2.</span> <span class="nav-text">port_posix.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#util-h"><span class="nav-number">1.3.</span> <span class="nav-text">util.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#net-h"><span class="nav-number">1.4.</span> <span class="nav-text">net.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#codec-h"><span class="nav-number">1.5.</span> <span class="nav-text">codec.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#threads-h"><span class="nav-number">1.6.</span> <span class="nav-text">threads.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logging-h"><span class="nav-number">1.7.</span> <span class="nav-text">logging.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#status-h"><span class="nav-number">1.8.</span> <span class="nav-text">status.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-h"><span class="nav-number">1.9.</span> <span class="nav-text">file.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#handy-imp-h"><span class="nav-number">1.10.</span> <span class="nav-text">handy_imp.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#poller-h"><span class="nav-number">1.11.</span> <span class="nav-text">poller.h</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#epoll"><span class="nav-number">1.11.1.</span> <span class="nav-text">epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Level-Trigger"><span class="nav-number">1.11.1.1.</span> <span class="nav-text">Level Trigger</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Edge-Trigger"><span class="nav-number">1.11.1.2.</span> <span class="nav-text">Edge Trigger</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#event-base-h"><span class="nav-number">1.12.</span> <span class="nav-text">event_base.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conn-h"><span class="nav-number">1.13.</span> <span class="nav-text">conn.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#udp-h"><span class="nav-number">1.14.</span> <span class="nav-text">udp.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http-h"><span class="nav-number">1.15.</span> <span class="nav-text">http.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conf-h"><span class="nav-number">1.16.</span> <span class="nav-text">conf.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#daemon-h"><span class="nav-number">1.17.</span> <span class="nav-text">daemon.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stat-svr-h"><span class="nav-number">1.18.</span> <span class="nav-text">stat-svr.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.19.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2020/04/18/handy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="handy源码分析 | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          handy源码分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-04-18 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-18T00:00:00+08:00">2020-04-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Programing/" itemprop="url" rel="index"><span itemprop="name">Programing</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>7.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>27 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1>Handy网络库分析</h1>
+<p>最近想学一下Linux的网络编程，于是想先阅读一些网络库，所以这篇博客可能会有一些比较基本的知识点。</p>
+<p>直接开始，我们先来看看利用Doxygen生成的Include依赖关系图</p>
+<p><img src="includes.png" alt="include-relationship"></p>
+<p>我们就按从下往上来分析一下各个头文件所实现的功能</p>
+<h2 id="slice-h">slice.h</h2>
+<p>定义字符串切片类（包含front() / back() / begin() / end() 等类似容器的操作，但实际的实现是char*）以及切片的一些操作（返回第一个词，返回第一行，返回前n个字符等等）</p>
+<h2 id="port-posix-h">port_posix.h</h2>
+<p>用于解决主机字节序到网络字节序的转换，根据 OS_LINUX / OS_MACOSX 实现不同的getHostByName</p>
+<h2 id="util-h">util.h</h2>
+<blockquote>
+<p>这里noncopyable是通过将<strong>拷贝构造函数</strong>和<strong>拷贝赋值运算符</strong>声明为禁止使用(=delete)实现</p>
+<p>这样实现的好处：</p>
+<ul>
+<li>在c++11之前实现该功能需要将这两个函数设为private，但依然无法避免成员函数和友元函数的使用</li>
+<li>通过更少/更明确的代码实现，且可复用(从noncopyable类派生)</li>
+</ul>
+<p>该类的作用：</p>
+<ul>
+<li>防止对象被拷贝。尤其是在涉及到文件操作/网络连接的类中，资源的释放/关闭可能会出现问题</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//boost::noncopyable</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">noncopyable</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">noncopyable</span>() = <span class="keyword">default</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">noncopyable</span>(<span class="type">const</span> noncopyable&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">  noncopyable&amp; <span class="keyword">operator</span>=(<span class="type">const</span> noncopyable&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>具体解释可看<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/cpp/cpp/explicitly-defaulted-and-deleted-functions?view=vs-2019">Explicitly Defaulted and Deleted Functions</a></p>
+</blockquote>
+<p>util类则包含</p>
+<ul>
+<li>
+<p>格式化输出string</p>
+<blockquote>
+<p>进行两次尝试：</p>
+<p>第1次尝试：</p>
+<p>申请char[500]的栈内存，va_start获取可变参数列表，通过vsnprintf()得到格式化后的字符串，判断返回大小是否超出限制，未超出结束尝试并返回，超出则进行第二次尝试</p>
+<p>第2次尝试：</p>
+<p>申请char[30000]的堆内存，并且由<strong>unique_ptr</strong>管理(销毁)，通过vsnprintf()得到格式化后的字符串，判断返回大小是否超出限制，未超出结束尝试并返回，超出则截断，将字符串最后一字节设为结束字符‘\0’</p>
+</blockquote>
+</li>
+<li>
+<p>基础的时间函数（std::chrono库）</p>
+</li>
+<li>
+<p>atoi() ---- 将字符串转换为整数，函数内部通过strtol()实现</p>
+</li>
+<li>
+<p>更改(添加)文件描述符flag（fcntl）</p>
+</li>
+</ul>
+<p>ExitCaller类继承于noncopyable，只有一个私有成员<code>std::function&lt;void()&gt; functor_</code>，即一个无参数返回int的可调用对象，并且在析构时进行调用执行。当实例为局部变量时，作用与golang的defer类似</p>
+<h2 id="net-h">net.h</h2>
+<p><code>net</code>类包含一些设置函数</p>
+<ul>
+<li>
+<p>setNonBlock()设置文件的 阻塞/非阻塞IO</p>
+</li>
+<li>
+<p>setReuseAddr() / setReusePort() / setNoDelay() 设置套接字的属性</p>
+<blockquote>
+<p><code>SO_REUSEADDR</code>允许 绑定一个正处于TIME_WAIT中的本地地址 / 通配符IP(INADDR_ANY)地址冲突</p>
+<p><code>SO_REUSEPORT</code>允许多个套接字绑定到同一地址端口组合(所有套接字必须都设置了<code>SO_REUSEPORT</code>)</p>
+<p><code>TCP_NODELAY</code> 关闭Nagle缓存算法，允许小包的发送(适合延时敏感且数据量较小的情况)</p>
+<p><a target="_blank" rel="noopener" href="http://man7.org/linux/man-pages/man7/socket.7.html">man socket</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ">How do SO_REUSEADDR and SO_REUSEPORT differ?</a></p>
+</blockquote>
+</li>
+</ul>
+<p><code>Ip4Addr</code>类则是对sockaddr_in进行了一些简单的封装，提供一些常用的函数(format/getter/validate)</p>
+<p><code>Buffer</code>类是连续的动态伸缩的内存空间，用于缓存</p>
+<p>内存空间大小由私有成员变量</p>
+<p><code>char *buf_</code>内存地址起始地址 / <code>size_t b_</code>正在使用内存空间（缓存数据但未使用）的起始地址相对buf的偏移量 / <code>size_t e_</code>正在使用内存空间的结束地址 + 1数据单元地址相对buf的偏移量 / <code>size_t cap_</code>已分配空间大小 / <code>size_t exp_</code>建议/期望分配大小</p>
+<ul>
+<li>
+<p>添加数据：先调用<code>allocRoom(len)</code>分配足够大小空间，然后<code>memcpy()</code>拷贝数据</p>
+</li>
+<li>
+<p>分配空间：调用<code>makeRoom(len)</code>获得所分配空间的首地址</p>
+<p>在分配过程中，如果内存空间足够(<code>e_ + len &lt;= cap_</code>)，无需操作</p>
+<p>如果内存尾部空间不足</p>
+<ol>
+<li>判断当前所需要使用的内存是否小于已分配的一半(<code>size() + len &lt; cap_/2</code>)，是则将有效数据移动到起始位置<code>buf_</code></li>
+<li>调用<code>expand(len)</code>重新分配一块内存，内存大小为<code>max(exp_, max(2 * cap_, size() + len))</code></li>
+</ol>
+</li>
+<li>
+<p>获取数据：<code>consume(size_t len)</code>直接<code>b_ += len</code>，所以使用时需保证<code>len</code>的大小正确</p>
+</li>
+</ul>
+<h2 id="codec-h">codec.h</h2>
+<blockquote>
+<p>TCP的粘包/拆包问题：TCP是字节流协议，消息之间没有边界</p>
+<p>一般的处理：</p>
+<ul>
+<li>发送定长包。如果每个消息的大小都是一样的，那么在接收对等方只要累计接收数据，直到数据等于一个定长的数值就将它作为一个消息。</li>
+<li>包尾加上\r\n标记。FTP协议正是这么做的。但问题在于如果数据正文中也含有\r\n，则会误判为消息的边界。</li>
+<li>包头加上包体长度。包头是定长的4个字节，说明了包体的长度。接收对等方先接收包体长度，依据包体长度来接收包体。</li>
+<li>使用更加复杂的应用层协议</li>
+</ul>
+</blockquote>
+<p><code>CodecBase</code>类 就是用来处理这些问题，其派生类<code>LineCodec</code>采用第二种方案，<code>LengthCodec</code>采用第三种方案</p>
+<p><code>LengthCodec</code>类的具体编码：“mBdt”（四个字节）+ 消息长度（四个字节）+消息</p>
+<h2 id="threads-h">threads.h</h2>
+<p>SafeQueue类</p>
+<p>要做到线程安全，我们需要利用锁。一般在封装线程安全的类时，我们会直接声明一个mutex成员变量，但是该类是通过私有继承mutex类实现，所以上锁的时候直接传入(*this)：<code>lock_guard&lt;mutex&gt; lk(*this)</code></p>
+<p><code>push()</code>任务时直接上锁，然后将任务添加到链表中，调用<code>notify_one()</code>唤醒一个等待条件变量<code>ready_</code>的线程</p>
+<p><code>wait_ready()</code>使用条件变量阻塞线程，直到 超时 / 队列中不为空(有任务) / 退出</p>
+<p><code>pop_wait()</code>调用<code>wait_ready()</code>，返回空任务(退出/超时)或者队列头任务(队列不为空)</p>
+<p>ThreadPool类</p>
+<p>构造一个最大等待任务数量为<code>taskCapacity</code>，线程数量为<code>thread</code>的线程池，当线程启动时，遍历线程集合，对于每一个线程，创建一个新的线程执行<code>pop_wait()</code>获取任务并执行，然后交换，即将新线程替换旧线程</p>
+<h2 id="logging-h">logging.h</h2>
+<p>定义了8个日志等级</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">LogLevel</span> &#123; LFATAL = <span class="number">0</span>, LERROR, LUERR, LWARN, LINFO, LDEBUG, LTRACE, LALL &#125;;</span><br></pre></td></tr></table></figure>
+<p>Logger类是通过<code>getLogger()</code>获取一个静态单例（c++11保证局部静态变量的初始化是线程安全的），功能</p>
+<ol>
+<li>
+<p>可以绝对<code>setLogLevel()</code> / 相对<code>adjustLogLevel()</code>设置 / 获取<code>getLogLevel()</code>当前的日志输出等级</p>
+</li>
+<li>
+<p>自定义设置日志文件，打开方式</p>
+<ul>
+<li><code>O_APPEND</code>将写入追加到文件的尾端</li>
+<li><code>O_CREAT</code>不存在则自动创建，权限为<code>#define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)</code> 即 User/Group/Others可读可写</li>
+<li><code>O_WRONLY</code>只写</li>
+<li><code>O_CLOEXEC</code>设置文件描述符<code>close-on-exec</code>，即当fork()的子进程成功调用exec()类函数时，会自动关闭该文件描述符，避免泄露给子进程</li>
+</ul>
+<blockquote>
+<p>修改成员函数的时候使用的是<code>dup2()</code>，避免<code>close()</code>+<code>dup()</code>两个函数会受到竞争条件的影响：比如在两个函数之间，成员函数被赋值为另一个fd</p>
+</blockquote>
+</li>
+<li>
+<p>设置日志周期<code>rotateInterval_</code></p>
+<ul>
+<li>如果当前时间与当前日志文件创建时间在同一周期内，无需新建日志文件</li>
+<li>否则，保存并重命名为 当前年月日时分</li>
+</ul>
+</li>
+<li>
+<p>写入日志<code>logv(int level, const char *file, int line, const char *func, const char *fmt...)</code></p>
+<ul>
+<li>如果写入日志等级高于当前日志等级，退出</li>
+<li>检查是否开启新的日志周期（重命名）</li>
+<li>写入详细的时间 + tid + 发生的文件/位置 + 事件内容 + ‘\n’</li>
+</ul>
+</li>
+</ol>
+<h2 id="status-h">status.h</h2>
+<p>表示文件操作后的状态</p>
+<p>表示格式：</p>
+<p>state_[0…3] == length of state_</p>
+<p>state_[4…7] == code</p>
+<p>state_[8…] == message</p>
+<h2 id="file-h">file.h</h2>
+<p>file类中包含了一些文件io的静态成员函数，返回<code>Status</code>类</p>
+<ul>
+<li>
+<p><code>getContent(const string &amp;filename, string &amp;cont)</code>：将文件内容读(append)到字符串中</p>
+</li>
+<li>
+<p><code>writeContent(const string &amp;filename, const string &amp;cont)</code>：截断并从头往文件写入字符串中内容</p>
+</li>
+<li>
+<p><code>createDir(const string &amp;name)</code>/ <code>deleteDir(const string &amp;name)</code>：创建/删除文件目录</p>
+</li>
+<li>
+<p><code>getChildren(const string &amp;dir, vector&lt;string&gt; *result)</code>：通过<code>readdir()</code>获取遍历目录文件信息，然后它们的文件名 <code>push_back(d_name)</code>到<code>*result</code></p>
+</li>
+<li>
+<p><code>getFileSize((const string &amp;fname, uint64_t *size))</code>：通过调用<code>stat(const char *path, struct stat *buf)</code> 获取文件大小，并将<code>*size</code>赋值为文件大小<code>buf.st_size</code></p>
+</li>
+<li>
+<p><code>deleteFile(const string &amp;fname)</code>：通过调用<code>unlink(const char *pathname)</code>删除文件</p>
+<blockquote>
+<p><strong>unlink</strong>() 从文件系统删除一个名字.</p>
+<ul>
+<li>如果这个名字是指向文件的最后一个链接并且该文件当前没有被某进程打开，则删除该文件</li>
+<li>如果这个名字是指向文件的最后一个链接并且该文件正在被某进程打开，则等待指向该文件的最后一个文件描述符被关闭时删除该文件</li>
+<li>如果这个名字指向一个软链接，则删除该软连接</li>
+<li>如果名称指向一个socket、fifo或设备，则删除其名称，但打开该对象的进程可以继续使用它。</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>调用<code>writeContent(tmpName,cont)</code> 往 <code>tmpName</code>文件写入内容成功后，调用<code>renameFile(tmpName,name)</code>重命名</p>
+</li>
+</ul>
+<h2 id="handy-imp-h">handy_imp.h</h2>
+<p><code>AutoContext</code>类通过模板类实现对传入类的内存管理，自动（第一次访问时）new和（析构时）delete</p>
+<h2 id="poller-h">poller.h</h2>
+<blockquote>
+<p>结合event_base一起看</p>
+</blockquote>
+<p>基于<code>PollerBase</code>抽象类，根据Linux和MacOS不同平台派生类，实现了对epoll的封装</p>
+<h3 id="epoll">epoll</h3>
+<blockquote>
+<p><code>epoll</code>把用户关心的文件描述符上的事件放在内核里的一个事件表中，从而无需像 <code>select</code> 和 <code>poll</code> 那样每次调用都要重复传入文件描述符集或事件集。但 <code>epoll</code> 需要使用一个额外的文件描述符来<strong>唯一标识</strong>内核中的这个事件表</p>
+</blockquote>
+<p>这里我们先来看看epoll的几个函数</p>
+<ul>
+<li>
+<p><code>int epoll_create(int size)</code>：用来创建上述的文件描述符。<code>size</code>参数现在不起作用，只是给内核一个提示，告诉它事件表需要多大</p>
+</li>
+<li>
+<p><code>int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)</code>：</p>
+<p><code>fd</code> 是要操作的文件描述符，<code>op</code> 参数则指定操作类型，有如下3种：</p>
+<ul>
+<li><code>EPOLL_CTL_ADD</code>：往事件表种注册 <code>fd</code> 上的事件</li>
+<li><code>EPOLL_CTL_MOD</code>：修改 <code>fd</code> 上的注册事件</li>
+<li><code>EPOLL_CTL_DEL</code>：删除 <code>fd</code> 上的注册事件</li>
+</ul>
+<p><code>event</code> 参数指定事件，<code>epoll_event</code> 结构体定义了：<code>events</code> 成员描述事件类型，<code>data</code> 成员存储用户数据</p>
+</li>
+<li>
+<p><code>int epoll_wait(int epfd, struct epoll_event* events, int maxevents, int timeout)</code>：</p>
+<p><code>epoll_wait()</code>在一段超时时间内等待一组文件描述符上的事件，<code>timeout</code> 指定超时值，单位是ms，<code>maxevents</code> 指定最多监听多少个事件</p>
+<p><code>epoll_wait()</code> 如果检测到事件，就将所有就绪的事件从内核事件表中复制它的第二个参数<code>events</code>指向的数组中</p>
+</li>
+</ul>
+<h4 id="Level-Trigger">Level Trigger</h4>
+<blockquote>
+<p>当<code>epoll_wait()</code> 检测到有事件发生并将其通知应用程序后，应用程序可以不立即处理该事件。当应用程序下一次调用 <code>epoll_wait()</code> 时，此事件仍然会被通知，直到该事件被处理</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">lt</span><span class="params">(epoll_event* events, <span class="type">int</span> number, <span class="type">int</span> epollfd, <span class="type">int</span> listenfd)</span></span>&#123;</span><br><span class="line">    <span class="type">char</span> buf[BUFFER_SIZE];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; number; i++)&#123;</span><br><span class="line">        <span class="type">int</span> sockfd = events[i].data.fd;</span><br><span class="line">        <span class="keyword">if</span>(sockfd == listenfd) &#123;	<span class="comment">/*Regist*/</span>	&#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (events[i].events &amp; EPOLLIN)&#123;</span><br><span class="line">            <span class="type">int</span> ret = <span class="built_in">recv</span>( sockfd, buf, BUFFER_SIZE - <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">            <span class="keyword">if</span>(ret &lt;= <span class="number">0</span>)&#123;</span><br><span class="line">                <span class="built_in">close</span>(sockfd);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//data processing</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Edge-Trigger">Edge Trigger</h4>
+<blockquote>
+<p>当<code>epoll_wait()</code> 检测到有事件发生并将其通知应用程序后，应用程序必须立即处理该事件，因为后续的<code>epoll_wait()</code> 不再向应用程序通知该事件</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">et</span><span class="params">(epoll_event* events, <span class="type">int</span> number, <span class="type">int</span> epollfd, <span class="type">int</span> listenfd)</span></span>&#123;</span><br><span class="line">    <span class="type">char</span> buf[BUFFER_SIZE];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; number; i++)&#123;</span><br><span class="line">        <span class="type">int</span> sockfd = events[i].data.fd;</span><br><span class="line">        <span class="keyword">if</span>(sockfd == listenfd)&#123;		<span class="comment">/*Regist*/</span>	&#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(events[i].events &amp; EPOLLIN)&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">                <span class="type">int</span> ret = <span class="built_in">recv</span>( sockfd, buf, BUFFER_SIZE - <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">                <span class="keyword">if</span>(ret &lt; <span class="number">0</span>)&#123;</span><br><span class="line">                    <span class="keyword">if</span>( (errno == EAGAIN ) || (errno == EWOULDBLOCK))<span class="keyword">break</span>;</span><br><span class="line">                    <span class="built_in">close</span>(sockfd);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span>(ret == <span class="number">0</span>)<span class="built_in">close</span>(sockfd);</span><br><span class="line">                <span class="keyword">else</span> &#123;	<span class="comment">/*data processing*/</span>	&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="event-base-h">event_base.h</h2>
+<blockquote>
+<p>事件的到来是随机的、异步的。我们无法预知程序何时收到一个客户连接请求 / 暂停信号。所以程序需要循环等待并处理事件，这就是<strong>事件循环</strong>。在事件循环中，等待事件一般使用I/O复用技术实现。</p>
+<p>将系统支持的各种I/O复用系统调用封装成统一的接口，称为<strong>事件多路分发器</strong>，一般包含三个函数：等待事件(select/poll/epoll_wait)，添加事件，删除事件。</p>
+<p><strong>事件处理器</strong>执行事件对应的业务逻辑，通常包含一个或多个回调函数，这些回调函数在事件循环中被执行。</p>
+</blockquote>
+<p><code>TimerRepeatable</code> 类是一个带有编号，回调函数的定时器，通过其中的 <code>at</code> 过期时间，<code>interval</code>定时周期控制</p>
+<p><strong>事件循环</strong>：<code>EventBase::loop()</code> -&gt; <code>EventsImp::loop()</code> -&gt; <code>poller::loop_once()</code></p>
+<p><strong>事件分发器</strong>：<code>EventBase::safeCall()</code> -&gt; <code>EventsImp::safeCall()</code> -&gt;</p>
+<p><code>EventsBase</code>类是对 <code>EventsImp</code> 类再进一层封装，简化操作，方便多线程事件派发器<code>MultiBase</code>的实现</p>
+<p><code>EventsImp</code> 类成员</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">EventBase *base_;		<span class="comment">//所属的事件分发器</span></span><br><span class="line">PollerBase *poller_;	</span><br><span class="line">std::atomic&lt;<span class="type">bool</span>&gt; exit_;	<span class="comment">//设置退出</span></span><br><span class="line"><span class="type">int</span> wakeupFds_[<span class="number">2</span>];			<span class="comment">//用于唤醒IO线程</span></span><br><span class="line"><span class="type">int</span> nextTimeout_;			</span><br><span class="line">SafeQueue&lt;Task&gt; tasks_;</span><br><span class="line"></span><br><span class="line">std::map&lt;TimerId, TimerRepeatable&gt; timerReps_;	<span class="comment">//循环定时任务</span></span><br><span class="line">std::map&lt;TimerId, Task&gt; timers_;	<span class="comment">//定时任务</span></span><br><span class="line">std::atomic&lt;<span class="type">int64_t</span>&gt; timerSeq_;		<span class="comment">//给每个定时器编号</span></span><br><span class="line"><span class="comment">// 记录每个idle时间（单位秒）下所有的连接。链表中的所有连接，最新的插入到链表末尾。连接若有活动，会把连接从链表中移到链表尾部，做法参考memcache</span></span><br><span class="line">std::map&lt;<span class="type">int</span>, std::list&lt;IdleNode&gt;&gt; idleConns_;	<span class="comment">//空闲连接</span></span><br><span class="line">std::set&lt;TcpConnPtr&gt; reconnectConns_;		<span class="comment">//重连连接</span></span><br><span class="line"><span class="type">bool</span> idleEnabled;			<span class="comment">//是否正在idle watcher模式</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//调用poller::loop_once()，然后调用handleTimeouts()处理超时任务</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">loop_once</span><span class="params">(<span class="type">int</span> waitMs)</span></span>;</span><br><span class="line"><span class="comment">//循环调用loop_once(10000)直至设置退出，然后清空所有定时任务，清空连接，loop_once(0)</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">loop</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//创建管道，然后向poller注册它的可读事件，用于唤醒IO线程</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//如果连接空闲时间超过idle，重置该连接的空闲时间，将其从链表头部放到尾部，执行空闲超时回调</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">callIdles</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//启用idle watcher模式，将注册事件添加到对应idle秒的链表末尾</span></span><br><span class="line"><span class="function">IdleId <span class="title">registerIdle</span><span class="params">(<span class="type">int</span> idle, <span class="type">const</span> TcpConnPtr &amp;con, <span class="type">const</span> TcpCallBack &amp;cb)</span></span>;</span><br><span class="line"><span class="comment">//取消id对应的空闲连接监控事件</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">unregisterIdle</span><span class="params">(<span class="type">const</span> IdleId &amp;id)</span></span>;</span><br><span class="line"><span class="comment">//将id从所在的监控链表放到末尾</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">updateIdle</span><span class="params">(<span class="type">const</span> IdleId &amp;id)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//将超时的任务移除并执行，然后调用refreshNearest()</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">handleTimeouts</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//检查距离下一次超时的时间</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">refreshNearest</span><span class="params">(<span class="type">const</span> TimerId *tid = <span class="literal">NULL</span>)</span></span>;</span><br><span class="line"><span class="comment">//对于需要重复执行的超时任务，执行之前原子更新其定时器，回调函数为重新调用repeatableTimeout()</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">repeatableTimeout</span><span class="params">(TimerRepeatable *tr)</span></span>;</span><br><span class="line"><span class="comment">//添加定时任务</span></span><br><span class="line"><span class="comment">//对于循环定时任务TimerId.first = -milli，放进 timers_ 和 timerReps_ 里</span></span><br><span class="line"><span class="comment">//对于一次定时任务TimerId.first = milli，放进 timers_ 里</span></span><br><span class="line"><span class="function">TimerId <span class="title">runAt</span><span class="params">(<span class="type">int64_t</span> milli, Task &amp;&amp;task, <span class="type">int64_t</span> interval)</span></span>;</span><br><span class="line"><span class="comment">//取消定时任务</span></span><br><span class="line"><span class="comment">//与runAt()规则一样，将其从 timers_ / timerReps_ 里删除</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">cancel</span><span class="params">(TimerId timerid)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>EventBase</code> 类只有一个事件分发器，只在主线程上运行，所有的事件处理也是在主线程上</p>
+<p><code>EventBase</code> 类只有一个事件分发器，只在主线程上运行，所有的事件处理也是在主线程上</p>
+<p><code>MultiBase</code>类拥有多个事件分发器<code>EventBase</code> ，在执行<code>loop()</code>的时候，为第0 ~ n-1个事件分发器创建一个线程执行<code>EventBase::loop()</code>，第n个事件分发器（主Reactor，需处理accept）则在主线程上执行，所有的事件处理在各自的线程上</p>
+<h2 id="conn-h">conn.h</h2>
+<p>分别使用<code>TcpConn</code>记录访问的tcp连接，<code>TcpServer</code>(包含事件分发器)处理具体的事件</p>
+<blockquote>
+<p><code>enable_shared_from_this&lt;&gt;</code> 和 <code>shared_from_this()</code></p>
+<p>从<code>enable_shared_from_this</code>派生的对象可以使用成员函数中的 <code>shared_from_this</code> 方法创建一个 <code>shared_ptr</code> 所有者，与现有 <code>shared_ptr</code> 所有者共享实例所有权。<br>
+否则，如果通过 <code>this</code> 创建新的 <code>shared_ptr</code> ，则它与现有的 <code>shared_ptr</code> 所有者不同，这可能导致无效引用或导致该对象被删除多次。</p>
+</blockquote>
+<p>先来看看<code>TcpConn</code>类的一些成员函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用Channel封装套接字 并 设置回调函数</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::attach</span><span class="params">(EventBase *base, <span class="type">int</span> fd, Ip4Addr local, Ip4Addr peer)</span></span>;</span><br><span class="line"><span class="comment">//建立非阻塞socket的tcp连接</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::connect</span><span class="params">(EventBase *base, <span class="type">const</span> string &amp;host, <span class="type">unsigned</span> <span class="type">short</span> port, <span class="type">int</span> timeout, <span class="type">const</span> string &amp;localip)</span></span>;</span><br><span class="line"><span class="comment">//将连接放到EventsImp的等待重连队列中，超时之后从队列中取出，重新connnect()</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::reconnect</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//设置重连时间间隔，-1: 不重连，0:立即重连，其它：等待毫秒数，未设置不重连</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">setReconnectInterval</span><span class="params">(<span class="type">int</span> milli)</span></span>;</span><br><span class="line"><span class="comment">//通过EventBase::safeCall()关闭channel_</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::close</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//表示当前连接失败或关闭</span></span><br><span class="line"><span class="comment">//(如果设置)重连 / 移出空闲监控 -&gt; 清除回调函数 -&gt; delete channel</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::cleanup</span><span class="params">(<span class="type">const</span> TcpConnPtr &amp;con)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//判断当前状态是否正确(connected)</span></span><br><span class="line"><span class="comment">//然后调用read()/write()</span></span><br><span class="line"><span class="comment">//根据返回的错误码执行相应的操作</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::handleRead</span><span class="params">(<span class="type">const</span> TcpConnPtr &amp;con)</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::handleWrite</span><span class="params">(<span class="type">const</span> TcpConnPtr &amp;con)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//当接收到消息且处于handshaking状态就需要调用该函数，使连接监听读/写-&gt;只监听读</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">TcpConn::handleHandshake</span><span class="params">(<span class="type">const</span> TcpConnPtr &amp;con)</span>；</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="comment">//调用wirte()往socket写入数据，对不同的errno进行处理</span></span></span><br><span class="line"><span class="function"><span class="comment">//EINTR -&gt; 重新write()   </span></span></span><br><span class="line"><span class="function"><span class="comment">//EAGAIN or EWOULDBLOCK -&gt; 不继续发送，启用写事件监听，HandleWrite()处理</span></span></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">TcpConn::isend</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> len)</span></span>;</span><br><span class="line"><span class="comment">//根据参数重载，实质调用isend()发送，如果未发送完成，添加到输出缓冲区，通过handleWrite()发送</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::send</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//两种模式: onRead()和onMsg()只能选择其一</span></span><br><span class="line"><span class="comment">//onMsg()也是通过调用onRead()实现，只是需要先decode</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::onMsg</span><span class="params">(CodecBase *codec, <span class="type">const</span> MsgCallBack &amp;cb)</span></span>;</span><br><span class="line"><span class="comment">//先encode再send()</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::sendMsg</span><span class="params">(Slice msg)</span></span>;</span><br><span class="line">    </span><br><span class="line"><span class="comment">//连接空闲idle秒后执行回调cb</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TcpConn::addIdleCB</span><span class="params">(<span class="type">int</span> idle, <span class="type">const</span> TcpCallBack &amp;cb)</span></span>;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>输入/输出缓冲区的设置：</p>
+<p>输入/输出缓冲区的设置：</p>
+<p><a target="_blank" rel="noopener" href="http://www.cppblog.com/Solstice/archive/2011/04/17/144378.html">为什么 non-blocking 网络编程中应用层 buffer 是必须的？—— 陈硕的Blog</a></p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">TcpServer</span> : <span class="keyword">private</span> noncopyable &#123;</span><br><span class="line">    <span class="built_in">TcpServer</span>(EventBases *bases);</span><br><span class="line">    <span class="comment">// return 0 on sucess, errno on error</span></span><br><span class="line">    <span class="comment">//创建socket,为socket设置SO_REUSEADDR/SO_REUSEPORT/FD_CLOEXEC</span></span><br><span class="line">    <span class="comment">//通过调用::bind绑定ip和端口</span></span><br><span class="line">    <span class="comment">//lsiten()设置该套接字等待处理的队列长度为20</span></span><br><span class="line">    <span class="comment">//将套接字封装为listen_channel_，设置套接字接收数据时的执行的函数</span></span><br><span class="line">    <span class="comment">//poller::loop_once()-&gt;Channel::handleRead()-&gt;TcpServer::handleAccept()</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">bind</span><span class="params">(<span class="type">const</span> std::string &amp;host, <span class="type">unsigned</span> <span class="type">short</span> port, <span class="type">bool</span> reusePort = <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="comment">//创建以bases为事件分发器的tcpserver,调用TcpServer::bind()</span></span><br><span class="line">    <span class="function"><span class="type">static</span> TcpServerPtr <span class="title">startServer</span><span class="params">(EventBases *bases, <span class="type">const</span> std::string &amp;host, <span class="type">unsigned</span> <span class="type">short</span> port, <span class="type">bool</span> reusePort = <span class="literal">false</span>)</span></span>;</span><br><span class="line">    ~<span class="built_in">TcpServer</span>() &#123; <span class="keyword">delete</span> listen_channel_; &#125;</span><br><span class="line">    <span class="function">Ip4Addr <span class="title">getAddr</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> addr_; &#125;</span><br><span class="line">    <span class="function">EventBase *<span class="title">getBase</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> base_; &#125;</span><br><span class="line">    <span class="comment">//添加tcp连接时,为新的tcp连接所设置的回调函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onConnCreate</span><span class="params">(<span class="type">const</span> std::function&lt;TcpConnPtr()&gt; &amp;cb)</span> </span>&#123; createcb_ = cb; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onConnState</span><span class="params">(<span class="type">const</span> TcpCallBack &amp;cb)</span> </span>&#123; statecb_ = cb; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onConnRead</span><span class="params">(<span class="type">const</span> TcpCallBack &amp;cb)</span> </span>&#123;</span><br><span class="line">        readcb_ = cb;</span><br><span class="line">        <span class="built_in">assert</span>(!msgcb_);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 消息处理与Read回调冲突，只能调用一个</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onConnMsg</span><span class="params">(CodecBase *codec, <span class="type">const</span> MsgCallBack &amp;cb)</span> </span>&#123;</span><br><span class="line">        codec_.<span class="built_in">reset</span>(codec);</span><br><span class="line">        msgcb_ = cb;</span><br><span class="line">        <span class="built_in">assert</span>(!readcb_);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    EventBase *base_;<span class="comment">//当前服务器所使用的事件分发器</span></span><br><span class="line">    EventBases *bases_;<span class="comment">//负责为新连接分配事件分发器</span></span><br><span class="line">    Ip4Addr addr_;</span><br><span class="line">    Channel *listen_channel_;<span class="comment">//listen的套接字的Channel封装</span></span><br><span class="line">    <span class="comment">//创建的tcp新连接的回调函数</span></span><br><span class="line">    TcpCallBack statecb_, readcb_;</span><br><span class="line">    MsgCallBack msgcb_;</span><br><span class="line">    std::function&lt;TcpConnPtr()&gt; createcb_;</span><br><span class="line">    std::unique_ptr&lt;CodecBase&gt; codec_;</span><br><span class="line">    <span class="comment">//循环调用accept()当前等待处理的队列</span></span><br><span class="line">    <span class="comment">//如果当前连接和分配给新连接的事件分发器一致，则直接创建新连接</span></span><br><span class="line">    <span class="comment">//如果不一致,则通过safeCall调用创建新连接</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handleAccept</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>还有一个半同步半异步服务器HSHA，利用线程池，为每一个消息处理都分配一个worker线程，即同步处理请求，异步管理IO</p>
+<h2 id="udp-h">udp.h</h2>
+<p>参考conn.h</p>
+<h2 id="http-h">http.h</h2>
+<p>HTTP消息是服务器和客户端之间交换数据的方式。有两种类型的消息：客户端发送的用于触发服务器上某个操作的<strong>请求</strong>和来自服务器的<strong>响应</strong>。</p>
+<p><img src="httpRequest.png" alt="HTTP-Request"><img src="httpResponse.png" alt="HTTP-Response"></p>
+<p>这里对这两种消息类型进行了抽象<code>HttpMsg</code>和实现<code>HttpRequest</code> / <code>HttpResponse</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">HttpMsg</span> &#123;</span><br><span class="line">    <span class="keyword">enum</span> <span class="title class_">Result</span> &#123;Error, Complete, NotComplete, Continue100,&#125;;</span><br><span class="line">    <span class="built_in">HttpMsg</span>() &#123; HttpMsg::<span class="built_in">clear</span>(); &#125;;</span><br><span class="line">    <span class="comment">//内容添加到buf，返回写入的字节数</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">int</span> <span class="title">encode</span><span class="params">(Buffer &amp;buf)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">//尝试从buf中解析，默认复制body内容</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Result <span class="title">tryDecode</span><span class="params">(Slice buf, <span class="type">bool</span> copyBody = <span class="literal">true</span>)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">//清空消息相关的字段</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">clear</span><span class="params">()</span></span>;</span><br><span class="line">	</span><br><span class="line">    <span class="function">std::string <span class="title">getHeader</span><span class="params">(<span class="type">const</span> std::string &amp;n)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">getValueFromMap_</span>(headers, n); &#125;</span><br><span class="line">    <span class="function">Slice <span class="title">getBody</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> body<span class="number">2.</span><span class="built_in">size</span>() ? body2 : (Slice) body; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果tryDecode返回Complete，则返回已解析的字节数</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">getByte</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> scanned_; &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//保存Status line/Headers/Body</span></span><br><span class="line">    std::map&lt;std::string, std::string&gt; headers;</span><br><span class="line">    std::string version, body;</span><br><span class="line">    <span class="comment">// body可能较大，为了避免数据复制，加入body2</span></span><br><span class="line">    Slice body2;</span><br><span class="line">    </span><br><span class="line">   <span class="keyword">protected</span>:</span><br><span class="line">    <span class="type">bool</span> complete_;<span class="comment">//是否完整读完一个消息</span></span><br><span class="line">    <span class="type">size_t</span> contentLen_;<span class="comment">//消息主体长度</span></span><br><span class="line">    <span class="type">size_t</span> scanned_;<span class="comment">//已经读过的长度</span></span><br><span class="line">    <span class="comment">//line1存储第一行</span></span><br><span class="line">    <span class="comment">//以第一个\r\n\r\n作为header和body的分割，如未找到，则header未读完，返回NotComplete</span></span><br><span class="line">    <span class="comment">//循环读入每一行的，以第一个词(保证跟着&quot;:&quot;)为key, 后面为value保存到headers中</span></span><br><span class="line">    <span class="comment">//最后根据headers中的&quot;content-length&quot;判断是否读完整个Http Message，没有则返回Continue100</span></span><br><span class="line">    <span class="comment">//如果选择copyBody,则将消息主体拷贝到body中，否则仅仅将指针存放在body2中，返回Complete </span></span><br><span class="line">    <span class="function">Result <span class="title">tryDecode_</span><span class="params">(Slice buf, <span class="type">bool</span> copyBody, Slice *line1)</span></span>;</span><br><span class="line">    <span class="function">std::string <span class="title">getValueFromMap_</span><span class="params">(std::map&lt;std::string, std::string&gt; &amp;m, <span class="type">const</span> std::string &amp;n)</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>HTTP Request Target <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7230#page-41">Request Target</a> / <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages">HTTP Message - MDN web docs</a></p>
+<p>HTTP Request Target <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7230#page-41">Request Target</a> / <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages">HTTP Message - MDN web docs</a></p>
+<ul>
+<li>
+<p>origin-form</p>
+<p>absolute-path [ “?” query ]</p>
+<p>the most common form, and it is used with <code>GET</code>, <code>POST</code>, <code>HEAD</code>, and <code>OPTIONS</code> methods.</p>
+<p>e.g. GET /background.png HTTP/1.0 HEAD /test.html?query=alibaba HTTP/1.1</p>
+</li>
+<li>
+<p>absolute-form</p>
+<p>absolute-URI</p>
+<p>e.g. GET <a target="_blank" rel="noopener" href="http://developer.mozilla.org/en-US/docs/Web/HTTP/Messages">http://developer.mozilla.org/en-US/docs/Web/HTTP/Messages</a> HTTP/1.1</p>
+</li>
+<li>
+<p>authority-form</p>
+<p>The authority component of a URL, consisting of the domain name and optionally the port (prefixed by a ‘:’), is called the authority form. It is only used with CONNECT when setting up an HTTP tunnel.</p>
+<p>e.g. CONNECT <a target="_blank" rel="noopener" href="http://developer.mozilla.org/">developer.mozilla.org:80</a> HTTP/1.1</p>
+</li>
+<li>
+<p>asterisk-form</p>
+<p>Used with <code>OPTIONS</code>, representing the server as a whole.</p>
+<p>e.g. OPTIONS * HTTP/1.1</p>
+</li>
+</ul>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">HttpRequest</span> : <span class="keyword">public</span> HttpMsg &#123;</span><br><span class="line">    <span class="built_in">HttpRequest</span>() &#123; <span class="built_in">clear</span>(); &#125;</span><br><span class="line">    std::map&lt;std::string, std::string&gt; args;</span><br><span class="line">    <span class="comment">//保存HTTP method(GET/PUT/POST/HEAD...)</span></span><br><span class="line">    <span class="comment">//query_uri保存完整的request target</span></span><br><span class="line">    <span class="comment">//而uri则保存其中的绝对路径,在请求中与查询字符串以?分隔</span></span><br><span class="line">    std::string method, uri, query_uri;</span><br><span class="line">    <span class="function">std::string <span class="title">getArg</span><span class="params">(<span class="type">const</span> std::string &amp;n)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">getValueFromMap_</span>(args, n); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// override</span></span><br><span class="line">    <span class="comment">// 按格式将Start line/headers(手动添加content-length和长连接)/body添加到buf中</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">int</span> <span class="title">encode</span><span class="params">(Buffer &amp;buf)</span></span>;</span><br><span class="line">    <span class="comment">//只支持origin-form的解析</span></span><br><span class="line">    <span class="comment">//将query_uri中&quot;?&quot;后面的查询字符串，通过查找&quot;&amp;&quot;和&quot;=&quot;,提取query参数到args中</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Result <span class="title">tryDecode</span><span class="params">(Slice buf, <span class="type">bool</span> copyBody = <span class="literal">true</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        HttpMsg::<span class="built_in">clear</span>();</span><br><span class="line">        args.<span class="built_in">clear</span>();</span><br><span class="line">        method = <span class="string">&quot;GET&quot;</span>;</span><br><span class="line">        query_uri = uri = <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>HttpResponse</code>类和<code>HttpRequest</code>只有以下区别（不考虑HTTP1.1和2的区别(chunked)）：</p>
+<ul>
+<li>
+<p>HTTP response的起始行叫做<code>status line</code>，包含协议版本/状态码/状态的简单描述</p>
+<p>e.g. HTTP/1.1 404 Not Found</p>
+</li>
+<li>
+<p>与Request Header相对应的是Response Header，提供有关服务器的其他信息</p>
+<p>e.g. Vary / Accept-Ranges</p>
+</li>
+</ul>
+<p>所以解码只需通过<code>HttpMsg</code>继承的<code>tryDecode_(Slice buf, bool copyBody, Slice *line1)</code>完成，然后单独处理<code>line1</code></p>
+<p><code>HttpConnPtr</code>类是本质上是一条Tcp连接，进一步封装主要是加入了HttpRequest，HttpResponse的处理</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">HttpConnPtr</span> &#123;</span><br><span class="line">    TcpConnPtr tcp;</span><br><span class="line">    <span class="built_in">HttpConnPtr</span>(<span class="type">const</span> TcpConnPtr &amp;con) : <span class="built_in">tcp</span>(con) &#123;&#125;</span><br><span class="line">    <span class="comment">//允许将HttpConnPtr转换成TcpConnPtr,就是获得其中的tcp</span></span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">TcpConnPtr</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> tcp; &#125;</span><br><span class="line">    <span class="comment">//重载-&gt;，返回shared_ptr&lt;TcpCoon&gt;中存储的指针</span></span><br><span class="line">    TcpConn *<span class="keyword">operator</span>-&gt;() <span class="type">const</span> &#123; <span class="keyword">return</span> tcp.<span class="built_in">get</span>(); &#125;</span><br><span class="line">    <span class="type">bool</span> <span class="keyword">operator</span>&lt;(<span class="type">const</span> HttpConnPtr &amp;con) <span class="type">const</span> &#123; <span class="keyword">return</span> tcp &lt; con.tcp; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">typedef</span> std::function&lt;<span class="type">void</span>(<span class="type">const</span> HttpConnPtr &amp;)&gt; HttpCallBack;</span><br><span class="line">	<span class="comment">//利用AutoContext类实现HttpContext的内存管理 并 提供访问</span></span><br><span class="line">    <span class="function">HttpRequest &amp;<span class="title">getRequest</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> tcp-&gt;internalCtx_.<span class="built_in">context</span>&lt;HttpContext&gt;().req; &#125;</span><br><span class="line">    <span class="function">HttpResponse &amp;<span class="title">getResponse</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> tcp-&gt;internalCtx_.<span class="built_in">context</span>&lt;HttpContext&gt;().resp; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sendRequest</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="built_in">sendRequest</span>(<span class="built_in">getRequest</span>()); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sendResponse</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="built_in">sendResponse</span>(<span class="built_in">getResponse</span>()); &#125;</span><br><span class="line">    <span class="comment">//将http request编码后放到tcp的output缓冲区进行发送</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sendRequest</span><span class="params">(HttpRequest &amp;req)</span> <span class="type">const</span> </span>&#123;&#125;</span><br><span class="line">    <span class="comment">//将http response编码后放到tcp的output缓冲区进行发送</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sendResponse</span><span class="params">(HttpResponse &amp;resp)</span> <span class="type">const</span> </span>&#123;&#125;</span><br><span class="line">    <span class="comment">//文件作为Response</span></span><br><span class="line">    <span class="comment">//先读取文件内容，然后将内容指针存到getResponse()的body2,sendResponse()</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sendFile</span><span class="params">(<span class="type">const</span> std::string &amp;filename)</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="comment">//客户端:将tcp的输入缓冲区中已解析为HttpResponse的数据移除,然后清空getResponse()</span></span><br><span class="line">    <span class="comment">//服务端:将tcp的输入缓冲区中已解析为HttpRequest的数据移除,然后清空getRequest()</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">clearData</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="comment">//设置tcp数据到达时的回调函数:</span></span><br><span class="line">    <span class="comment">//为tcp生成一个HttpConnPtr对象从而使用其中的handleRead()</span></span><br><span class="line">    <span class="comment">//将tcp缓冲区中解析到getRequest()/getResponse(),并执行回调函数cb()</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onHttpMsg</span><span class="params">(<span class="type">const</span> HttpCallBack &amp;cb)</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="comment">//当数据到达</span></span><br><span class="line">    <span class="comment">//poller::loop_once()-&gt;Channel::handleRead()-&gt;TcpConn::handleRead()</span></span><br><span class="line">    <span class="comment">//-&gt;TcpConn::readcb_()</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">HttpContext</span> &#123;</span><br><span class="line">        HttpRequest req;</span><br><span class="line">        HttpResponse resp;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">//如果是服务器,从tcp的输入缓冲区解析到getRequest()</span></span><br><span class="line">    <span class="comment">//解析出错，则关闭tcp连接,解析未完成则请求客户端继续发送,解析完成执行回调函数</span></span><br><span class="line">    <span class="comment">//如果是客户端,从tcp的输入缓冲区解析到getResponse()</span></span><br><span class="line">    <span class="comment">//解析出错，则关闭tcp连接,解析完成执行回调函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handleRead</span><span class="params">(<span class="type">const</span> HttpCallBack &amp;cb)</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">logOutput</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *title)</span> <span class="type">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">HttpServer</span> : <span class="keyword">public</span> TcpServer &#123;</span><br><span class="line">    <span class="comment">//TcpServer(bases)</span></span><br><span class="line">    <span class="comment">//设置当前tcp连接accept其他connect请求时,新的tcp的连接方式:</span></span><br><span class="line">    <span class="comment">//创建一条新的tcp连接,用它生成一个HttpConnPtr,设置该HttpConnPtr的onHttpMsg():</span></span><br><span class="line">    <span class="comment">//当HttpConnPtr所拥有的tcp数据到来时,解析为httpRequest,并执行对应的cbs_,再执行defcb_</span></span><br><span class="line">    <span class="built_in">HttpServer</span>(EventBases *bases);</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Conn</span> = TcpConn&gt;</span><br><span class="line">    <span class="type">void</span> <span class="built_in">setConnType</span>() &#123;</span><br><span class="line">        conncb_ = [] &#123; <span class="keyword">return</span> <span class="built_in">TcpConnPtr</span>(<span class="keyword">new</span> Conn); &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置当接收到GET uri的请求时,需要执行的函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onGet</span><span class="params">(<span class="type">const</span> std::string &amp;uri, <span class="type">const</span> HttpCallBack &amp;cb)</span> </span>&#123; cbs_[<span class="string">&quot;GET&quot;</span>][uri] = cb; &#125;</span><br><span class="line">    <span class="comment">//设置当接收到何种方法,何种uri的请求时需要执行的函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onRequest</span><span class="params">(<span class="type">const</span> std::string &amp;method, <span class="type">const</span> std::string &amp;uri, <span class="type">const</span> HttpCallBack &amp;cb)</span> </span>&#123; cbs_[method][uri] = cb; &#125;</span><br><span class="line">    <span class="comment">//设置接收并以对应的方式处理完之后还需要执行的函数</span></span><br><span class="line">    <span class="comment">//默认是发送404 Not Found的Http Response</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onDefault</span><span class="params">(<span class="type">const</span> HttpCallBack &amp;cb)</span> </span>&#123; defcb_ = cb; &#125;</span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    HttpCallBack defcb_;	<span class="comment">//处理完请求之后的回调函数</span></span><br><span class="line">    std::function&lt;TcpConnPtr()&gt; conncb_;</span><br><span class="line">    std::map&lt;std::string, std::map&lt;std::string, HttpCallBack&gt;&gt; cbs_;</span><br><span class="line">    <span class="comment">//保存[method][uri]对应请求所需执行的函数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="conf-h">conf.h</h2>
+<p><code>Conf</code>类是对INI配置文件读写的封装</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 0 success</span></span><br><span class="line"><span class="comment">// -1 IOERROR</span></span><br><span class="line"><span class="comment">// &gt;0 line no of error</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">parse</span><span class="params">(<span class="type">const</span> std::string &amp;filename)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get a string value from INI file</span></span><br><span class="line"><span class="function">std::string <span class="title">get</span><span class="params">(std::string section, std::string name, std::string default_value)</span></span>;</span><br><span class="line"><span class="comment">// Get an integer (long) value from INI file</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="title">getInteger</span><span class="params">(std::string section, std::string name, <span class="type">long</span> default_value)</span></span>;</span><br><span class="line"><span class="comment">// Get a real (floating point double) value from INI file</span></span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">getReal</span><span class="params">(std::string section, std::string name, <span class="type">double</span> default_value)</span></span>;</span><br><span class="line"><span class="comment">// Get a boolean value from INI file</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">getBoolean</span><span class="params">(std::string section, std::string name, <span class="type">bool</span> default_value)</span></span>;</span><br><span class="line"><span class="comment">// Get a string value from INI file</span></span><br><span class="line"><span class="function">std::list&lt;std::string&gt; <span class="title">getStrings</span><span class="params">(std::string section, std::string name)</span></span>;</span><br><span class="line"></span><br><span class="line">std::map&lt;std::string, std::list&lt;std::string&gt;&gt; values_;</span><br><span class="line">std::string filename;</span><br></pre></td></tr></table></figure>
+<h2 id="daemon-h">daemon.h</h2>
+<blockquote>
+<p>参考<a target="_blank" rel="noopener" href="http://www.enderunix.org/docs/eng/daemon.php">Unix Daemon Server Programming</a></p>
+</blockquote>
+<p>创建守护进程一般有以下几步</p>
+<ol>
+<li>
+<p><code>fork()</code>父进程，让父进程退出，则孤儿进程会成为 <code>init</code> 的子进程</p>
+</li>
+<li>
+<p>调用<code>setsid()</code>创建新会话，当前进程成为 新会话&amp;新进程组 的领导进程，没有控制tty</p>
+<blockquote>
+<p>在Unix系统中，进程在进程组内运行，因此在一个进程组中的所有进程被视为单个实体，子进程也会继承父进程的进程组和会话。而服务器不应从启动它的进程中接收信号，因此它必须将自己与控制tty分离，所以我们需要通过<code>setsid()</code>进一步独立进程</p>
+</blockquote>
+</li>
+<li>
+<p>大多数服务器以超级用户身份运行，出于安全原因，它们应保护自己创建的文件。<code>umask()</code> 设置用户掩码将防止在创建文件时可能出现的不安全文件特权。</p>
+</li>
+<li>
+<p>服务器应在已知目录中运行 <code>chdir(&quot;/servers/&quot;)</code></p>
+</li>
+<li>
+<p>大多数服务一次只需要运行一个服务器副本。因此我们通过文件锁定<code>loackf</code>来保持单例。服务器的第一个实例将锁定文件，以便其他实例了解实例已在运行。 如果服务器终止，锁将自动释放，以便新实例可以运行。</p>
+</li>
+<li>
+<p>进程可能会从用户或进程接收信号，因此最好抓住这些信号并相应地执行操作。 子进程终止时会发送SIGCHLD信号，服务器进程必须忽略或处理这些信号。</p>
+</li>
+<li>
+<p>日志消息的处理 -&gt; 标准IO / 写入文件 / 系统日志守护进程syslogd</p>
+</li>
+</ol>
+<h2 id="stat-svr-h">stat-svr.h</h2>
+<p>对<code>HttpServer</code>添加query 参数stat，方便外部的工具查看应用程序的状态</p>
+<h2 id="总结">总结</h2>
+<p><code>EventBases</code>负责线程与<code>EventBase</code>（持有<code>poller</code>）之间的联系，底层的<code>poller</code>（使用epoll水平触发） 检测到<code>POLLIN</code> / <code>POLLOUT</code>读写事件时，调用事件对应 <code>Channel</code> 的 <code>handleRead()</code> / <code>handleWrite()</code> 执行 I/O，具体的操作取决于上层的协议，如<code>TcpCoon</code> 所持有的套接字的Channel的就会调用<code>TcpConn::handleRead()</code>，然后一次性把 socket 里的数据读完（从操作系统 buffer 搬到应用层 buffer），否则会反复触发 <code>POLLIN</code> 事件，造成 <code>busy-loop</code> 。对于数据不完整的情况，则数据依然存放在应用层buffer中直到构成完整的消息，因此每个 <code>TcpConn</code> 都需配置 <code>input buffer</code>，同理也需要<code>output buffer</code>，并且程序只负责调用<code>send</code>往应用层buffer中添加发送内容，然后由库接手，为 <code>socket</code> 注册 <code>POLLOUT</code> 事件，只要<code>socket</code>可写就将数据从应用层buffer搬到操作系统buffer，直到写完后停止<code>POLLOUT</code></p>
+<p><img src="reactor.png" alt="Reactor"></p>
+<p>线程模型：</p>
+<p>每个线程最多有一个 <code>EventBase</code>，每个<code>TcpConn</code> 所在的线程由其所属的 <code>EventBase</code> （<code>TcpServer</code>通过调用<code>allocBase()</code>分配）决定</p>
+<p>所有对IO和buffer的读写，都应该在IO线程中完成</p>
+<p>单线程：同步处理请求，同步管理IO，全部在主线程完成，不需要考虑线程安全</p>
+<p>多线程：</p>
+<ul>
+<li>
+<p>MultiBase —— 通过vector + atomic&lt;int&gt;实现对 <code>EventBase</code> 的分配（Round Robin）</p>
+<p>（类似于多个单线程模型，只是需要考虑线程安全）</p>
+<p>一个reactor对应一个<code>EventBase</code>。主Reactor只有一个，只负责监听新的连接，accept后将这个连接分配到子Reactor上，子Reactor可以有多个，这样可以分摊一个<code>EventBase</code>的压力。</p>
+<p><img src="reactor-master.png" alt="reactor-master"></p>
+</li>
+<li>
+<p>HSHA服务器（同步处理请求，异步管理IO）则主要是实现了上图下部的<code>Thread Pool</code>的例子，可以设置消息模式时，将每一个读写任务添加到queued tasks中即业务线程池，适用于阻塞型或者耗时型的任务，尽可能不影响每一个<code>EventBase::loop()</code></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2020/04/18/handy/" title="handy源码分析">https://wywwwwei.github.io/2020/04/18/handy/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Socket/" rel="tag"># Socket</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/01/rvalue/" rel="next" title="C++ Rvalue Reference">
+                  C++ Rvalue Reference <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>

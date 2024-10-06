@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Notes for the book - Part 1 - Process">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes for OSTEP">
+<meta property="og:url" content="https://wywwwwei.github.io/2020/08/03/ostep-1/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="Notes for the book - Part 1 - Process">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/process.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/process_state.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/pcb.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/lde_1.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/lde_2.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/timer.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/switch.png">
+<meta property="article:published_time" content="2020-08-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-06T10:00:47.462Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Operating System">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2020/08/03/ostep-1/process.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2020/08/03/ostep-1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2020/08/03/ostep-1/","path":"2020/08/03/ostep-1/","title":"Notes for OSTEP"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Notes for OSTEP | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">Operating Systems: Three Easy Pieces</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Virtualization"><span class="nav-number">1.2.</span> <span class="nav-text">Virtualization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#The-Abstraction-The-Process"><span class="nav-number">1.2.1.</span> <span class="nav-text">The Abstraction: The Process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Key-Process-API"><span class="nav-number">1.2.2.</span> <span class="nav-text">Key Process API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mechanism-Limited-Direct-Execution"><span class="nav-number">1.2.3.</span> <span class="nav-text">Mechanism: Limited Direct Execution</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2020/08/03/ostep-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Notes for OSTEP | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Notes for OSTEP
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-08-03 00:00:00" itemprop="dateCreated datePublished" datetime="2020-08-03T00:00:00+08:00">2020-08-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>8 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1><em>Operating Systems: Three Easy Pieces</em></h1>
+<blockquote>
+<p>Notes - Part One</p>
+<p>Links to the book: <a target="_blank" rel="noopener" href="http://pages.cs.wisc.edu/~remzi/OSTEP/">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
+</blockquote>
+<h2 id="Introduction">Introduction</h2>
+<blockquote>
+<p>What an OS actually does</p>
+</blockquote>
+<p>It takes physical resources, such as a CPU, memory, or disk, and <strong>virtualizes</strong> them. It handles tough and tricky issues related to <strong>concurrency</strong>. And it stores files <strong>persistently</strong>, thus making them safe over the long-term.</p>
+<blockquote>
+<p>Design goal</p>
+</blockquote>
+<ul>
+<li>build up some <strong>abstractions</strong> in order to make the system convenient and easy to use</li>
+<li>provide high <strong>performance</strong> / <strong>minimize the overheads</strong> of the OS</li>
+<li>provide <strong>protections</strong> between applications, as well as the OS and applications.</li>
+<li>strive to provide a high degree of <strong>reliability</strong>. ( run non-stop )</li>
+<li>energy-efficiency / security / mobility…</li>
+</ul>
+<blockquote>
+<p>History of how OS developed</p>
+</blockquote>
+<ol>
+<li>
+<p>Just Libraries: a set of libraries of commonly-used functions</p>
+<p>Batch Processing: a number of jobs were set up and then run in a “batch” by the operator</p>
+</li>
+<li>
+<p>Protection</p>
+<p>if allow any program read any file? -&gt; the code run on behalf of the OS was special -&gt; <strong>system call</strong></p>
+<blockquote>
+<p>Key difference between a system call and a procedure call</p>
+<p>A system call transfer control into the OS while simultaneously raising the <strong>hardware privilege level</strong>. User applications run in what is referred to an <strong>user mode</strong> which means the hardware restricts what applications can do.</p>
+<p>When a system call is initiated( usually through a special hardware instruction called a <strong>trap</strong>), the hardware transfers control to a pre-specified <strong>trap handler</strong>( that the OS set up previously) and simultaneously raises the privilege level to <strong>kernel mode</strong>( In kernel mode, the OS has full access to the hardware of system). When the OS is done servicing the request, it passed control back to the user via a special <strong>return-from-trap</strong> instruction, which reverts to user mode while simultaneously passing control back to where the application let off.</p>
+</blockquote>
+</li>
+<li>
+<p>Era of Multiprogramming</p>
+<p>desire to make better use of machine resources -&gt;</p>
+<p><strong>multiprogramming</strong>: load a number of jobs into memory and switch rapidly between them for improving CPU utilization -&gt;</p>
+<p>don’t want one program to be able to access the memory of another program -&gt;</p>
+<p><strong>memory protection</strong> &amp; other <strong>concurrency</strong> issues</p>
+</li>
+<li>
+<p>Modern Era</p>
+</li>
+</ol>
+<h2 id="Virtualization">Virtualization</h2>
+<h3 id="The-Abstraction-The-Process">The Abstraction: The Process</h3>
+<p>The definition of a process -&gt; ( informally ) a running program</p>
+<p>A program -&gt; a lifeless thing: sits on the disk, a bunch of instructions and maybe some static data, waiting to spring into action</p>
+<p><img src="process.png" alt="process"></p>
+<blockquote>
+<p>Summarize a process by taking an inventory of the different pieces of the system it accesses or affects</p>
+</blockquote>
+<ul>
+<li>
+<p>the memory that the process can address</p>
+<p>Instructions / the data it reads or writes sits in memory</p>
+</li>
+<li>
+<p>registers、</p>
+<p>Many instructions explicitly read or update registers. (includes some special registers like IP/SP…)</p>
+</li>
+<li>
+<p>access persistent storage devices</p>
+<p>Might include a list of the files it currently has open.</p>
+</li>
+</ul>
+<blockquote>
+<p>Process creation</p>
+</blockquote>
+<ol>
+<li>
+<p>load its code and any static data (e.g., initialized variables) into memory, into the address space of the process</p>
+<p>from eager (Early OS: <strong>all at once</strong> before running) to lazy (Modern OS: <strong>load pieces</strong> when needed during execution)</p>
+</li>
+<li>
+<p>allocate memory for program’s <strong>run-time stack</strong></p>
+</li>
+<li>
+<p>allocate memory for program’s <strong>heap</strong></p>
+</li>
+<li>
+<p>other work as related to <strong>I/O setup</strong></p>
+<p>e.g., in Unix systems, each process by default has 3 open file descriptors for standard input/output/error.</p>
+</li>
+</ol>
+<blockquote>
+<p>Process state in a simplified view</p>
+</blockquote>
+<p><img src="process_state.png" alt="process state"></p>
+<ul>
+<li>running: runing on a processor and executing instructions.</li>
+<li>ready: ready to run but for some reason the OS has chosen not to run it at this given moment.</li>
+<li>blocked: has performed some kind of operation that makes it not ready to run until some other event takes place</li>
+</ul>
+<p>other state:</p>
+<ul>
+<li>initial: begin created</li>
+<li>final: has exited but has not yet been cleaned up (zombie state)</li>
+</ul>
+<blockquote>
+<p>Key data structures to track information</p>
+</blockquote>
+<p>track state of each process -&gt; process list</p>
+<p>individual structure stores information about a process -&gt; process control block:</p>
+<img src="pcb.png" alt="PCB" style="zoom:33%;" />
+<blockquote>
+<p>How can the OS provide the illusion of a nearly-endless supply of CPUs</p>
+</blockquote>
+<p>By <strong>virtualizing</strong> the CPU. By running one process, then stopping it and running another, and so forth, it can promote the illusion.</p>
+<p><strong>Mechanisms</strong></p>
+<blockquote>
+<p>low-level methods or protocols that implement a needed piece of functionality. -&gt; how</p>
+</blockquote>
+<ul>
+<li>
+<p>Time sharing</p>
+<p>It is a basic technique used by an OS to share a resource. By allowing the resource to be used for a little while by one entity, and then a little while by another, and so forth, the resources in question can be shared by many.</p>
+</li>
+<li>
+<p>Context switch</p>
+<p>Give the OS the ability to stop running one program and start running another on a given CPU.</p>
+</li>
+</ul>
+<p><strong>Policies</strong></p>
+<blockquote>
+<p>On top of the mechanisms (high-level), algorithms for making some kind of decision -&gt; which</p>
+</blockquote>
+<ul>
+<li>
+<p>scheduling policy</p>
+<p>Determine which program should the OS run.</p>
+</li>
+</ul>
+<h3 id="Key-Process-API">Key Process API</h3>
+<ul>
+<li>The <strong>fork()</strong> system call is used in Unix systems to create a new process. The creator is called the <strong>parent</strong>; the newly created process is called the <strong>child</strong>.</li>
+<li>The <strong>wait()</strong> system call allows a parent to wait for its child to complex execution.</li>
+<li>The <strong>exec()</strong> family of system calls allows a child to break free from its similarity to its parent and execute an entirely new program.</li>
+</ul>
+<blockquote>
+<p>Why the separation of <strong>fork()</strong> and <strong>exec()</strong> is essential in building a Unix shell</p>
+</blockquote>
+<p>It lets the shell run code <em>after</em> the call to <strong>fork()</strong> but <em>before</em> the call to <strong>exec()</strong>; this code can alter the environment of the about-to-be-run program, and thus enables a variety of interesting features to be readily built.</p>
+<h3 id="Mechanism-Limited-Direct-Execution">Mechanism: Limited Direct Execution</h3>
+<blockquote>
+<p>Challenges</p>
+</blockquote>
+<ul>
+<li>performance - implement virtualization without adding excessive overhead to system</li>
+<li>control - run process efficiently while retaining control over the CPU</li>
+</ul>
+<blockquote>
+<p>Direct Execution Protocol (Without Limits)</p>
+</blockquote>
+<ol>
+<li>
+<p>OS:</p>
+<p>Create entry for process list -&gt; Allocate memory for program -&gt; Load program into memory -&gt; Set up stack with argc / argv -&gt; Clear registers -&gt; Execute call main()</p>
+</li>
+<li>
+<p>Program:</p>
+<p>Run main -&gt; Execute return from main</p>
+</li>
+<li>
+<p>OS:</p>
+<p>Free memory of process -&gt; Remove from process list</p>
+</li>
+</ol>
+<p>Advantage: fast</p>
+<p>Problems:</p>
+<ol>
+<li>
+<p>Restricted Operations</p>
+<blockquote>
+<p>A process must be able to perform I/O and some other restricted operations, but without giving the process complete control over the system.</p>
+</blockquote>
+<p>Approach: a new process mode</p>
+<p>Code that runs in <strong>user mode</strong> is <strong>restricted</strong> in what it can do. In contrast to user mode is <strong>kernel mode</strong>, which the operating system (or kernel) runs in. In this mode, code that runs can <strong>do what it likes</strong>, including privileged operations.</p>
+<p>To make a user process perform some kind of privileged operation when it wishes, the <strong>system call</strong> is provided. To execute a system call, a program must execute a special <strong>trap</strong> instruction. This instruction simultaneously jumps into the kernel and raises the privilege level to <strong>kernel mode</strong>; once in kernel, the system can now perform whatever privileged operations are needed, and thus <strong>do the required work for the calling process</strong>. When finished, the OS calls a special <strong>return-from-trap</strong> instruction to return into the calling user program while simultaneously reducing the privilege level <strong>back to user mode</strong>.</p>
+<p>In order to be able to return correctly when the OS issues the return-from-trap instruction, it must make sure to <strong>save enough of the caller’s registers</strong>. For example, on x86, the processor will push them onto <strong>per-process kernel stack</strong> and the return-from-trap will pop them off and resume execution of the user-mode process.</p>
+<blockquote>
+<p>How does the trap know which code to run inside the OS</p>
+</blockquote>
+<p>Clearly, if the calling process does this by <strong>specifying an address to jump to</strong>, it will allow programs to jump anywhere into the kernel which is a <strong>very bad idea</strong>.</p>
+<p>The kernel does so by setting up a trap table at boot time. When the machine boot up, it does so in privileged (kernel) mode, and thus is free to configure machine hardware as need be.</p>
+<p>One of the first things the OS thus does is to tell the hardware what code to run (<strong>location of trap handlers</strong>) when certain exceptional events occur. Once the hardware is informed, it remembers the location of these handlers until the machine is <strong>next rebooted</strong>.</p>
+<p>To specify the exact system call, a <strong>system-call number</strong> is usually assigned to each system call. The user code is thus responsible for placing the desired system-call number in a <strong>register</strong> or at a specified location on the <strong>stack</strong>; the OS,when handling the system call inside the trap handler, <strong>examines this number</strong>, ensures it is valid, and if it is, executes the corresponding code.</p>
+<p>One last aside: being able to execute the instruction to tell the hardware <strong>where the trap tables are</strong> is also a <strong>privileged operation</strong>.</p>
+<blockquote>
+<p>Limited Direct Execution Protocol (two phases)</p>
+</blockquote>
+<p>In the first (at boot time), the kernel initializes the trap table, and the CPU remembers its location for subsequent use. The kernel does so via a privileged instruction (highlighted).</p>
+<img src="lde_1.png" alt="lde1" style="zoom:60%;" />
+<p>In the second (when running a process), <strong>the kernel sets up</strong> a few things such as allocation before using a return-from-trap instruction to start the execution of the process; this <strong>switches the CPU to user mode</strong> and begins running the process. When the process wishes to <strong>issue a system call</strong>, it <strong>traps back</strong> into the OS, which <strong>handles</strong> it and once again <strong>return control via a return-from-trap</strong> to the process. The process then completes its work, and returns from main(); this usually will return into some stub code which will properly <strong>exit the program (by calling the exit() system call)</strong>. At this point, the OS cleans up.</p>
+<img src="lde_2.png" alt="lde" style="zoom:60%;" />
+</li>
+<li>
+<p>Switching Between Process</p>
+<blockquote>
+<p>If a process is running on the CPU, this by definition means the OS is not running. So how can the operating system <strong>regain control</strong> of the CPU so that it can switch between process?</p>
+</blockquote>
+<p><strong>A cooperative approach: wait for system calls</strong></p>
+<p>In this style, the OS <strong>trusts the processes</strong> of the system to <strong>behave reasonably</strong>. Processes that run for too long are assumed to periodically give up the CPU so that the OS can decide to run some other task.</p>
+<p>In a cooperative scheduling system, the OS regains control of the CPU by <strong>waiting for a system call or an illegal operation</strong> of some kind to take place. This passive approach is too ideal.</p>
+<p><strong>A non-cooperative approach: the OS takes control</strong></p>
+<p>Without some additional help from the hardware, it turns out that the OS can’t do much at all when a process refuses to make system calls (or mistakes) and thus return control to the OS.</p>
+<p>The answer to how to gain control <strong>without cooperation</strong> is simple: a <strong>timer interrupt</strong>. A timer device can be programmed to raise an interrupt every so many milliseconds; when the interrupt is raised,the currently running process is <strong>halted</strong>, and a <strong>pre-configured interrupt handler</strong> in the OS runs. At this point, the OS has regained control of the CPU, and thus can do what it pleases: stop the current process, and start a different one.</p>
+<img src="timer.png" alt="timer" style="zoom:60%;" />
+<blockquote>
+<p>Saving and Restoring Context</p>
+</blockquote>
+<p>It is made by a part of the operating system known as the scheduler to decide whether to continue running the currently-running process, or switch to a different one.</p>
+<p>If the decision is made to switch, the OS then executes a low-level piece of code which we refer to as a <strong>context switch</strong>. A context switch is conceptually simple: all the OS has to do is <strong>save a few register values</strong> for the currently-running process (onto its kernel stack, for example), and <strong>restore a few</strong> (from its kernel stack), and <strong>switch to the kernel stack</strong> for the soon-to-be-executing process. By switching stacks, the kernel enters the call to the switch code in the context of one process (the one that was interrupted) and returns in the context of another (the soon-to-be-executing one). When the OS finally executes a return-from-trap instructions, the soon-to-be-executing process becomes the currently-running process. And thus the context switch is complete.</p>
+<img src="switch.png" alt="context switch" style="zoom:60%;" />
+<p>two types of register saves/restores</p>
+<ol>
+<li>When <strong>interrupt occurs</strong>, the <strong>user registers</strong> of the running process are implicitly saved by the <strong>hardware</strong>, using the <strong>kernel stack</strong> of that process.</li>
+<li>When the OS <strong>decides to switch</strong>, the <strong>kernel registers</strong> are explicitly saved by the <strong>software</strong> (i.e., the OS) , into memory in the <strong>process structure</strong> of the process.</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>What happen if, during interrupt or trap handling, another interrupt occurs. (Detailed discussion is defer until second piece)</p>
+</blockquote>
+<p>One simple thing an OS might do is <strong>disable interrupts</strong> during interrupt processing; doing so ensures that when one interrupt is being handled, no other one will be delivered to the CPU. But disabling interrupts for too long could <strong>lead to lost interrupts</strong>.</p>
+<p>Operating systems also have developed a number of <strong>sophisticated locking schemes</strong> to protect concurrent access to internal data structures. This enables <strong>multiple activities to be on-going</strong> within the kernel at the same time, particularly useful on multiprocessors.</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2020/08/03/ostep-1/" title="Notes for OSTEP">https://wywwwwei.github.io/2020/08/03/ostep-1/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Operating-System/" rel="tag"># Operating System</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/01/rvalue/" rel="prev" title="C++ Rvalue Reference">
+                  <i class="fa fa-angle-left"></i> C++ Rvalue Reference
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/12/pointer/" rel="next" title="C++ Smart Pointers">
+                  C++ Smart Pointers <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>

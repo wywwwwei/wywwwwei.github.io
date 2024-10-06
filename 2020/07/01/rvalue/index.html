@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="C++11 右值引用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ Rvalue Reference">
+<meta property="og:url" content="https://wywwwwei.github.io/2020/07/01/rvalue/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="C++11 右值引用">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/07/01/rvalue/value_categories.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2020/07/01/rvalue/.value-categories.png">
+<meta property="article:published_time" content="2020-06-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-06T09:37:59.032Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2020/07/01/rvalue/value_categories.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2020/07/01/rvalue/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2020/07/01/rvalue/","path":"2020/07/01/rvalue/","title":"C++ Rvalue Reference"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C++ Rvalue Reference | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">C++ Rvalue Reference</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Value-categories"><span class="nav-number">1.1.</span> <span class="nav-text">Value categories</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lvalue-Reference"><span class="nav-number">1.2.</span> <span class="nav-text">Lvalue Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rvalue-Reference"><span class="nav-number">1.3.</span> <span class="nav-text">Rvalue Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Move-Semantics"><span class="nav-number">1.4.</span> <span class="nav-text">Move Semantics</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Forcing-Move-Semantics"><span class="nav-number">1.4.1.</span> <span class="nav-text">Forcing Move Semantics</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Perfect-forwarding"><span class="nav-number">1.5.</span> <span class="nav-text">Perfect forwarding</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#References"><span class="nav-number">1.6.</span> <span class="nav-text">References</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2020/07/01/rvalue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C++ Rvalue Reference | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ Rvalue Reference
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-07-01 00:00:00" itemprop="dateCreated datePublished" datetime="2020-07-01T00:00:00+08:00">2020-07-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Concepts/" itemprop="url" rel="index"><span itemprop="name">Concepts</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.7k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>6 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1>C++ Rvalue Reference</h1>
+<h2 id="Value-categories">Value categories</h2>
+<p><img src="value_categories.png" alt="Value-categories"></p>
+<p>每个 C++ 表达式（带有操作数的操作符、字面量、变量名等）都属于三种基本值类别中的一种：</p>
+<p>更具体的示例描述请查看 <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/value_category">Value categories – cppreference.com</a></p>
+<ul>
+<li>
+<p>纯右值 (prvalue)</p>
+<p>纯右值表达式没有可通过程序访问的地址。</p>
+<p>纯右值表达式的示例包括：（除了字符串字面量之外的）字面量、返回非引用类型的函数调用，以及在表达式评估期间创建但仅由编译器访问的临时对象</p>
+</li>
+<li>
+<p>亡值 (xvalue)</p>
+<p>亡值表达式的地址不能再由您的程序访问，但可用于初始化 rvalue 引用，后者提供对表达式的访问。</p>
+<p>亡值表达式的示例包括返回右值引用的函数调用，以及数组下标、成员和指针到数组或对象为右值引用的成员表达式</p>
+</li>
+<li>
+<p>左值 (lvalue)</p>
+<p>左值具有程序可以访问的地址。</p>
+<p>左值表达式的示例包括变量名称，包括<strong>常量</strong>变量、数组元素、返回 lvalue 引用、位字段、联合和类成员的函数调用</p>
+</li>
+</ul>
+<p>随着移动语义引入到 C++11 之中，值类别被重新进行了定义，以区别表达式的两种独立的性质：</p>
+<ul>
+<li><em>拥有身份 ( has identity)</em>：可以确定表达式是否与另一表达式指代同一实体，例如通过比较它们所标识的对象或函数的（直接或间接获得的）地址；</li>
+<li><em>可被移动</em>：移动构造函数、移动赋值运算符或实现了移动语义的其他函数重载能够绑定于这个表达式。</li>
+</ul>
+<p>C++11 中：</p>
+<ul>
+<li>拥有身份且不可被移动的表达式被称作*左值 (lvalue)*表达式；</li>
+<li>拥有身份且可被移动的表达式被称作*亡值 (xvalue)*表达式；</li>
+<li>不拥有身份且可被移动的表达式被称作*纯右值 (prvalue)*表达式；</li>
+<li>不拥有身份且不可被移动的表达式无法使用。</li>
+</ul>
+<p>拥有身份的表达式被称作“泛左值 (glvalue) 表达式”。左值和亡值都是泛左值表达式。</p>
+<p>可被移动的表达式被称作“右值 (rvalue) 表达式”。纯右值和亡值都是右值表达式。</p>
+<p><img src=".value-categories.png" alt="value-categories"></p>
+<h2 id="Lvalue-Reference">Lvalue Reference</h2>
+<p>c++11之前，C 中仅存在一种引用类型，所以简单称之为<em>引用</em>，而在c11中其被称为左值引用</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">L-value reference</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">Yes</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<p>而对const对象的左值引用可以使用左值或右值进行初始化</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">L-value reference to const</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<p>对const对象的左值引用非常有用，因为它使得可以将任何类型的参数（左值或右值）传递给函数，而无需复制该参数</p>
+<h2 id="Rvalue-Reference">Rvalue Reference</h2>
+<p>右值引用可将左值和右值区分开，可以帮助您不必要的内存分配和复制操作需求，从而提高应用程序的性能。</p>
+<p>相比于左值引用，</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">R-value reference</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">Yes</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">R-value reference to const</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Move-Semantics">Move Semantics</h2>
+<p>要实现移动语义，通常向类提供<em>移动构造函数，</em> 并可以选择移动赋值运算符 （<strong>运算符 =</strong>）。 其源是右值的复制和赋值操作随后会自动利用移动语义。 与默认复制构造函数不同，编译器不提供默认移动构造函数。</p>
+<p>假设一个类X，其中包含一个/多个指向 创建和拷贝开销较大的对象(资源) 的指针，则无需取消引用该指针并复制其内容，移动构造（拷贝）函数只需复制指针的地址， 这就是移动构造函数带来的性能优势所在（只需要浅拷贝）。</p>
+<p>（由于参数是非常量引用，因此它可以修改传递给它的对象，可能具有破坏性）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">X&amp; X::<span class="keyword">operator</span>=(<span class="type">const</span> X &amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//make a clone of what rhs&#x27;s member pointer refers to</span></span><br><span class="line">    <span class="comment">//destruct the resources that this member pointer refers to</span></span><br><span class="line">    <span class="comment">//attach the clone</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">X&amp; X::<span class="keyword">operator</span>=(X &amp;&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//swap this-&gt;pointer and rhs.pointer</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="built_in">main</span>()</span><br><span class="line">&#123;</span><br><span class="line">    X a;</span><br><span class="line">    a = <span class="built_in">X</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此，通过const lvalue 引用或 rvalue 引用参数重载函数，来编写区分不可修改对象 （lvalue） 和可修改临时值 （rvalue） 的代码。</p>
+<h3 id="Forcing-Move-Semantics">Forcing Move Semantics</h3>
+<p>如果你想通过一个变量(lvalue)来调用移动构造（拷贝）函数，std::move()会将变量(lvalue)转换为右值，使其绑定到移动构造(拷贝)函数</p>
+<blockquote>
+<p>std::move() does not move, it casts.</p>
+<p>std::move()实际上是通过static_cast实现的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">return static_cast&lt;typename std::remove_reference&lt;T&gt;::type&amp;&amp;&gt;(t);</span><br></pre></td></tr></table></figure>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; </span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(T&amp; a, T&amp; b)</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="function">T <span class="title">tmp</span><span class="params">(std::move(a))</span></span>;</span><br><span class="line">  a = std::<span class="built_in">move</span>(b); </span><br><span class="line">  b = std::<span class="built_in">move</span>(tmp);</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X a, b;</span><br><span class="line">	<span class="built_in">swap</span>(a, b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为已经将变量强制转换为右值，而接收右值的函数可能会对该变量产生破坏性作用，在此之后使用变量的内容可能会导致不确定的行为，因此在变量经过std::move()之后，需要销毁或重新分配。</p>
+<h2 id="Perfect-forwarding">Perfect forwarding</h2>
+<p>完美转发可减少对重载函数的需求，并有助于避免转发问题。 当编写一个泛型函数，该函数将<em>引用</em>作为其参数，并将这些参数传递给（或<em>转发</em>）到另一个函数时，可能会出现<em>转发问题</em>。 例如，如果泛型函数采用 <code>const T&amp;</code> 类型的参数，则调用的函数无法修改该参数的值。 如果泛型函数采用 <code>T&amp;</code> 类型的参数，则无法使用右值（如临时对象或非字符串字面量）来调用该函数。</p>
+<p>通常，若要解决此问题，则必须提供为其每个参数采用 <code>T&amp;</code> 和 <code>const T&amp;</code> 的重载版本的泛型函数。 因此，重载函数的数量将基于参数的数量呈指数方式增加。 利用右值引用，函数模板会推导出其模板自变量类型，然后使用引用折叠规则，函数可接受任意参数并将其转发给另一个函数，就像已直接调用其他函数一样。</p>
+<p>引用折叠规则：</p>
+<ul>
+<li>T&amp; &amp; -&gt; T&amp;</li>
+<li>T&amp; &amp;&amp; -&gt; T&amp;</li>
+<li>T&amp;&amp; &amp; -&gt; T&amp;</li>
+<li>T&amp;&amp; &amp;&amp; -&gt; T&amp;&amp;</li>
+</ul>
+<p>使用示例:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Arg&gt; </span></span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">factory</span><span class="params">(Arg&amp;&amp; arg)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;T&gt;(<span class="keyword">new</span> <span class="built_in">T</span>(std::forward&lt;Arg&gt;(arg)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>std::forward从概念上所实现：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_lvalue_reference&lt;T&gt;::value)<span class="comment">//Code producing an lvalue reference expects the object to remain valid.</span></span><br><span class="line">  <span class="keyword">return</span> t;</span><br><span class="line"><span class="keyword">return</span> std::<span class="built_in">move</span>(t);</span><br></pre></td></tr></table></figure>
+<h2 id="References">References</h2>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/cpp/cpp/rvalue-reference-declarator-amp-amp?view=vs-2019#syntax">Rvalue Reference Declarator: &amp;&amp; - Microsoft Docs</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=vs-2015">Value Categories - Microsoft Docs</a></p>
+<p><a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/value_category">Value categories - cppreference.com</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.chromium.org/rvalue-references?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#TOC-1.-What-makes-rvalues.">Rvalue references in Chromium</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2020/07/01/rvalue/" title="C++ Rvalue Reference">https://wywwwwei.github.io/2020/07/01/rvalue/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/04/18/handy/" rel="prev" title="handy源码分析">
+                  <i class="fa fa-angle-left"></i> handy源码分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/03/ostep-1/" rel="next" title="Notes for OSTEP">
+                  Notes for OSTEP <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
