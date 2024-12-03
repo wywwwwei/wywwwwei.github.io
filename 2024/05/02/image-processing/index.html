@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://wywwwwei.github.io/2024/05/02/image-processing/image-20241204010838685.png">
 <meta property="og:image" content="https://wywwwwei.github.io/2024/05/02/image-processing/image-20241204011100729.png">
 <meta property="article:published_time" content="2024-05-01T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-12-03T17:49:26.400Z">
+<meta property="article:modified_time" content="2024-12-03T17:53:52.836Z">
 <meta property="article:author" content="Wu Yongwei">
 <meta property="article:tag" content="Multimedia">
 <meta name="twitter:card" content="summary">
@@ -263,7 +263,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>896</span>
+      <span>941</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
@@ -330,6 +330,7 @@
 </ul>
 <img src="image-20241203224550736.png" alt="image-20241203224550736" style="zoom: 33%;" />
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage.transform <span class="keyword">import</span> rescale</span><br><span class="line">image_rescaled = rescale(image, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled2 = rescale(image_rescaled, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled3 = rescale(image_rescaled2, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">f, axs = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">6</span>, <span class="number">8</span>))</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">0</span>].imshow(image, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">1</span>].imshow(image_rescaled, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">0</span>].imshow(image_rescaled2, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">1</span>].imshow(image_rescaled3, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>The purpose of this code is to demonstrate the effects of <strong>repeatedly downscaling</strong> an image without applying any anti-aliasing filters. As the image is rescaled multiple times, the quality and resolution of the image will degrade, and the visual artifacts may become more pronounced.</p>
 <img src="image-20241203224639505.png" alt="image-20241203224639505" style="zoom: 33%;" />
 <h4 id="Image-Quantization">Image Quantization</h4>
 <ul>
