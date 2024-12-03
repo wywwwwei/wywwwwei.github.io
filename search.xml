@@ -1984,358 +1984,6 @@
   </entry>
   <entry>
     <title>Notes for OSTEP</title>
-    <url>/2020/09/10/ostep-2/</url>
-    <content><![CDATA[<h1><em>Operating Systems: Three Easy Pieces</em></h1>
-<blockquote>
-<p>Notes - Part Two</p>
-<p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
-</blockquote>
-<h2 id="Virtualization">Virtualization</h2>
-<h3 id="Scheduling-Introduction">Scheduling: Introduction</h3>
-<blockquote>
-<p>How to develop a basic framework for thinking about scheduling policies</p>
-</blockquote>
-<ul>
-<li>
-<p>Workload Assumptions</p>
-<p>Before getting into the range of possible policies, let us first make a number of <strong>simplifying assumptions</strong> about the process running in the system, sometimes collectively called <strong>workload</strong>.</p>
-<ol>
-<li>Each job runs for the same amount of time</li>
-<li>All jobs arrive at the same time</li>
-<li>Once started, each job runs to completion</li>
-<li>All jobs only use the CPU (i.e., they perform no I/O)</li>
-<li>The run-time of each job is known</li>
-</ol>
-<p>The workload assumptions are mostly <strong>unrealistic</strong>, but that is alright (for now), because we will <strong>relax</strong> them as we go, and eventually develop what we will refer to as a <strong>fully-operational scheduling discipline</strong>.</p>
-</li>
-<li>
-<p>Scheduling Metrics</p>
-<p>A metric is just something that we use to measure something. Here we simply use a single metric: <strong>turnaround time</strong>. The turnaround time of a job is defined as the time at which job completes minus the time at which the job arrived in the system.</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>r</mi><mi>o</mi><mi>u</mi><mi>n</mi><mi>d</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{turnaround}=T_{completion}−T_{arrival}
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">na</span><span class="mord mathnormal mtight">ro</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">co</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">pl</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
-<p>It is a <strong>performance metric</strong>, and another metric of interest is <strong>fairness</strong>, as measured (for example) by <strong>Jain’s Fairness Index</strong>. Performance and fairness are often <strong>at odds</strong> in scheduling.</p>
-</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th style="text-align:left"></th>
-<th style="text-align:left">FIFO</th>
-<th style="text-align:left">SJF</th>
-<th style="text-align:left">STCF / PSJF / SRTF</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"></td>
-<td style="text-align:left">non-preemptive</td>
-<td style="text-align:left">non-preemptive</td>
-<td style="text-align:left">preemptive</td>
-</tr>
-<tr>
-<td style="text-align:left">Principle</td>
-<td style="text-align:left">run the jobs that arrives earlier</td>
-<td style="text-align:left">runs the shortest job first</td>
-<td style="text-align:left">runs the jobs has the least time left</td>
-</tr>
-<tr>
-<td style="text-align:left">Timing</td>
-<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
-<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
-<td style="text-align:left">any time a new job arrives (switch to ready state)</td>
-</tr>
-<tr>
-<td style="text-align:left">Problem</td>
-<td style="text-align:left"><a href="https://www.geeksforgeeks.org/convoy-effect-operating-systems/">convoy effect</a></td>
-<td style="text-align:left">convoy effect</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left">Solve</td>
-<td style="text-align:left"></td>
-<td style="text-align:left">jobs that run for different amounts of time</td>
-<td style="text-align:left">convoy effect</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<blockquote>
-<p>A new metric for those demand interactive performance</p>
-</blockquote>
-<p>Now users would sit at a terminal and <strong>demand interactive performance</strong> from the system as well. And thus, a new metric was born: <strong>response time</strong>. We define response time as from when the job arrives in a system to the first time it is scheduled.</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi><mi>p</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi><mi>r</mi><mi>u</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{response}=T_{firstrun}−T_{arrival}
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">res</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">se</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">rs</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
-<p>But STCF and related disciplines are <strong>not particularly good for response time</strong>. For example, if three jobs arrive at the same time, the third job has to wait for the previous two jobs to run in their entirely before being scheduled just once.</p>
-<p>The general technique of <strong>amortization</strong> is commonly used in systems when there is a fixed cost of some operation. So a new scheduling algorithm, <strong>Round-Robin</strong> scheduling, is proposed. The basic idea is simple, instead of running jobs to completion, RR runs a job for a <strong>time slice</strong> (<strong>scheduling quantum</strong>) and then switch to the <strong>next job in the run queue</strong>.</p>
-<p>The length of the time slice is critical for RR, making it <strong>long enough</strong> to amortize the cost of switching without making it so long that the system is no longer responsive.</p>
-<blockquote>
-<p>Note that the cost of context switching does not arise solely from the <strong>OS actions of saving and restoring a few registers</strong>. When program runs, they build up <strong>a great deal of state in CPU caches, TLBs, branch prediction, and other on-chip hardware</strong>. Switching to another job causes this state to be flushed and new state relevant to the currently-running job to be brought in, which may exact <strong>a noticeable performance cost</strong>.</p>
-</blockquote>
-<p>RR, with a reasonable time slice, is thus an <strong>excellent</strong> scheduler if <strong>response time</strong> is the only metric. But it is indeed one of the <strong>worst policies</strong> if <strong>turnaround time</strong> is the metric.</p>
-<p>An inherent trade-off:</p>
-<p>If you are willing to unfair, you can run shortest jobs to completion, but at the cost of response time;</p>
-<p>if you instead value fairness, response time is lower, but at the cost of turnaround time.</p>
-<hr>
-<blockquote>
-<p>Relax Assumption 4: all programs perform I/O.</p>
-</blockquote>
-<p>A scheduler clearly has a decision to make both when a job initiates an I/O request and when the I/O completes.</p>
-<p>The scheduler incorporate I/O by <strong>treating each CPU burst as a job</strong>, the scheduler makes sure process that are “interactive” get <strong>run frequently</strong>. While those interactive jobs are performing I/O, other <strong>CPU-intensive</strong> jobs run, thus better utilizing the processor.</p>
-<p>Take the STCF scheduler for example, both A and B need 50ms CPU time, but A runs for 10ms and then issues an I/O request whereas B performs no I/O.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Treating A as a single job</th>
-<th style="text-align:center">Treating each CPU burst of A as a job</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="sub_job_1.png" alt="before"></td>
-<td style="text-align:center"><img src="sub_job_2.png" alt="after"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-<blockquote>
-<p>Relax Assumption 5:</p>
-<p>In a general-purpose OS, it usually knows very <strong>little about the length of each job</strong>. So how can we build an approach that behaves like SJF/STCF <strong>without such a priori knowledge</strong>?</p>
-</blockquote>
-<h3 id="Scheduling-The-Multi-Level-Feedback-Queue">Scheduling: The Multi-Level Feedback Queue</h3>
-<blockquote>
-<p>Basic Rule</p>
-</blockquote>
-<p>The MLFQ has a number of distinct queues, each assigned a different <strong>priority level</strong>. At any time, a job that is ready to run is on a single queue.</p>
-<p>Basic principle of decision:</p>
-<ul>
-<li>Rule 1: if Priority(A) &gt; Priority(B), A runs (B doesn’t)</li>
-<li>Rule 2: if Priority(A) = Priority(B), A &amp; B run in RR</li>
-</ul>
-<p>The key to MLFQ scheduling therefore lies in how the scheduler sets priorities. Rather than giving a fixed priority to each job, MLFQ <strong>varies the priority of a job based on its observed behavior</strong>. For example,</p>
-<p>a job repeatedly relinquishes the CPU -&gt; (might be) interactive -&gt; priority high</p>
-<p>a job uses the CPU intensively -&gt; reduce its priority</p>
-<blockquote>
-<p>How to change priority</p>
-</blockquote>
-<p>First attempt at a priority adjustment algorithm:</p>
-<ul>
-<li>
-<p>Rule 3: when a job enters the system, it is placed at the highest priority (the topmost queue)</p>
-</li>
-<li>
-<p>Rule 4a: if a job uses up an entire time slice while running, its priority is reduced.</p>
-</li>
-<li>
-<p>Rule 4b: if a job gives up the CPU before the time slice is up, it stays at the same priority level.</p>
-<blockquote>
-<p>Problems with current MLFQ</p>
-</blockquote>
-<ol>
-<li>
-<p>Starvation</p>
-<p>if there are “too many” interactive jobs in the system, they will combine to consume all CPU time, and thus long-running jobs will never receive any CPU time (they starve).</p>
-</li>
-<li>
-<p>A smart user could rewrite their program to <strong>game the scheduler</strong> which refers to the idea of doing something sneaky to <strong>trick</strong> the scheduler into giving you <strong>more than your fair share of the resource</strong>.</p>
-</li>
-<li>
-<p>A program may change its behavior over time; what was CPU-bound may transition to a phase of interactivity.</p>
-</li>
-</ol>
-</li>
-</ul>
-<blockquote>
-<p>The priority boost to avoid starvation</p>
-</blockquote>
-<ul>
-<li>Rule 5: After some time period S, move all the jobs in the system to the topmost queue.</li>
-</ul>
-<p>In fact, this new rule solves two problems at once. First, processes are <strong>guaranteed not to starve</strong>. Second, if a CPU-bound job has <strong>become interactive</strong>, the scheduler <strong>treats it properly</strong> once it has <strong>received the priority boost</strong>.</p>
-<p>Of course, the addition of the time period S leads to the obvious question: what should S be set to? If it is set too high, long-running jobs could starve; too slow, and interactive jobs may not get a proper share of the CPU.</p>
-<blockquote>
-<p>Better accounting to avoid gaming of scheduler</p>
-</blockquote>
-<p>The real culprit are rules 4a and 4b, which let a job <strong>retain its priority by relinquishing</strong> the CPU before the time slice expires.</p>
-<p>Rewrite them to be the following single rule:</p>
-<ul>
-<li>Rule 4: Once a job uses up its time allotment at a given level (regardless of how many times it has given up the CPU), its priority is reduced.</li>
-</ul>
-<h4 id="Summary">Summary</h4>
-<p>As for how to parameterize a scheduler, there are <strong>no easy answers</strong> to these questions, and thus only some <strong>experience with workloads and subsequent tuning</strong> of the scheduler will lead to a satisfactory balance.</p>
-<img src="MLFQ.png" alt="MLFQ" style="zoom:60%;" />
-<h3 id="Scheduling-Proportional-Share">Scheduling: Proportional Share</h3>
-<p>Instead of optimizing for turnaround time or response time, a scheduler might instead try to guarantee that each job obtain a certain percentage of CPU time.</p>
-<blockquote>
-<p>How to share the CPU proportionally?</p>
-</blockquote>
-<p>Not Deterministic - Lottery scheduling</p>
-<ol>
-<li>
-<p>Use of randomness</p>
-<p>It achieves this probabilistically (but not deterministically) by holding a lottery every time slice. Holding a lottery is straightforward: the scheduler must know how many total tickets there are. The scheduler then picks a winning ticket to determine which process to run.</p>
-<p>For example: Process A holds tickets 0 through 74 and process B holds tickets 75 through 99</p>
-<p>Then the scheduler choose from 0 - 99 and loads the state of the winning process.</p>
-<p>The <strong>randomness</strong> in lottery scheduling leads to <strong>a probabilistic correctness in meeting the desire proportion, but no guarantee</strong>.</p>
-</li>
-<li>
-<p>Ticket currency</p>
-<p>Currency allows a user with a set of tickets to <strong>allocate tickets among their jobs</strong> in whatever currency they would like; the system automatically converts said currency into the <strong>correct global value</strong>.</p>
-</li>
-<li>
-<p>Ticket transfer</p>
-<p>With transfers, a process can <strong>temporarily hand off its tickets</strong> to another process and it is especially useful in a client/server setting.</p>
-</li>
-<li>
-<p>Ticket inflation</p>
-<p>With inflation, a process can <strong>temporarily raise or lower the number of tickets it owns</strong>. (Apply in an environment where a group of processes trust one another)</p>
-</li>
-</ol>
-<p>But the ticket-assignment problem remains open.</p>
-<p>While randomness gets us a simple scheduler, it occasionally will not deliver the exact right proportions, especially over short time scales.</p>
-<hr>
-<p>Deterministic - Stride scheduling</p>
-<p>Each job in the system has a <strong>stride</strong>, which is <strong>inverse</strong> in proportion to the number of tickets it has. Every time a process runs, we will increment a counter for it (called its <strong>pass value</strong>) by its stride to track its global progress. Then pick the process to run that has the lowest pass value so far.</p>
-<p>pick client with min pass -&gt; run for quantum -&gt; update pass using stride -&gt; return the client to queue</p>
-<blockquote>
-<p>Disadvantage compared with lottery scheduling</p>
-</blockquote>
-<p>It owns a <strong>global state</strong>.</p>
-<p>Imagine a new job enters in the middle of our stride scheduling, <strong>what should its pass value be</strong>? If it is set to 0, it will monopolize the CPU.</p>
-<p>With lottery scheduling, there is no global state per process; we simply add a new process with whatever tickets it has, update the single global variable to track <strong>how many total tickets we have</strong>, and go from there.</p>
-<hr>
-<p>Linux Completely Fair Scheduler</p>
-<p>Goal: to fairly divide a CPU evenly among all competing processes.</p>
-<p>It does so through a simple <strong>counting-based</strong> technique known as <strong>virtual runtime</strong>. As each process runs, it <strong>accumulates vruntime</strong>. When a scheduling decision occurs, CFS will pick the process with the <strong>lowest vruntime to run next</strong>.</p>
-<blockquote>
-<p>How does the scheduler know when to stop the currently running process, and run the next one?</p>
-</blockquote>
-<p>If CFS switches too often, fairness is increased, as CFS will ensure that each process receives its share of CPU even over miniscule time windows, but at the cost of performance (too much context switching).</p>
-<p>If CFS switches less often, performance is increased (reduced context switching), but at cost of near-term fairness.</p>
-<blockquote>
-<p>CFS manage the tension above through various control parameters</p>
-</blockquote>
-<ul>
-<li>
-<p><code>sched_latency</code> (A typical value is 48ms)</p>
-<p>Determine how long one process should run before considering a switch (effectively determining its time slice but in a dynamic fashion). <strong>CFS divides this value by the number (n) of processes running on the CPU to determine the time slice for a process</strong>, and thus ensures that over this period of time, CFS will be completely fair.</p>
-<p>If there are too many processes running, it leads to too small of a time slice and thus too many context switches.</p>
-</li>
-<li>
-<p><code>min_granularity</code> (usually set to a value like 6ms)</p>
-<p>CFS will <strong>never set the time slice of a process to less than this value</strong>, ensuring that not too much time is spent in scheduling overhead. Although CFS won’t be perfectly fair over the target scheduling latency, it will be close, while still achieving high CPU efficiency.</p>
-</li>
-</ul>
-<p>CFS tracks vruntime precisely which allows a job has a time slice that is not a perfect multiple of the time interrupt interval.</p>
-<blockquote>
-<p>Weighting design (niceness)</p>
-</blockquote>
-<p>The <strong>nice</strong> level of a process. (can be set anywhere from -20 to +19 with a default of 0. Positive nice value imply lower priority and negative values imply higher priority)</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>l</mi><mi>i</mi><mi>c</mi><msub><mi>e</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>k</mi></msub></mrow><mrow><munderover><mo>∑</mo><mn>0</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub><mo>∗</mo><mi>s</mi><mi>c</mi><mi>h</mi><mi>e</mi><mi>d</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></mfrac><mspace linebreak="newline"></mspace><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>+</mo><mfrac><mrow><mi>N</mi><mi>I</mi><mi>C</mi><mi>E</mi><mi mathvariant="normal">_</mi><mi>O</mi><mi mathvariant="normal">_</mi><mi>L</mi><mi>O</mi><mi>A</mi><mi>D</mi></mrow><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow></mfrac><mo>∗</mo><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">time\_slice_k=\frac{weight_k}{\sum_{0}^{n-1}weight_i*sched\_latency}\\
-vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">s</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5254em;vertical-align:-1.154em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.156em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">sc</span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.03588em;">cy</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.154em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2638em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3833em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.7em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal" style="margin-right:0.05764em;">CE</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">L</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
-<p>NICE_O_LOAD is a constant default weight of a process.</p>
-<blockquote>
-<p>Using Red-Black Trees</p>
-<p>To find the next job to run quickly as soon as possible</p>
-</blockquote>
-<p>CFS only keep running (or runnable) processes in this structure.</p>
-<p>Insert / delete job: O( log(n) )</p>
-<blockquote>
-<p>Dealing with I/O and Sleeping processes</p>
-</blockquote>
-<p>CFS handles them by <strong>altering the vruntime of a job when it wakes up</strong>. Specially, CFS sets the vruntime of that job to the <strong>minimum value</strong> found in the tree to avoid starvation of other processes.</p>
-<h4 id="Summary-2">Summary</h4>
-<p>No scheduler is a panacea, and fair-share schedulers have their fair share of problems.</p>
-<ol>
-<li>do not particularly mesh well with I/O</li>
-<li>ticket or priority assignment problem</li>
-</ol>
-<h3 id="Multiprocessor-Scheduling">Multiprocessor Scheduling</h3>
-<blockquote>
-<p>difference between single-CPU hardware and multi-CPU hardware</p>
-</blockquote>
-<p>The use of hardware caches and exactly how data is shared across multiple processors.</p>
-<p>Caches fast memories that <strong>hold copies of popular data</strong> that is found in the <strong>main memory</strong> of the system.</p>
-<p>Caches are based on the <strong>notion of locality</strong>.</p>
-<ul>
-<li>
-<p>Temporal locality</p>
-<p>When a piece of data is accessed, it is likely to be accessed again in the near future</p>
-</li>
-<li>
-<p>Spatial locality</p>
-<p>If a program accesses a data item at address <em>x</em>, it is likely to access data item near <em>x</em> as well.</p>
-</li>
-</ul>
-<p>Caching with multiple CPUs is much more complicated. For example, it will cause a general problem - <strong>cache coherence</strong></p>
-<blockquote>
-<p>Solution to maintain a cache coherence</p>
-</blockquote>
-<p>Basic solution provided by the hardware: by <strong>monitoring memory accesses</strong>, hardware can ensure that basically the <strong>“right thing” happens</strong> and that the view of a single shared memory is preserved.</p>
-<p>One way to do this on a bus-based system is to use an old technique known as <strong>bus snooping</strong>; each cache pays attention to memory updates by observing the bus that connects them to main memory. When a CPU then sees an update for a data item it holds in memory, it will <strong>notice the change</strong> and either <strong>invalidate</strong> (remove it from its own cache) its copy or <strong>update</strong> it (put the new value into its cache).</p>
-<blockquote>
-<p>Synchronization</p>
-</blockquote>
-<p>When accessing / updating shared data items or structures across CPUs, <strong>mutual exclusion primitives</strong> (such as <strong>locks</strong>) should likely to be used to guarantee correctness (other approaches, such as <strong>building lock-free data structures</strong>). But locking will create the problem with regards to performance especially as the number of CPU grows.</p>
-<blockquote>
-<p>Cache affinity</p>
-</blockquote>
-<p>A process, when run on a particular CPU, builds up a fair bit of state in the caches (and TLBs) of the CPU. The next time the process runs, it is often advantageous to run it <strong>on the same CPU</strong>, as it will run faster if <strong>some of its state is already present</strong> in the caches on that CPU.</p>
-<p>A multiprocessor scheduler should consider cache affinity when making its scheduling decisions, perhaps <strong>preferring to keep a process on the same CPU</strong> if all at possible.</p>
-<h4 id="Single-Queue-Scheduling">Single-Queue Scheduling</h4>
-<p>The most basic approach is to simply reuse the basic framework for single processor scheduling, by <strong>putting all jobs that need to scheduled into a single queue</strong>; we call this single-queue multiprocessor scheduling (SQMS).</p>
-<p>Advantage:</p>
-<ul>
-<li>Simplicity. Not require much work to take an existing pick policy and adapt it to work on more than one CPU.</li>
-</ul>
-<p>Disadvantage:</p>
-<ul>
-<li>
-<p>Lack of scalability. The developers have to inserted some form of locking into code which greatly reduce performance to ensure correct access to the single queue.</p>
-</li>
-<li>
-<p>Cache affinity</p>
-<p>Each CPU simply picks the next job to run from the globally shared queue, each job ends up bouncing around from CPU to CPU, thus doing exactly the opposite of what would make sense from the stand point of cache affinity.</p>
-<p>To handle this problem, most SQMS schedulers include some kind of affinity mechanism. One might provide affinity for some jobs, but move others around to balance load.</p>
-</li>
-</ul>
-<h4 id="Multi-Queue-Scheduling">Multi-Queue Scheduling</h4>
-<p>Some system opt for multiple queues, e.g., one per CPU. We call it multi-queue multiprocessor scheduling (MQMS)</p>
-<p>In MQMS, our basic scheduling framework consists of multiple scheduling queues. <strong>Each queue will likely follow a particular scheduling discipline</strong>, such as round-robin, though of any algorithm can be used.</p>
-<p>When a job enters the system, it is placed on exactly one scheduling queue, according to some heuristic. Then it is scheduled essentially independently.</p>
-<p>Advantage:</p>
-<ul>
-<li>Avoiding the problems of information sharing and synchronization found in the single-queue approach</li>
-<li>Inherently more scalable ( lock and cache contention not become a central problem; intrinsically provides cache affinity)</li>
-</ul>
-<p>Disadvantage:</p>
-<ul>
-<li><strong>load imbalance</strong></li>
-</ul>
-<blockquote>
-<p>How to deal with load imbalance</p>
-</blockquote>
-<p>By <strong>migrating</strong> a job from one CPU to another, true load balance can be achieved.</p>
-<blockquote>
-<p>How should the system decide to enact a migration</p>
-</blockquote>
-<p><strong>Work stealing</strong>. A queue that is low on jobs will occasionally peek at another queue, to see how full it is. If the target queue is more full than the source queue, the source will steal one or more jobs from the target to help balance load.</p>
-<p>However, if you look around at other queues too often, you will suffer from <strong>high overhead and have trouble scaling</strong>. If you don’t look at other queues very often, you are in danger of <strong>suffering from severe load imbalances</strong>.</p>
-<h4 id="Linux-Multiprocessor-Schedulers">Linux Multiprocessor Schedulers</h4>
-<p>Both O(1) and CFS use multiple queues, whereas BFS uses a single queue.</p>
-<p>O(1) scheduler is a priority-based scheduler (similar to the MLFQ), changing a process’s priority over time and then scheduling those with highest priority in order to meet various scheduling objectives.</p>
-<p>CFS, in contrast, is a deterministic proportional-share approach (more like stride scheduling).</p>
-<p>BFS, is also proportional-share, but based on a more complicated scheme known as Earliest Eligible Virtual Deadline First (EEVDF).</p>
-]]></content>
-      <categories>
-        <category>Notes</category>
-      </categories>
-      <tags>
-        <tag>Operating System</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Notes for OSTEP</title>
     <url>/2021/08/23/ostep-3/</url>
     <content><![CDATA[<h1><em>Operating Systems: Three Easy Pieces</em></h1>
 <blockquote>
@@ -2861,6 +2509,102 @@ vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
       </tags>
   </entry>
   <entry>
+    <title>Image Processing</title>
+    <url>/2024/05/02/image-processing/</url>
+    <content><![CDATA[<h2 id="Concepts">Concepts</h2>
+<ul>
+<li>
+<p>Image Processing</p>
+<ul>
+<li>
+<p>Improvement of pictorial information for human interpretation</p>
+</li>
+<li>
+<p>Processing of image data for storage, transmission, and representation for autonomous machine perception</p>
+</li>
+<li>
+<p>Digital IP refers to processing of digital images by means of a computer</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Computer Vision</p>
+<ul>
+<li>A branch of artificial intelligence</li>
+<li>Analyse and understand images</li>
+<li>Comparable to the human vision system, including
+<ul>
+<li>Learning</li>
+<li>Being able to make inferences</li>
+<li>Taking actions based on visual inputs</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>IP vs CV</p>
+<p>There is a continuum from IP at one end to CV at the other. The area Image Analysis is in between IP and CV.</p>
+<p><img src="image-20241007030550578.png" alt="image-20241007030550578"></p>
+</li>
+</ul>
+<h2 id="Image-Processing">Image Processing</h2>
+<p>Consider a monochromatic image, denote images by 2D functions of the form f(x, y).</p>
+<h3 id="Image-Sampling-Quantization">Image Sampling &amp; Quantization</h3>
+<p>An image may be continuous with respect to the x and y spatial coordinates and also in amplitude. To convert an image into digital form, the function has to be sampled in both coordinates and amplitudes</p>
+<ul>
+<li>Digitizing the coordinate values is called sampling</li>
+<li>Digitizing the amplitude values is called quantization</li>
+</ul>
+<h4 id="Image-Sampling">Image Sampling</h4>
+<ul>
+<li>Example</li>
+</ul>
+<img src="image-20241203224550736.png" alt="image-20241203224550736" style="zoom: 33%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage.transform <span class="keyword">import</span> rescale</span><br><span class="line">image_rescaled = rescale(image, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled2 = rescale(image_rescaled, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled3 = rescale(image_rescaled2, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">f, axs = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">6</span>, <span class="number">8</span>))</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">0</span>].imshow(image, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">1</span>].imshow(image_rescaled, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">0</span>].imshow(image_rescaled2, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">1</span>].imshow(image_rescaled3, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241203224639505.png" alt="image-20241203224639505" style="zoom: 33%;" />
+<h4 id="Image-Quantization">Image Quantization</h4>
+<ul>
+<li>False Contouring</li>
+</ul>
+<blockquote>
+<p>False contouring can occur in digital images when the number of displayable colors is limited. It happens when the continuous tonal gradients in the original image are not accurately reproduced due to the limited number of discrete color levels available in the output device or image format.</p>
+<p><strong>False contouring is a direct consequence of the image quantization process.</strong> When the number of color levels is reduced too drastically, the resulting discrete steps between color levels become visible as false contours in the image.</p>
+</blockquote>
+<img src="image-20241203232732722.png" alt="image-20241203232732722" style="zoom:50%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># The purpose of this code is to demonstrate the effect </span></span><br><span class="line"><span class="comment"># of bit depth reduction on an image.  </span></span><br><span class="line"><span class="comment"># By performing a bitwise right shift operation on the image, </span></span><br><span class="line"><span class="comment"># the code creates a series of images with different bit depths, </span></span><br><span class="line"><span class="comment"># effectively reducing the number of grayscale levels.</span></span><br><span class="line">fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line"><span class="keyword">for</span> i, ax <span class="keyword">in</span> <span class="built_in">enumerate</span>(axes.flat):</span><br><span class="line">    ax.imshow(image &gt;&gt; i, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">    ax.axis(<span class="string">&#x27;off&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241203232818382.png" alt="image-20241203232818382" style="zoom:50%;" />
+<ul>
+<li>Saturation and Noise</li>
+</ul>
+<blockquote>
+<p>When an image is quantized, the continuous tonal range is mapped to a smaller set of discrete color levels.  This can result in the amplification or accentuation of noise patterns, as the subtle variations in pixel values may be lost or masked by the discrete color levels.<br>
+In areas of the image with low contrast or subtle details, the quantization process can make noise more visible and pronounced, as the small variations in pixel values are more likely to be affected by the reduction in color levels.</p>
+</blockquote>
+<img src="image-20241204010527996.png" alt="image-20241204010527996" style="zoom: 33%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># The purpose of this code is to highlight the saturated pixels </span></span><br><span class="line"><span class="comment"># in an image, which are the pixels that have reached the </span></span><br><span class="line"><span class="comment"># maximum value of 255 (in an 8-bit grayscale image). </span></span><br><span class="line"><span class="comment"># This is often useful for identifying areas of the image that are </span></span><br><span class="line"><span class="comment"># overexposed or have lost detail due to the pixels being saturated.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> skimage.color <span class="keyword">import</span> gray2rgb</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find the saturated pixels</span></span><br><span class="line">saturated_mask = (image &gt;= <span class="number">255</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Convert the highlight image to rgb</span></span><br><span class="line">highlighted_image = gray2rgb(image)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Highlight the saturated pixels in red</span></span><br><span class="line">highlighted_image[saturated_mask] = [<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">plt.imshow(highlighted_image)</span><br></pre></td></tr></table></figure>
+<img src="image-20241204010542818.png" alt="image-20241204010542818" style="zoom: 33%;" />
+<ul>
+<li>
+<p>Bit Plane Slicing</p>
+<blockquote>
+<p>Bit plane slicing is a technique used to analyze the contribution of individual bit planes (the binary digits that make up the pixel values) in a digital image.</p>
+<img src="image-20241204010957744.png" alt="image-20241204010957744" style="zoom:33%;" />
+<p>Bit plane slicing can be used to understand the impact of quantization on the image, as the removal of lower-order bit planes during quantization directly affects the visual information contained in the image.</p>
+</blockquote>
+</li>
+</ul>
+<img src="image-20241204010838685.png" alt="image-20241204010838685" style="zoom: 33%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># The purpose of this code is to extract the </span></span><br><span class="line"><span class="comment"># most significant bit plane of an image.</span></span><br><span class="line"><span class="comment"># By extracting the most significant bit plane, </span></span><br><span class="line"><span class="comment"># this code can provide a simplified representation of the image, </span></span><br><span class="line"><span class="comment"># highlighting the high-level features and structures </span></span><br><span class="line"><span class="comment"># that are determined by the most significant bits.</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_k_bitPlane</span>(<span class="params">image, k</span>):</span><br><span class="line">    <span class="keyword">return</span> np.where(image&amp;(<span class="number">1</span>&lt;&lt;k), <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">most_significant_bitplane = get_k_bitPlane(image, <span class="number">0</span>)</span><br><span class="line">plt.imshow(most_significant_bitplane, cmap=<span class="string">&#x27;gray&#x27;</span>, vmin=<span class="number">0</span>, vmax=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># The purpose of this modified code is to extract </span></span><br><span class="line"><span class="comment"># and display multiple bit planes of an image.</span></span><br><span class="line"><span class="comment"># By selectively displaying or processing different bit planes, </span></span><br><span class="line"><span class="comment"># you can gain insights into the image data and </span></span><br><span class="line"><span class="comment"># potentially improve the performance of various image processing algorithms.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Using bit plane 6 and 7</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_k_bitsPlane</span>(<span class="params">image, kbits</span>):</span><br><span class="line">    new_image = np.zeros_like(image)</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> kbits:</span><br><span class="line">        new_image = new_image &lt;&lt; <span class="number">1</span></span><br><span class="line">        new_image += np.where(image &amp; (<span class="number">1</span> &lt;&lt; k), <span class="number">1</span>, <span class="number">0</span>).astype(new_image.dtype)</span><br><span class="line">    <span class="keyword">return</span> new_image</span><br><span class="line">bits = [<span class="number">7</span>, <span class="number">6</span>]</span><br><span class="line">plt.imshow(get_k_bitsPlane(image, bits), cmap=<span class="string">&#x27;gray&#x27;</span>, vmin=<span class="number">0</span>, vmax=<span class="number">2</span> ** <span class="built_in">len</span>(bits) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241204011100729.png" alt="image-20241204011100729" style="zoom:50%;" />
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>Multimedia</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ Smart Pointers</title>
     <url>/2020/08/12/pointer/</url>
     <content><![CDATA[<h1>C++ Smart Pointers</h1>
@@ -2916,6 +2660,358 @@ vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
       </categories>
       <tags>
         <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Notes for OSTEP</title>
+    <url>/2020/09/10/ostep-2/</url>
+    <content><![CDATA[<h1><em>Operating Systems: Three Easy Pieces</em></h1>
+<blockquote>
+<p>Notes - Part Two</p>
+<p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
+</blockquote>
+<h2 id="Virtualization">Virtualization</h2>
+<h3 id="Scheduling-Introduction">Scheduling: Introduction</h3>
+<blockquote>
+<p>How to develop a basic framework for thinking about scheduling policies</p>
+</blockquote>
+<ul>
+<li>
+<p>Workload Assumptions</p>
+<p>Before getting into the range of possible policies, let us first make a number of <strong>simplifying assumptions</strong> about the process running in the system, sometimes collectively called <strong>workload</strong>.</p>
+<ol>
+<li>Each job runs for the same amount of time</li>
+<li>All jobs arrive at the same time</li>
+<li>Once started, each job runs to completion</li>
+<li>All jobs only use the CPU (i.e., they perform no I/O)</li>
+<li>The run-time of each job is known</li>
+</ol>
+<p>The workload assumptions are mostly <strong>unrealistic</strong>, but that is alright (for now), because we will <strong>relax</strong> them as we go, and eventually develop what we will refer to as a <strong>fully-operational scheduling discipline</strong>.</p>
+</li>
+<li>
+<p>Scheduling Metrics</p>
+<p>A metric is just something that we use to measure something. Here we simply use a single metric: <strong>turnaround time</strong>. The turnaround time of a job is defined as the time at which job completes minus the time at which the job arrived in the system.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>r</mi><mi>o</mi><mi>u</mi><mi>n</mi><mi>d</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{turnaround}=T_{completion}−T_{arrival}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">na</span><span class="mord mathnormal mtight">ro</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">co</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">pl</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>It is a <strong>performance metric</strong>, and another metric of interest is <strong>fairness</strong>, as measured (for example) by <strong>Jain’s Fairness Index</strong>. Performance and fairness are often <strong>at odds</strong> in scheduling.</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">FIFO</th>
+<th style="text-align:left">SJF</th>
+<th style="text-align:left">STCF / PSJF / SRTF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">non-preemptive</td>
+<td style="text-align:left">non-preemptive</td>
+<td style="text-align:left">preemptive</td>
+</tr>
+<tr>
+<td style="text-align:left">Principle</td>
+<td style="text-align:left">run the jobs that arrives earlier</td>
+<td style="text-align:left">runs the shortest job first</td>
+<td style="text-align:left">runs the jobs has the least time left</td>
+</tr>
+<tr>
+<td style="text-align:left">Timing</td>
+<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
+<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
+<td style="text-align:left">any time a new job arrives (switch to ready state)</td>
+</tr>
+<tr>
+<td style="text-align:left">Problem</td>
+<td style="text-align:left"><a href="https://www.geeksforgeeks.org/convoy-effect-operating-systems/">convoy effect</a></td>
+<td style="text-align:left">convoy effect</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">Solve</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">jobs that run for different amounts of time</td>
+<td style="text-align:left">convoy effect</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<blockquote>
+<p>A new metric for those demand interactive performance</p>
+</blockquote>
+<p>Now users would sit at a terminal and <strong>demand interactive performance</strong> from the system as well. And thus, a new metric was born: <strong>response time</strong>. We define response time as from when the job arrives in a system to the first time it is scheduled.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi><mi>p</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi><mi>r</mi><mi>u</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{response}=T_{firstrun}−T_{arrival}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">res</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">se</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">rs</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>But STCF and related disciplines are <strong>not particularly good for response time</strong>. For example, if three jobs arrive at the same time, the third job has to wait for the previous two jobs to run in their entirely before being scheduled just once.</p>
+<p>The general technique of <strong>amortization</strong> is commonly used in systems when there is a fixed cost of some operation. So a new scheduling algorithm, <strong>Round-Robin</strong> scheduling, is proposed. The basic idea is simple, instead of running jobs to completion, RR runs a job for a <strong>time slice</strong> (<strong>scheduling quantum</strong>) and then switch to the <strong>next job in the run queue</strong>.</p>
+<p>The length of the time slice is critical for RR, making it <strong>long enough</strong> to amortize the cost of switching without making it so long that the system is no longer responsive.</p>
+<blockquote>
+<p>Note that the cost of context switching does not arise solely from the <strong>OS actions of saving and restoring a few registers</strong>. When program runs, they build up <strong>a great deal of state in CPU caches, TLBs, branch prediction, and other on-chip hardware</strong>. Switching to another job causes this state to be flushed and new state relevant to the currently-running job to be brought in, which may exact <strong>a noticeable performance cost</strong>.</p>
+</blockquote>
+<p>RR, with a reasonable time slice, is thus an <strong>excellent</strong> scheduler if <strong>response time</strong> is the only metric. But it is indeed one of the <strong>worst policies</strong> if <strong>turnaround time</strong> is the metric.</p>
+<p>An inherent trade-off:</p>
+<p>If you are willing to unfair, you can run shortest jobs to completion, but at the cost of response time;</p>
+<p>if you instead value fairness, response time is lower, but at the cost of turnaround time.</p>
+<hr>
+<blockquote>
+<p>Relax Assumption 4: all programs perform I/O.</p>
+</blockquote>
+<p>A scheduler clearly has a decision to make both when a job initiates an I/O request and when the I/O completes.</p>
+<p>The scheduler incorporate I/O by <strong>treating each CPU burst as a job</strong>, the scheduler makes sure process that are “interactive” get <strong>run frequently</strong>. While those interactive jobs are performing I/O, other <strong>CPU-intensive</strong> jobs run, thus better utilizing the processor.</p>
+<p>Take the STCF scheduler for example, both A and B need 50ms CPU time, but A runs for 10ms and then issues an I/O request whereas B performs no I/O.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Treating A as a single job</th>
+<th style="text-align:center">Treating each CPU burst of A as a job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="sub_job_1.png" alt="before"></td>
+<td style="text-align:center"><img src="sub_job_2.png" alt="after"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<blockquote>
+<p>Relax Assumption 5:</p>
+<p>In a general-purpose OS, it usually knows very <strong>little about the length of each job</strong>. So how can we build an approach that behaves like SJF/STCF <strong>without such a priori knowledge</strong>?</p>
+</blockquote>
+<h3 id="Scheduling-The-Multi-Level-Feedback-Queue">Scheduling: The Multi-Level Feedback Queue</h3>
+<blockquote>
+<p>Basic Rule</p>
+</blockquote>
+<p>The MLFQ has a number of distinct queues, each assigned a different <strong>priority level</strong>. At any time, a job that is ready to run is on a single queue.</p>
+<p>Basic principle of decision:</p>
+<ul>
+<li>Rule 1: if Priority(A) &gt; Priority(B), A runs (B doesn’t)</li>
+<li>Rule 2: if Priority(A) = Priority(B), A &amp; B run in RR</li>
+</ul>
+<p>The key to MLFQ scheduling therefore lies in how the scheduler sets priorities. Rather than giving a fixed priority to each job, MLFQ <strong>varies the priority of a job based on its observed behavior</strong>. For example,</p>
+<p>a job repeatedly relinquishes the CPU -&gt; (might be) interactive -&gt; priority high</p>
+<p>a job uses the CPU intensively -&gt; reduce its priority</p>
+<blockquote>
+<p>How to change priority</p>
+</blockquote>
+<p>First attempt at a priority adjustment algorithm:</p>
+<ul>
+<li>
+<p>Rule 3: when a job enters the system, it is placed at the highest priority (the topmost queue)</p>
+</li>
+<li>
+<p>Rule 4a: if a job uses up an entire time slice while running, its priority is reduced.</p>
+</li>
+<li>
+<p>Rule 4b: if a job gives up the CPU before the time slice is up, it stays at the same priority level.</p>
+<blockquote>
+<p>Problems with current MLFQ</p>
+</blockquote>
+<ol>
+<li>
+<p>Starvation</p>
+<p>if there are “too many” interactive jobs in the system, they will combine to consume all CPU time, and thus long-running jobs will never receive any CPU time (they starve).</p>
+</li>
+<li>
+<p>A smart user could rewrite their program to <strong>game the scheduler</strong> which refers to the idea of doing something sneaky to <strong>trick</strong> the scheduler into giving you <strong>more than your fair share of the resource</strong>.</p>
+</li>
+<li>
+<p>A program may change its behavior over time; what was CPU-bound may transition to a phase of interactivity.</p>
+</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>The priority boost to avoid starvation</p>
+</blockquote>
+<ul>
+<li>Rule 5: After some time period S, move all the jobs in the system to the topmost queue.</li>
+</ul>
+<p>In fact, this new rule solves two problems at once. First, processes are <strong>guaranteed not to starve</strong>. Second, if a CPU-bound job has <strong>become interactive</strong>, the scheduler <strong>treats it properly</strong> once it has <strong>received the priority boost</strong>.</p>
+<p>Of course, the addition of the time period S leads to the obvious question: what should S be set to? If it is set too high, long-running jobs could starve; too slow, and interactive jobs may not get a proper share of the CPU.</p>
+<blockquote>
+<p>Better accounting to avoid gaming of scheduler</p>
+</blockquote>
+<p>The real culprit are rules 4a and 4b, which let a job <strong>retain its priority by relinquishing</strong> the CPU before the time slice expires.</p>
+<p>Rewrite them to be the following single rule:</p>
+<ul>
+<li>Rule 4: Once a job uses up its time allotment at a given level (regardless of how many times it has given up the CPU), its priority is reduced.</li>
+</ul>
+<h4 id="Summary">Summary</h4>
+<p>As for how to parameterize a scheduler, there are <strong>no easy answers</strong> to these questions, and thus only some <strong>experience with workloads and subsequent tuning</strong> of the scheduler will lead to a satisfactory balance.</p>
+<img src="MLFQ.png" alt="MLFQ" style="zoom:60%;" />
+<h3 id="Scheduling-Proportional-Share">Scheduling: Proportional Share</h3>
+<p>Instead of optimizing for turnaround time or response time, a scheduler might instead try to guarantee that each job obtain a certain percentage of CPU time.</p>
+<blockquote>
+<p>How to share the CPU proportionally?</p>
+</blockquote>
+<p>Not Deterministic - Lottery scheduling</p>
+<ol>
+<li>
+<p>Use of randomness</p>
+<p>It achieves this probabilistically (but not deterministically) by holding a lottery every time slice. Holding a lottery is straightforward: the scheduler must know how many total tickets there are. The scheduler then picks a winning ticket to determine which process to run.</p>
+<p>For example: Process A holds tickets 0 through 74 and process B holds tickets 75 through 99</p>
+<p>Then the scheduler choose from 0 - 99 and loads the state of the winning process.</p>
+<p>The <strong>randomness</strong> in lottery scheduling leads to <strong>a probabilistic correctness in meeting the desire proportion, but no guarantee</strong>.</p>
+</li>
+<li>
+<p>Ticket currency</p>
+<p>Currency allows a user with a set of tickets to <strong>allocate tickets among their jobs</strong> in whatever currency they would like; the system automatically converts said currency into the <strong>correct global value</strong>.</p>
+</li>
+<li>
+<p>Ticket transfer</p>
+<p>With transfers, a process can <strong>temporarily hand off its tickets</strong> to another process and it is especially useful in a client/server setting.</p>
+</li>
+<li>
+<p>Ticket inflation</p>
+<p>With inflation, a process can <strong>temporarily raise or lower the number of tickets it owns</strong>. (Apply in an environment where a group of processes trust one another)</p>
+</li>
+</ol>
+<p>But the ticket-assignment problem remains open.</p>
+<p>While randomness gets us a simple scheduler, it occasionally will not deliver the exact right proportions, especially over short time scales.</p>
+<hr>
+<p>Deterministic - Stride scheduling</p>
+<p>Each job in the system has a <strong>stride</strong>, which is <strong>inverse</strong> in proportion to the number of tickets it has. Every time a process runs, we will increment a counter for it (called its <strong>pass value</strong>) by its stride to track its global progress. Then pick the process to run that has the lowest pass value so far.</p>
+<p>pick client with min pass -&gt; run for quantum -&gt; update pass using stride -&gt; return the client to queue</p>
+<blockquote>
+<p>Disadvantage compared with lottery scheduling</p>
+</blockquote>
+<p>It owns a <strong>global state</strong>.</p>
+<p>Imagine a new job enters in the middle of our stride scheduling, <strong>what should its pass value be</strong>? If it is set to 0, it will monopolize the CPU.</p>
+<p>With lottery scheduling, there is no global state per process; we simply add a new process with whatever tickets it has, update the single global variable to track <strong>how many total tickets we have</strong>, and go from there.</p>
+<hr>
+<p>Linux Completely Fair Scheduler</p>
+<p>Goal: to fairly divide a CPU evenly among all competing processes.</p>
+<p>It does so through a simple <strong>counting-based</strong> technique known as <strong>virtual runtime</strong>. As each process runs, it <strong>accumulates vruntime</strong>. When a scheduling decision occurs, CFS will pick the process with the <strong>lowest vruntime to run next</strong>.</p>
+<blockquote>
+<p>How does the scheduler know when to stop the currently running process, and run the next one?</p>
+</blockquote>
+<p>If CFS switches too often, fairness is increased, as CFS will ensure that each process receives its share of CPU even over miniscule time windows, but at the cost of performance (too much context switching).</p>
+<p>If CFS switches less often, performance is increased (reduced context switching), but at cost of near-term fairness.</p>
+<blockquote>
+<p>CFS manage the tension above through various control parameters</p>
+</blockquote>
+<ul>
+<li>
+<p><code>sched_latency</code> (A typical value is 48ms)</p>
+<p>Determine how long one process should run before considering a switch (effectively determining its time slice but in a dynamic fashion). <strong>CFS divides this value by the number (n) of processes running on the CPU to determine the time slice for a process</strong>, and thus ensures that over this period of time, CFS will be completely fair.</p>
+<p>If there are too many processes running, it leads to too small of a time slice and thus too many context switches.</p>
+</li>
+<li>
+<p><code>min_granularity</code> (usually set to a value like 6ms)</p>
+<p>CFS will <strong>never set the time slice of a process to less than this value</strong>, ensuring that not too much time is spent in scheduling overhead. Although CFS won’t be perfectly fair over the target scheduling latency, it will be close, while still achieving high CPU efficiency.</p>
+</li>
+</ul>
+<p>CFS tracks vruntime precisely which allows a job has a time slice that is not a perfect multiple of the time interrupt interval.</p>
+<blockquote>
+<p>Weighting design (niceness)</p>
+</blockquote>
+<p>The <strong>nice</strong> level of a process. (can be set anywhere from -20 to +19 with a default of 0. Positive nice value imply lower priority and negative values imply higher priority)</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>l</mi><mi>i</mi><mi>c</mi><msub><mi>e</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>k</mi></msub></mrow><mrow><munderover><mo>∑</mo><mn>0</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub><mo>∗</mo><mi>s</mi><mi>c</mi><mi>h</mi><mi>e</mi><mi>d</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></mfrac><mspace linebreak="newline"></mspace><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>+</mo><mfrac><mrow><mi>N</mi><mi>I</mi><mi>C</mi><mi>E</mi><mi mathvariant="normal">_</mi><mi>O</mi><mi mathvariant="normal">_</mi><mi>L</mi><mi>O</mi><mi>A</mi><mi>D</mi></mrow><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow></mfrac><mo>∗</mo><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">time\_slice_k=\frac{weight_k}{\sum_{0}^{n-1}weight_i*sched\_latency}\\
+vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">s</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5254em;vertical-align:-1.154em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.156em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">sc</span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.03588em;">cy</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.154em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2638em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3833em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.7em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal" style="margin-right:0.05764em;">CE</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">L</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>NICE_O_LOAD is a constant default weight of a process.</p>
+<blockquote>
+<p>Using Red-Black Trees</p>
+<p>To find the next job to run quickly as soon as possible</p>
+</blockquote>
+<p>CFS only keep running (or runnable) processes in this structure.</p>
+<p>Insert / delete job: O( log(n) )</p>
+<blockquote>
+<p>Dealing with I/O and Sleeping processes</p>
+</blockquote>
+<p>CFS handles them by <strong>altering the vruntime of a job when it wakes up</strong>. Specially, CFS sets the vruntime of that job to the <strong>minimum value</strong> found in the tree to avoid starvation of other processes.</p>
+<h4 id="Summary-2">Summary</h4>
+<p>No scheduler is a panacea, and fair-share schedulers have their fair share of problems.</p>
+<ol>
+<li>do not particularly mesh well with I/O</li>
+<li>ticket or priority assignment problem</li>
+</ol>
+<h3 id="Multiprocessor-Scheduling">Multiprocessor Scheduling</h3>
+<blockquote>
+<p>difference between single-CPU hardware and multi-CPU hardware</p>
+</blockquote>
+<p>The use of hardware caches and exactly how data is shared across multiple processors.</p>
+<p>Caches fast memories that <strong>hold copies of popular data</strong> that is found in the <strong>main memory</strong> of the system.</p>
+<p>Caches are based on the <strong>notion of locality</strong>.</p>
+<ul>
+<li>
+<p>Temporal locality</p>
+<p>When a piece of data is accessed, it is likely to be accessed again in the near future</p>
+</li>
+<li>
+<p>Spatial locality</p>
+<p>If a program accesses a data item at address <em>x</em>, it is likely to access data item near <em>x</em> as well.</p>
+</li>
+</ul>
+<p>Caching with multiple CPUs is much more complicated. For example, it will cause a general problem - <strong>cache coherence</strong></p>
+<blockquote>
+<p>Solution to maintain a cache coherence</p>
+</blockquote>
+<p>Basic solution provided by the hardware: by <strong>monitoring memory accesses</strong>, hardware can ensure that basically the <strong>“right thing” happens</strong> and that the view of a single shared memory is preserved.</p>
+<p>One way to do this on a bus-based system is to use an old technique known as <strong>bus snooping</strong>; each cache pays attention to memory updates by observing the bus that connects them to main memory. When a CPU then sees an update for a data item it holds in memory, it will <strong>notice the change</strong> and either <strong>invalidate</strong> (remove it from its own cache) its copy or <strong>update</strong> it (put the new value into its cache).</p>
+<blockquote>
+<p>Synchronization</p>
+</blockquote>
+<p>When accessing / updating shared data items or structures across CPUs, <strong>mutual exclusion primitives</strong> (such as <strong>locks</strong>) should likely to be used to guarantee correctness (other approaches, such as <strong>building lock-free data structures</strong>). But locking will create the problem with regards to performance especially as the number of CPU grows.</p>
+<blockquote>
+<p>Cache affinity</p>
+</blockquote>
+<p>A process, when run on a particular CPU, builds up a fair bit of state in the caches (and TLBs) of the CPU. The next time the process runs, it is often advantageous to run it <strong>on the same CPU</strong>, as it will run faster if <strong>some of its state is already present</strong> in the caches on that CPU.</p>
+<p>A multiprocessor scheduler should consider cache affinity when making its scheduling decisions, perhaps <strong>preferring to keep a process on the same CPU</strong> if all at possible.</p>
+<h4 id="Single-Queue-Scheduling">Single-Queue Scheduling</h4>
+<p>The most basic approach is to simply reuse the basic framework for single processor scheduling, by <strong>putting all jobs that need to scheduled into a single queue</strong>; we call this single-queue multiprocessor scheduling (SQMS).</p>
+<p>Advantage:</p>
+<ul>
+<li>Simplicity. Not require much work to take an existing pick policy and adapt it to work on more than one CPU.</li>
+</ul>
+<p>Disadvantage:</p>
+<ul>
+<li>
+<p>Lack of scalability. The developers have to inserted some form of locking into code which greatly reduce performance to ensure correct access to the single queue.</p>
+</li>
+<li>
+<p>Cache affinity</p>
+<p>Each CPU simply picks the next job to run from the globally shared queue, each job ends up bouncing around from CPU to CPU, thus doing exactly the opposite of what would make sense from the stand point of cache affinity.</p>
+<p>To handle this problem, most SQMS schedulers include some kind of affinity mechanism. One might provide affinity for some jobs, but move others around to balance load.</p>
+</li>
+</ul>
+<h4 id="Multi-Queue-Scheduling">Multi-Queue Scheduling</h4>
+<p>Some system opt for multiple queues, e.g., one per CPU. We call it multi-queue multiprocessor scheduling (MQMS)</p>
+<p>In MQMS, our basic scheduling framework consists of multiple scheduling queues. <strong>Each queue will likely follow a particular scheduling discipline</strong>, such as round-robin, though of any algorithm can be used.</p>
+<p>When a job enters the system, it is placed on exactly one scheduling queue, according to some heuristic. Then it is scheduled essentially independently.</p>
+<p>Advantage:</p>
+<ul>
+<li>Avoiding the problems of information sharing and synchronization found in the single-queue approach</li>
+<li>Inherently more scalable ( lock and cache contention not become a central problem; intrinsically provides cache affinity)</li>
+</ul>
+<p>Disadvantage:</p>
+<ul>
+<li><strong>load imbalance</strong></li>
+</ul>
+<blockquote>
+<p>How to deal with load imbalance</p>
+</blockquote>
+<p>By <strong>migrating</strong> a job from one CPU to another, true load balance can be achieved.</p>
+<blockquote>
+<p>How should the system decide to enact a migration</p>
+</blockquote>
+<p><strong>Work stealing</strong>. A queue that is low on jobs will occasionally peek at another queue, to see how full it is. If the target queue is more full than the source queue, the source will steal one or more jobs from the target to help balance load.</p>
+<p>However, if you look around at other queues too often, you will suffer from <strong>high overhead and have trouble scaling</strong>. If you don’t look at other queues very often, you are in danger of <strong>suffering from severe load imbalances</strong>.</p>
+<h4 id="Linux-Multiprocessor-Schedulers">Linux Multiprocessor Schedulers</h4>
+<p>Both O(1) and CFS use multiple queues, whereas BFS uses a single queue.</p>
+<p>O(1) scheduler is a priority-based scheduler (similar to the MLFQ), changing a process’s priority over time and then scheduling those with highest priority in order to meet various scheduling objectives.</p>
+<p>CFS, in contrast, is a deterministic proportional-share approach (more like stride scheduling).</p>
+<p>BFS, is also proportional-share, but based on a more complicated scheme known as Earliest Eligible Virtual Deadline First (EEVDF).</p>
+]]></content>
+      <categories>
+        <category>Notes</category>
+      </categories>
+      <tags>
+        <tag>Operating System</tag>
       </tags>
   </entry>
   <entry>
