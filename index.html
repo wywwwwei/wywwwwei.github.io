@@ -148,13 +148,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -188,6 +188,196 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2024/10/01/VideoStartUp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/10/01/VideoStartUp/" class="post-title-link" itemprop="url">Optimizing First Open Time in Media Player Applications</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2024-10-01T00:00:00+08:00">2024-10-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Application/" itemprop="url" rel="index"><span itemprop="name">Application</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>747</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
+<h2 id="Definition-of-First-Open-Time">Definition of First Open Time</h2>
+<p>First open time is the duration from when the user presses the “play” button (or triggers media playback) to the moment the first audio or video frame is successfully decoded and presented. It typically includes the following steps:</p>
+<ol>
+<li><strong>Request Initialization</strong>: Setting up the network request for the media resource.</li>
+<li><strong>Media Resource Loading</strong>: Downloading the initial segments of the media file.</li>
+<li><strong>Demuxing and Parsing</strong>: Extracting audio and video streams from the media container.</li>
+<li><strong>Codec Initialization</strong>: Setting up audio and video decoders.</li>
+<li><strong>Buffering</strong>: Pre-loading enough data to ensure smooth playback.</li>
+<li><strong>Rendering</strong>: Displaying the first frame or playing the first audio sample.</li>
+</ol>
+<h2 id="Step-by-Step-Breakdown-and-Optimization">Step-by-Step Breakdown and Optimization</h2>
+<h3 id="1-Request-Initialization">1. Request Initialization</h3>
+<h4 id="Process-Overview">Process Overview</h4>
+<ul>
+<li>Establishing the connection to the media server.</li>
+<li>Resolving DNS, negotiating SSL/TLS (if applicable), and sending the HTTP(S) request.</li>
+</ul>
+<h4 id="Optimization">Optimization</h4>
+<ul>
+<li><strong>DNS Pre-fetching</strong>: Resolve domain names in advance to reduce lookup time.</li>
+<li><strong>Persistent Connections</strong>: Use HTTP/2 or keep-alive connections to eliminate the need to re-establish TCP connections.</li>
+<li><strong>Edge Caching</strong>: Deploy CDN (Content Delivery Network) servers close to the user to reduce latency.</li>
+<li><strong>Reduce Redirects</strong>: Ensure direct access to the media URL to avoid unnecessary HTTP redirections.</li>
+</ul>
+<h3 id="2-Media-Resource-Loading">2. Media Resource Loading</h3>
+<h4 id="Process-Overview-2">Process Overview</h4>
+<ul>
+<li>Retrieving the initial media segments (e.g., initialization segments, first GOP for video).</li>
+</ul>
+<h4 id="Optimization-2">Optimization</h4>
+<ul>
+<li>
+<p><strong>Smaller Initialization Segments</strong>: Minimize the size of the first chunk of data required for playback.</p>
+</li>
+<li>
+<p><strong>Adaptive Bitrate (ABR)</strong>: Start playback with a lower bitrate to reduce the initial data load.</p>
+</li>
+<li>
+<p><strong>Parallel Requests</strong>: Fetch audio and video segments simultaneously to save time.</p>
+</li>
+<li>
+<p><strong>Preloading</strong>: Predict and prefetch media segments based on user behavior or autoplay scenarios.</p>
+</li>
+</ul>
+<h3 id="3-Demuxing-and-Parsing">3. Demuxing and Parsing</h3>
+<h4 id="Process-Overview-3">Process Overview</h4>
+<ul>
+<li>Splitting the media container into audio and video streams.</li>
+<li>Parsing metadata (e.g., timestamps, codec information).</li>
+</ul>
+<h4 id="Optimization-3">Optimization</h4>
+<ul>
+<li><strong>Efficient Parsers</strong>: Use highly optimized demuxing libraries to reduce processing time.</li>
+<li><strong>Streamlined Containers</strong>: Favor lightweight media containers like MP4 or WebM with minimal overhead. Placing the ‘moov’ atom at the start of the MP4 file (instead of the default location at the end) allows the player to access this critical metadata immediately, without having to download the entire file first.</li>
+<li><strong>Lazy Parsing</strong>: Parse only essential metadata needed for playback, deferring deeper parsing for later.</li>
+</ul>
+<h3 id="4-Codec-Initialization">4. Codec Initialization</h3>
+<h4 id="Process-Overview-4">Process Overview</h4>
+<ul>
+<li>Setting up decoders for audio and video based on the codec information (e.g., H.264, AAC).</li>
+</ul>
+<h4 id="Optimization-4">Optimization</h4>
+<ul>
+<li><strong>Hardware Acceleration</strong>: Leverage GPU or hardware decoders for faster codec initialization.</li>
+<li><strong>Pre-initialized Decoders</strong>: Keep decoders ready for commonly used codecs to avoid setup delays.</li>
+<li><strong>Codec Negotiation</strong>: Ensure client and server agree on the optimal codec during the handshake phase.</li>
+</ul>
+<h3 id="5-Buffering">5. Buffering</h3>
+<h4 id="Process-Overview-5">Process Overview</h4>
+<ul>
+<li>Filling the playback buffer with enough data to start playback while avoiding interruptions.</li>
+</ul>
+<h4 id="Optimization-5">Optimization</h4>
+<ul>
+<li><strong>Dynamic Buffering Thresholds</strong>: Start playback with minimal buffering for faster startup and dynamically adjust thresholds during playback.</li>
+<li><strong>Predictive Buffering</strong>: Use machine learning to predict network conditions and pre-buffer accordingly.</li>
+<li><strong>Low-Latency Protocols</strong>: Implement protocols like HTTP/3 or QUIC to reduce latency during data transfer.</li>
+</ul>
+<h3 id="6-Rendering">6. Rendering</h3>
+<h4 id="Process-Overview-6">Process Overview</h4>
+<ul>
+<li>Decoding and rendering the first frame of video or playing the first audio sample.</li>
+</ul>
+<h4 id="Optimization-6">Optimization</h4>
+<ul>
+<li><strong>Skip Unnecessary Frames</strong>: Drop non-essential frames (e.g., B-frames) during startup to prioritize the first I-frame.</li>
+<li><strong>Frame Preprocessing</strong>: Pre-decode and cache the first frame during media loading.</li>
+<li><strong>Audio-First Start</strong>: If video decoding takes longer, start with audio playback to give the illusion of faster startup.</li>
+</ul>
+<h2 id="Additional-Best-Practices">Additional Best Practices</h2>
+<h4 id="Device-Specific-Optimizations">Device-Specific Optimizations</h4>
+<p>Optimize for popular devices and browsers by identifying bottlenecks in specific platforms.</p>
+<h4 id="Graceful-Degradation">Graceful Degradation</h4>
+<p>Provide fallback mechanisms (e.g., lower resolution or audio-only playback) for users on slow networks.</p>
+<h2 id="Conclusion">Conclusion</h2>
+<p>Optimizing first open time is a multi-faceted challenge that requires improvements at every step of the media playback pipeline. By implementing the techniques outlined above, developers can significantly reduce startup delays, leading to a smoother and more engaging user experience.</p>
+<p>Reducing first open time isn’t just about technical enhancements—it’s about providing a seamless experience that keeps users coming back. With continuous monitoring and iteration, these optimizations can have a lasting impact on user satisfaction and retention.</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 

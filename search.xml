@@ -1,6 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Optimizing First Open Time in Media Player Applications</title>
+    <url>/2024/10/01/VideoStartUp/</url>
+    <content><![CDATA[<p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
+<h2 id="Definition-of-First-Open-Time">Definition of First Open Time</h2>
+<p>First open time is the duration from when the user presses the “play” button (or triggers media playback) to the moment the first audio or video frame is successfully decoded and presented. It typically includes the following steps:</p>
+<ol>
+<li><strong>Request Initialization</strong>: Setting up the network request for the media resource.</li>
+<li><strong>Media Resource Loading</strong>: Downloading the initial segments of the media file.</li>
+<li><strong>Demuxing and Parsing</strong>: Extracting audio and video streams from the media container.</li>
+<li><strong>Codec Initialization</strong>: Setting up audio and video decoders.</li>
+<li><strong>Buffering</strong>: Pre-loading enough data to ensure smooth playback.</li>
+<li><strong>Rendering</strong>: Displaying the first frame or playing the first audio sample.</li>
+</ol>
+<h2 id="Step-by-Step-Breakdown-and-Optimization">Step-by-Step Breakdown and Optimization</h2>
+<h3 id="1-Request-Initialization">1. Request Initialization</h3>
+<h4 id="Process-Overview">Process Overview</h4>
+<ul>
+<li>Establishing the connection to the media server.</li>
+<li>Resolving DNS, negotiating SSL/TLS (if applicable), and sending the HTTP(S) request.</li>
+</ul>
+<h4 id="Optimization">Optimization</h4>
+<ul>
+<li><strong>DNS Pre-fetching</strong>: Resolve domain names in advance to reduce lookup time.</li>
+<li><strong>Persistent Connections</strong>: Use HTTP/2 or keep-alive connections to eliminate the need to re-establish TCP connections.</li>
+<li><strong>Edge Caching</strong>: Deploy CDN (Content Delivery Network) servers close to the user to reduce latency.</li>
+<li><strong>Reduce Redirects</strong>: Ensure direct access to the media URL to avoid unnecessary HTTP redirections.</li>
+</ul>
+<h3 id="2-Media-Resource-Loading">2. Media Resource Loading</h3>
+<h4 id="Process-Overview-2">Process Overview</h4>
+<ul>
+<li>Retrieving the initial media segments (e.g., initialization segments, first GOP for video).</li>
+</ul>
+<h4 id="Optimization-2">Optimization</h4>
+<ul>
+<li>
+<p><strong>Smaller Initialization Segments</strong>: Minimize the size of the first chunk of data required for playback.</p>
+</li>
+<li>
+<p><strong>Adaptive Bitrate (ABR)</strong>: Start playback with a lower bitrate to reduce the initial data load.</p>
+</li>
+<li>
+<p><strong>Parallel Requests</strong>: Fetch audio and video segments simultaneously to save time.</p>
+</li>
+<li>
+<p><strong>Preloading</strong>: Predict and prefetch media segments based on user behavior or autoplay scenarios.</p>
+</li>
+</ul>
+<h3 id="3-Demuxing-and-Parsing">3. Demuxing and Parsing</h3>
+<h4 id="Process-Overview-3">Process Overview</h4>
+<ul>
+<li>Splitting the media container into audio and video streams.</li>
+<li>Parsing metadata (e.g., timestamps, codec information).</li>
+</ul>
+<h4 id="Optimization-3">Optimization</h4>
+<ul>
+<li><strong>Efficient Parsers</strong>: Use highly optimized demuxing libraries to reduce processing time.</li>
+<li><strong>Streamlined Containers</strong>: Favor lightweight media containers like MP4 or WebM with minimal overhead. Placing the ‘moov’ atom at the start of the MP4 file (instead of the default location at the end) allows the player to access this critical metadata immediately, without having to download the entire file first.</li>
+<li><strong>Lazy Parsing</strong>: Parse only essential metadata needed for playback, deferring deeper parsing for later.</li>
+</ul>
+<h3 id="4-Codec-Initialization">4. Codec Initialization</h3>
+<h4 id="Process-Overview-4">Process Overview</h4>
+<ul>
+<li>Setting up decoders for audio and video based on the codec information (e.g., H.264, AAC).</li>
+</ul>
+<h4 id="Optimization-4">Optimization</h4>
+<ul>
+<li><strong>Hardware Acceleration</strong>: Leverage GPU or hardware decoders for faster codec initialization.</li>
+<li><strong>Pre-initialized Decoders</strong>: Keep decoders ready for commonly used codecs to avoid setup delays.</li>
+<li><strong>Codec Negotiation</strong>: Ensure client and server agree on the optimal codec during the handshake phase.</li>
+</ul>
+<h3 id="5-Buffering">5. Buffering</h3>
+<h4 id="Process-Overview-5">Process Overview</h4>
+<ul>
+<li>Filling the playback buffer with enough data to start playback while avoiding interruptions.</li>
+</ul>
+<h4 id="Optimization-5">Optimization</h4>
+<ul>
+<li><strong>Dynamic Buffering Thresholds</strong>: Start playback with minimal buffering for faster startup and dynamically adjust thresholds during playback.</li>
+<li><strong>Predictive Buffering</strong>: Use machine learning to predict network conditions and pre-buffer accordingly.</li>
+<li><strong>Low-Latency Protocols</strong>: Implement protocols like HTTP/3 or QUIC to reduce latency during data transfer.</li>
+</ul>
+<h3 id="6-Rendering">6. Rendering</h3>
+<h4 id="Process-Overview-6">Process Overview</h4>
+<ul>
+<li>Decoding and rendering the first frame of video or playing the first audio sample.</li>
+</ul>
+<h4 id="Optimization-6">Optimization</h4>
+<ul>
+<li><strong>Skip Unnecessary Frames</strong>: Drop non-essential frames (e.g., B-frames) during startup to prioritize the first I-frame.</li>
+<li><strong>Frame Preprocessing</strong>: Pre-decode and cache the first frame during media loading.</li>
+<li><strong>Audio-First Start</strong>: If video decoding takes longer, start with audio playback to give the illusion of faster startup.</li>
+</ul>
+<h2 id="Additional-Best-Practices">Additional Best Practices</h2>
+<h4 id="Device-Specific-Optimizations">Device-Specific Optimizations</h4>
+<p>Optimize for popular devices and browsers by identifying bottlenecks in specific platforms.</p>
+<h4 id="Graceful-Degradation">Graceful Degradation</h4>
+<p>Provide fallback mechanisms (e.g., lower resolution or audio-only playback) for users on slow networks.</p>
+<h2 id="Conclusion">Conclusion</h2>
+<p>Optimizing first open time is a multi-faceted challenge that requires improvements at every step of the media playback pipeline. By implementing the techniques outlined above, developers can significantly reduce startup delays, leading to a smoother and more engaging user experience.</p>
+<p>Reducing first open time isn’t just about technical enhancements—it’s about providing a seamless experience that keeps users coming back. With continuous monitoring and iteration, these optimizations can have a lasting impact on user satisfaction and retention.</p>
+]]></content>
+      <categories>
+        <category>Application</category>
+      </categories>
+      <tags>
+        <tag>Multimedia</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Image Processing</title>
+    <url>/2024/05/02/image-processing/</url>
+    <content><![CDATA[<h2 id="Concepts">Concepts</h2>
+<ul>
+<li>
+<p>Image Processing</p>
+<ul>
+<li>
+<p>Improvement of pictorial information for human interpretation</p>
+</li>
+<li>
+<p>Processing of image data for storage, transmission, and representation for autonomous machine perception</p>
+</li>
+<li>
+<p>Digital IP refers to processing of digital images by means of a computer</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Computer Vision</p>
+<ul>
+<li>A branch of artificial intelligence</li>
+<li>Analyse and understand images</li>
+<li>Comparable to the human vision system, including
+<ul>
+<li>Learning</li>
+<li>Being able to make inferences</li>
+<li>Taking actions based on visual inputs</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>IP vs CV</p>
+<p>There is a continuum from IP at one end to CV at the other. The area Image Analysis is in between IP and CV.</p>
+<img src="image-20241007030550578.png" alt="image-20241007030550578" style="zoom: 50%;" />
+</li>
+</ul>
+<h2 id="Image-Processing">Image Processing</h2>
+<p>Consider a monochromatic image, denote images by 2D functions of the form f(x, y).</p>
+<h3 id="Image-Sampling-Quantization">Image Sampling &amp; Quantization</h3>
+<p>An image may be continuous with respect to the x and y spatial coordinates and also in amplitude. To convert an image into digital form, the function has to be sampled in both coordinates and amplitudes</p>
+<ul>
+<li>Digitizing the coordinate values is called sampling</li>
+<li>Digitizing the amplitude values is called quantization</li>
+</ul>
+<h4 id="Image-Sampling">Image Sampling</h4>
+<ul>
+<li>Example</li>
+</ul>
+<img src="image-20241203224550736.png" alt="image-20241203224550736" style="zoom: 33%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage.transform <span class="keyword">import</span> rescale</span><br><span class="line">image_rescaled = rescale(image, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled2 = rescale(image_rescaled, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled3 = rescale(image_rescaled2, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">f, axs = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">6</span>, <span class="number">8</span>))</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">0</span>].imshow(image, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">1</span>].imshow(image_rescaled, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">0</span>].imshow(image_rescaled2, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">1</span>].imshow(image_rescaled3, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>The purpose of this code is to demonstrate the effects of <strong>repeatedly downscaling</strong> an image without applying any anti-aliasing filters. As the image is rescaled multiple times, the quality and resolution of the image will degrade, and the visual artifacts may become more pronounced.</p>
+<img src="image-20241203224639505.png" alt="image-20241203224639505" style="zoom: 33%;" />
+<h4 id="Image-Quantization">Image Quantization</h4>
+<ul>
+<li>False Contouring</li>
+</ul>
+<blockquote>
+<p>False contouring can occur in digital images when the number of displayable colors is limited. It happens when the continuous tonal gradients in the original image are not accurately reproduced due to the limited number of discrete color levels available in the output device or image format.</p>
+<p><strong>False contouring is a direct consequence of the image quantization process.</strong> When the number of color levels is reduced too drastically, the resulting discrete steps between color levels become visible as false contours in the image.</p>
+</blockquote>
+<img src="image-20241203232732722.png" alt="image-20241203232732722" style="zoom:50%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># The purpose of this code is to demonstrate the effect </span></span><br><span class="line"><span class="comment"># of bit depth reduction on an image.  </span></span><br><span class="line"><span class="comment"># By performing a bitwise right shift operation on the image, </span></span><br><span class="line"><span class="comment"># the code creates a series of images with different bit depths, </span></span><br><span class="line"><span class="comment"># effectively reducing the number of grayscale levels.</span></span><br><span class="line">fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line"><span class="keyword">for</span> i, ax <span class="keyword">in</span> <span class="built_in">enumerate</span>(axes.flat):</span><br><span class="line">    ax.imshow(image &gt;&gt; i, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">    ax.axis(<span class="string">&#x27;off&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241203232818382.png" alt="image-20241203232818382" style="zoom:50%;" />
+<ul>
+<li>Saturation and Noise</li>
+</ul>
+<blockquote>
+<p>When an image is quantized, the continuous tonal range is mapped to a smaller set of discrete color levels.  This can result in the amplification or accentuation of noise patterns, as the subtle variations in pixel values may be lost or masked by the discrete color levels.<br>
+In areas of the image with low contrast or subtle details, the quantization process can make noise more visible and pronounced, as the small variations in pixel values are more likely to be affected by the reduction in color levels.</p>
+</blockquote>
+<img src="image-20241204010527996.png" alt="image-20241204010527996" style="zoom: 33%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># The purpose of this code is to highlight the saturated pixels </span></span><br><span class="line"><span class="comment"># in an image, which are the pixels that have reached the </span></span><br><span class="line"><span class="comment"># maximum value of 255 (in an 8-bit grayscale image). </span></span><br><span class="line"><span class="comment"># This is often useful for identifying areas of the image that are </span></span><br><span class="line"><span class="comment"># overexposed or have lost detail due to the pixels being saturated.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> skimage.color <span class="keyword">import</span> gray2rgb</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find the saturated pixels</span></span><br><span class="line">saturated_mask = (image &gt;= <span class="number">255</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Convert the highlight image to rgb</span></span><br><span class="line">highlighted_image = gray2rgb(image)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Highlight the saturated pixels in red</span></span><br><span class="line">highlighted_image[saturated_mask] = [<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">plt.imshow(highlighted_image)</span><br></pre></td></tr></table></figure>
+<img src="image-20241204010542818.png" alt="image-20241204010542818" style="zoom: 33%;" />
+<ul>
+<li>
+<p>Bit Plane Slicing</p>
+<blockquote>
+<p>Bit plane slicing is a technique used to analyze the contribution of individual bit planes (the binary digits that make up the pixel values) in a digital image.</p>
+<img src="image-20241204010957744.png" alt="image-20241204010957744" style="zoom:33%;" />
+<p>Bit plane slicing can be used to understand the impact of quantization on the image, as the removal of lower-order bit planes during quantization directly affects the visual information contained in the image.</p>
+</blockquote>
+</li>
+</ul>
+<img src="image-20241204010838685.png" alt="image-20241204010838685" style="zoom: 33%;" />
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># The purpose of this code is to extract the </span></span><br><span class="line"><span class="comment"># most significant bit plane of an image.</span></span><br><span class="line"><span class="comment"># By extracting the most significant bit plane, </span></span><br><span class="line"><span class="comment"># this code can provide a simplified representation of the image, </span></span><br><span class="line"><span class="comment"># highlighting the high-level features and structures </span></span><br><span class="line"><span class="comment"># that are determined by the most significant bits.</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_k_bitPlane</span>(<span class="params">image, k</span>):</span><br><span class="line">    <span class="keyword">return</span> np.where(image&amp;(<span class="number">1</span>&lt;&lt;k), <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">most_significant_bitplane = get_k_bitPlane(image, <span class="number">0</span>)</span><br><span class="line">plt.imshow(most_significant_bitplane, cmap=<span class="string">&#x27;gray&#x27;</span>, vmin=<span class="number">0</span>, vmax=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># The purpose of this modified code is to extract </span></span><br><span class="line"><span class="comment"># and display multiple bit planes of an image.</span></span><br><span class="line"><span class="comment"># By selectively displaying or processing different bit planes, </span></span><br><span class="line"><span class="comment"># you can gain insights into the image data and </span></span><br><span class="line"><span class="comment"># potentially improve the performance of various image processing algorithms.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Using bit plane 6 and 7</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_k_bitsPlane</span>(<span class="params">image, kbits</span>):</span><br><span class="line">    new_image = np.zeros_like(image)</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> kbits:</span><br><span class="line">        new_image = new_image &lt;&lt; <span class="number">1</span></span><br><span class="line">        new_image += np.where(image &amp; (<span class="number">1</span> &lt;&lt; k), <span class="number">1</span>, <span class="number">0</span>).astype(new_image.dtype)</span><br><span class="line">    <span class="keyword">return</span> new_image</span><br><span class="line">bits = [<span class="number">7</span>, <span class="number">6</span>]</span><br><span class="line">plt.imshow(get_k_bitsPlane(image, bits), cmap=<span class="string">&#x27;gray&#x27;</span>, vmin=<span class="number">0</span>, vmax=<span class="number">2</span> ** <span class="built_in">len</span>(bits) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241204011100729.png" alt="image-20241204011100729" style="zoom:50%;" />
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>Multimedia</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Database Outline</title>
     <url>/2021/05/14/database-outline/</url>
     <content><![CDATA[<h1>Database Outline</h1>
@@ -1288,103 +1494,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Image Processing</title>
-    <url>/2024/05/02/image-processing/</url>
-    <content><![CDATA[<h2 id="Concepts">Concepts</h2>
-<ul>
-<li>
-<p>Image Processing</p>
-<ul>
-<li>
-<p>Improvement of pictorial information for human interpretation</p>
-</li>
-<li>
-<p>Processing of image data for storage, transmission, and representation for autonomous machine perception</p>
-</li>
-<li>
-<p>Digital IP refers to processing of digital images by means of a computer</p>
-</li>
-</ul>
-</li>
-<li>
-<p>Computer Vision</p>
-<ul>
-<li>A branch of artificial intelligence</li>
-<li>Analyse and understand images</li>
-<li>Comparable to the human vision system, including
-<ul>
-<li>Learning</li>
-<li>Being able to make inferences</li>
-<li>Taking actions based on visual inputs</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p>IP vs CV</p>
-<p>There is a continuum from IP at one end to CV at the other. The area Image Analysis is in between IP and CV.</p>
-<img src="image-20241007030550578.png" alt="image-20241007030550578" style="zoom: 50%;" />
-</li>
-</ul>
-<h2 id="Image-Processing">Image Processing</h2>
-<p>Consider a monochromatic image, denote images by 2D functions of the form f(x, y).</p>
-<h3 id="Image-Sampling-Quantization">Image Sampling &amp; Quantization</h3>
-<p>An image may be continuous with respect to the x and y spatial coordinates and also in amplitude. To convert an image into digital form, the function has to be sampled in both coordinates and amplitudes</p>
-<ul>
-<li>Digitizing the coordinate values is called sampling</li>
-<li>Digitizing the amplitude values is called quantization</li>
-</ul>
-<h4 id="Image-Sampling">Image Sampling</h4>
-<ul>
-<li>Example</li>
-</ul>
-<img src="image-20241203224550736.png" alt="image-20241203224550736" style="zoom: 33%;" />
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage.transform <span class="keyword">import</span> rescale</span><br><span class="line">image_rescaled = rescale(image, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled2 = rescale(image_rescaled, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">image_rescaled3 = rescale(image_rescaled2, <span class="number">0.25</span>, anti_aliasing=<span class="literal">False</span>)</span><br><span class="line">f, axs = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">6</span>, <span class="number">8</span>))</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">0</span>].imshow(image, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">0</span>,<span class="number">1</span>].imshow(image_rescaled, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">0</span>].imshow(image_rescaled2, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">axs[<span class="number">1</span>,<span class="number">1</span>].imshow(image_rescaled3, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<p>The purpose of this code is to demonstrate the effects of <strong>repeatedly downscaling</strong> an image without applying any anti-aliasing filters. As the image is rescaled multiple times, the quality and resolution of the image will degrade, and the visual artifacts may become more pronounced.</p>
-<img src="image-20241203224639505.png" alt="image-20241203224639505" style="zoom: 33%;" />
-<h4 id="Image-Quantization">Image Quantization</h4>
-<ul>
-<li>False Contouring</li>
-</ul>
-<blockquote>
-<p>False contouring can occur in digital images when the number of displayable colors is limited. It happens when the continuous tonal gradients in the original image are not accurately reproduced due to the limited number of discrete color levels available in the output device or image format.</p>
-<p><strong>False contouring is a direct consequence of the image quantization process.</strong> When the number of color levels is reduced too drastically, the resulting discrete steps between color levels become visible as false contours in the image.</p>
-</blockquote>
-<img src="image-20241203232732722.png" alt="image-20241203232732722" style="zoom:50%;" />
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># The purpose of this code is to demonstrate the effect </span></span><br><span class="line"><span class="comment"># of bit depth reduction on an image.  </span></span><br><span class="line"><span class="comment"># By performing a bitwise right shift operation on the image, </span></span><br><span class="line"><span class="comment"># the code creates a series of images with different bit depths, </span></span><br><span class="line"><span class="comment"># effectively reducing the number of grayscale levels.</span></span><br><span class="line">fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line"><span class="keyword">for</span> i, ax <span class="keyword">in</span> <span class="built_in">enumerate</span>(axes.flat):</span><br><span class="line">    ax.imshow(image &gt;&gt; i, cmap=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">    ax.axis(<span class="string">&#x27;off&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<img src="image-20241203232818382.png" alt="image-20241203232818382" style="zoom:50%;" />
-<ul>
-<li>Saturation and Noise</li>
-</ul>
-<blockquote>
-<p>When an image is quantized, the continuous tonal range is mapped to a smaller set of discrete color levels.  This can result in the amplification or accentuation of noise patterns, as the subtle variations in pixel values may be lost or masked by the discrete color levels.<br>
-In areas of the image with low contrast or subtle details, the quantization process can make noise more visible and pronounced, as the small variations in pixel values are more likely to be affected by the reduction in color levels.</p>
-</blockquote>
-<img src="image-20241204010527996.png" alt="image-20241204010527996" style="zoom: 33%;" />
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># The purpose of this code is to highlight the saturated pixels </span></span><br><span class="line"><span class="comment"># in an image, which are the pixels that have reached the </span></span><br><span class="line"><span class="comment"># maximum value of 255 (in an 8-bit grayscale image). </span></span><br><span class="line"><span class="comment"># This is often useful for identifying areas of the image that are </span></span><br><span class="line"><span class="comment"># overexposed or have lost detail due to the pixels being saturated.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> skimage.color <span class="keyword">import</span> gray2rgb</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find the saturated pixels</span></span><br><span class="line">saturated_mask = (image &gt;= <span class="number">255</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Convert the highlight image to rgb</span></span><br><span class="line">highlighted_image = gray2rgb(image)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Highlight the saturated pixels in red</span></span><br><span class="line">highlighted_image[saturated_mask] = [<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">plt.imshow(highlighted_image)</span><br></pre></td></tr></table></figure>
-<img src="image-20241204010542818.png" alt="image-20241204010542818" style="zoom: 33%;" />
-<ul>
-<li>
-<p>Bit Plane Slicing</p>
-<blockquote>
-<p>Bit plane slicing is a technique used to analyze the contribution of individual bit planes (the binary digits that make up the pixel values) in a digital image.</p>
-<img src="image-20241204010957744.png" alt="image-20241204010957744" style="zoom:33%;" />
-<p>Bit plane slicing can be used to understand the impact of quantization on the image, as the removal of lower-order bit planes during quantization directly affects the visual information contained in the image.</p>
-</blockquote>
-</li>
-</ul>
-<img src="image-20241204010838685.png" alt="image-20241204010838685" style="zoom: 33%;" />
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># The purpose of this code is to extract the </span></span><br><span class="line"><span class="comment"># most significant bit plane of an image.</span></span><br><span class="line"><span class="comment"># By extracting the most significant bit plane, </span></span><br><span class="line"><span class="comment"># this code can provide a simplified representation of the image, </span></span><br><span class="line"><span class="comment"># highlighting the high-level features and structures </span></span><br><span class="line"><span class="comment"># that are determined by the most significant bits.</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_k_bitPlane</span>(<span class="params">image, k</span>):</span><br><span class="line">    <span class="keyword">return</span> np.where(image&amp;(<span class="number">1</span>&lt;&lt;k), <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">most_significant_bitplane = get_k_bitPlane(image, <span class="number">0</span>)</span><br><span class="line">plt.imshow(most_significant_bitplane, cmap=<span class="string">&#x27;gray&#x27;</span>, vmin=<span class="number">0</span>, vmax=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># The purpose of this modified code is to extract </span></span><br><span class="line"><span class="comment"># and display multiple bit planes of an image.</span></span><br><span class="line"><span class="comment"># By selectively displaying or processing different bit planes, </span></span><br><span class="line"><span class="comment"># you can gain insights into the image data and </span></span><br><span class="line"><span class="comment"># potentially improve the performance of various image processing algorithms.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Using bit plane 6 and 7</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_k_bitsPlane</span>(<span class="params">image, kbits</span>):</span><br><span class="line">    new_image = np.zeros_like(image)</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> kbits:</span><br><span class="line">        new_image = new_image &lt;&lt; <span class="number">1</span></span><br><span class="line">        new_image += np.where(image &amp; (<span class="number">1</span> &lt;&lt; k), <span class="number">1</span>, <span class="number">0</span>).astype(new_image.dtype)</span><br><span class="line">    <span class="keyword">return</span> new_image</span><br><span class="line">bits = [<span class="number">7</span>, <span class="number">6</span>]</span><br><span class="line">plt.imshow(get_k_bitsPlane(image, bits), cmap=<span class="string">&#x27;gray&#x27;</span>, vmin=<span class="number">0</span>, vmax=<span class="number">2</span> ** <span class="built_in">len</span>(bits) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-<img src="image-20241204011100729.png" alt="image-20241204011100729" style="zoom:50%;" />
-]]></content>
-      <categories>
-        <category>Concepts</category>
-      </categories>
-      <tags>
-        <tag>Multimedia</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Notes for OSTEP</title>
     <url>/2020/08/03/ostep-1/</url>
     <content><![CDATA[<h1><em>Operating Systems: Three Easy Pieces</em></h1>
@@ -1705,6 +1814,64 @@ In areas of the image with low contrast or subtle details, the quantization proc
       </categories>
       <tags>
         <tag>Operating System</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ Smart Pointers</title>
+    <url>/2020/08/12/pointer/</url>
+    <content><![CDATA[<h1>C++ Smart Pointers</h1>
+<p>与托管语言不同，C没有自动垃圾回收功能（在程序运行时释放堆内存和其他资源）。C程序负责将获取的所有资源返回到操作系统，己动态分配的堆内存由于某种原因程序未释放或无法释放，造成系统内存的浪费被称为<strong>内存泄漏</strong>。在进程退出之前，泄漏的资源对其他程序不可用。总而言之，内存泄漏是 C-style编程中出现 bug 的一个常见原因。</p>
+<h3 id="RAII">RAII</h3>
+<p>现代c++通过在堆栈上声明对象来尽可能避免使用堆内存。当一个资源对于堆栈来说太大时，它应该被一个对象所拥有。当对象被初始化时，它获得它所拥有的资源。然后，该对象负责释放其析构函数中的资源。拥有的对象本身是在堆栈上声明的。对象拥有资源的原则也称为 “<strong>Resource Acquisition Is Initialization</strong>” 或 <strong>RAII</strong>。</p>
+<p>当拥有资源的堆栈对象超出作用域时，将自动调用其析构函数。这样，C ++中的垃圾回收与对象生存期密切相关，并且是确定性的。资源总是在程序的可控的已知位置释放。这利用了核心语言特性(对象生存期、范围退出、初始化顺序和堆栈展开)来消除资源泄漏并保证异常安全性。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::mutex m;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">bad</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m.<span class="built_in">lock</span>();                    <span class="comment">// acquire the mutex</span></span><br><span class="line">    <span class="built_in">f</span>();                         <span class="comment">// if f() throws an exception, the mutex is never released</span></span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">everything_ok</span>()) <span class="keyword">return</span>; <span class="comment">// early return, the mutex is never released</span></span><br><span class="line">    m.<span class="built_in">unlock</span>();                  <span class="comment">// if bad() reaches this statement, the mutex is released</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">good</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lk</span><span class="params">(m)</span></span>; <span class="comment">// RAII class: mutex acquisition is initialization</span></span><br><span class="line">    <span class="built_in">f</span>();                               <span class="comment">// if f() throws an exception, the mutex is released</span></span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">everything_ok</span>()) <span class="keyword">return</span>;       <span class="comment">// early return, the mutex is released</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过使用智能指针进行内存分配，可以消除内存泄漏的可能性。它们的行为类似常规指针，重要的区别是它负责自动释放所指向的对象。<code>shared_ptr</code> 和 <code>unique_ptr</code> 的区别在于管理底层指针的方式：<code>shared_ptr</code> 允许多个指针指向同一个对象；<code>unique_ptr</code> 则“独占”所指向的对象。<code>weak_ptr</code> 是一种弱引用，指向 <code>shared_ptr</code> 所管理的对象。</p>
+<p>智能指针是<strong>模板</strong>，当创建时，需要提供指针指向的类型。默认初始化的智能指针保存着一个空指针。</p>
+<h3 id="unique-ptr">unique_ptr</h3>
+<p>只允许底层指针有一个所有者，与原始指针一样高效。<code>unique_ptr</code> 的基本特征：大小是<strong>一个指针</strong>，可移动（将所有权转移到新 <code>unique_ptr</code> 并重置旧 <code>unique_ptr</code>），但<strong>不可复制或共享</strong>。<code>unique_ptr</code> 通过引用来传递，如果尝试通过此处的值传递，由于删除了 <code>unique_ptr</code> 复制构造函数，编译器将引发错误。</p>
+<p><img src="unique_ptr.png" alt="unique_ptr"></p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Use make_unique function.(C++14)</span></span><br><span class="line">    <span class="keyword">auto</span> p1 = <span class="built_in">make_unique</span>&lt;MyClass&gt;(<span class="string">&quot;argv&quot;</span>);</span><br><span class="line">    <span class="comment">// Move raw pointer from one unique_ptr to another.</span></span><br><span class="line">    unique_ptr&lt;MyClass&gt; p2 = std::<span class="built_in">move</span>(p1);</span><br><span class="line">    <span class="comment">// Create a unique_ptr to an array of 5 integers.</span></span><br><span class="line">    <span class="keyword">auto</span> p3 = <span class="built_in">make_unique</span>&lt;<span class="type">int</span>[]&gt;(<span class="number">5</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="shared-ptr">shared_ptr</h3>
+<p>采用引用计数的智能指针，专门用于可能需要多个所有者管理内存中对象的生命周期的方案。<strong>大小为两个指针</strong>；一个用于<strong>对象</strong>，另一个用于包指向<strong>共享控制块</strong>。</p>
+<p>控制块是一个动态分配的对象，其中包含：</p>
+<ul>
+<li>指向被管理对象的指针或被管理对象本身</li>
+<li>删除器（类型擦除）</li>
+<li>分配器（类型擦除）</li>
+<li>占有被管理对象的 <code>shared_ptr</code> 的数量</li>
+<li>涉及被管理对象的 <code>weak_ptr</code> 的数量</li>
+</ul>
+<p>初始化 <code>shared_ptr</code> 之后，您可以复制它，在函数参数中按值传递它，并将其分配给其他 <code>shared_ptr</code> 实例。 所有实例都指向同一个对象，并且共享对一个控制块的访问权，每当添加新的 <code>shared_ptr</code>，超出范围或对其进行重置时，该控制块都会递增和递减<code>shared_ptr</code> 引用计数。如果<code>shared_ptr</code> 引用计数减至零，控制块就会调用被管理对象的析构函数。但控制块本身直到 <code>weak_ptr</code> 计数器同样归零时才会释放。</p>
+<p><code>shared_ptr</code> 的默认内存布局（通过构造函数）</p>
+<img src="shared_ptr1.png" alt="shared_ptr" style="zoom:45%;" />
+<p>使用<code>make_shared</code> / <code>allocate_shared</code>创建时的内存布局：</p>
+<img src="shared_ptr.png" alt="shared_ptr" style="zoom:50%;" />
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/34046070/why-are-two-raw-pointers-to-the-managed-object-needed-in-stdshared-ptr-impleme">Why are two raw pointers to the managed object needed in std::shared_ptr implementation?</a></p>
+</blockquote>
+<p>首次创建内存资源时，尽可能使用 <code>make_shared</code> 函数创建 <code>shared_ptr</code>。 <code>make_shared</code> 是 exception-safe 的。它在同一个调用中为控制块和资源分配内存 (<a href="https://stackoverflow.com/questions/20895648/difference-in-make-shared-and-normal-shared-ptr-in-c">Difference in make_shared and normal shared_ptr in C++</a>)，从而减少了构造开销。 如果不使用 <code>make_shared</code>，则必须先使用显式新表达式创建对象，然后再将其传递给<code>shared_ptr</code>构造函数。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Use make_shared function when possible.</span></span><br><span class="line">    <span class="keyword">auto</span> sp1 = <span class="built_in">make_shared</span>&lt;MyClass&gt;(<span class="string">&quot;argv&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Ok, but slightly less efficient. </span></span><br><span class="line">    <span class="function">shared_ptr&lt;MyClass&gt; <span class="title">sp2</span><span class="params">(<span class="keyword">new</span> MyClass(<span class="string">&quot;argv&quot;</span>))</span></span>;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//Initialize with copy constructor. Increments ref count.</span></span><br><span class="line">	<span class="function"><span class="keyword">auto</span> <span class="title">sp3</span><span class="params">(sp2)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//Initialize via assignment. Increments ref count.</span></span><br><span class="line">	<span class="keyword">auto</span> sp4 = sp2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="weak-ptr">weak_ptr</h3>
+<p>结合 <code>shared_ptr</code> 使用的特例智能指针，不控制所指向对象生命周期的智能指针。<strong>大小为两个指针</strong>；一个用于存储构建它的 <code>shared_ptr</code> 的指针，另一个用于指向 <strong>共享控制块</strong>。将一个 <code>weak_ptr</code> 绑定到一个 <code>shared_ptr</code> 不会改变 <code>shared_ptr</code> 的引用计数，一旦最后一个指向对象的 <code>shared_ptr</code> 被销毁，对象就会被释放。但控制块本身直到 <code>weak_ptr</code> 计数器同样归零时才会释放。</p>
+<p>当<code>weak_ptr</code>需要获得临时所有权时，需要将其转换为 <code>shared_ptr</code>，此时如果原来的 <code>shared_ptr</code> 被销毁，则该对象的生命期将被延长至这个临时的 <code>shared_ptr</code> 同样被销毁为止。</p>
+<p>最好的设计是尽可能<strong>避免共享</strong>指针的所有权。但是，如果必须共享 <code>shared_ptr</code> 实例的所有权，则应避免在它们之间循环引用。</p>
+<h4 id="circular-references">circular references</h4>
+<p>在基于引用计数的任何类型的系统中，对类的引用可以形成循环，即第一个对象引用第二个对象，第二个对象引用第三个对象，依此类推，直到某个最终对象引用回第一个对象。因此，引用计数永远不会达到0，对象也永远不会被释放。</p>
+<img src="cyclic.png" alt="cyclic reference" style="zoom:80%;" />
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    shared_ptr&lt;B&gt; b_ptr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:    </span><br><span class="line">    shared_ptr&lt;A&gt; a_ptr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> obj1 = <span class="built_in">make_shared</span>&lt;A&gt;(<span class="keyword">new</span> <span class="built_in">A</span>());</span><br><span class="line">    <span class="keyword">auto</span> obj2 = <span class="built_in">make_shared</span>&lt;B&gt;(<span class="keyword">new</span> <span class="built_in">B</span>());</span><br><span class="line">    obj1-&gt;b_ptr = obj2;</span><br><span class="line">    obj2-&gt;a_ptr = obj1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当 <code>shared_ptr</code> 离开作用域时，引用计数仍然都是1，因此A和B对象不会被删除。</p>
+<img src="cyclic_solution.png" alt="solution" style="zoom:67%;" />
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Solution</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    shared_ptr&lt;B&gt; b_ptr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:    </span><br><span class="line">    weak_ptr&lt;A&gt; a_ptr;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">useA</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">auto</span> a = a_ptr.<span class="built_in">lock</span>();</span><br><span class="line">        <span class="keyword">if</span>(a) &#123;	<span class="comment">//<span class="doctag">TODO:</span> do something to a &#125;</span></span><br><span class="line">        <span class="keyword">else</span> &#123; <span class="comment">//<span class="doctag">TODO:</span> a has been deleted &#125;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> obj1 = <span class="built_in">make_shared</span>&lt;A&gt;(<span class="keyword">new</span> <span class="built_in">A</span>());</span><br><span class="line">    <span class="keyword">auto</span> obj2 = <span class="built_in">make_shared</span>&lt;B&gt;(<span class="keyword">new</span> <span class="built_in">B</span>());</span><br><span class="line">    obj1-&gt;b_ptr = obj2;</span><br><span class="line">    obj2-&gt;a_ptr = obj1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="References">References</h3>
+<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/smart-pointers-modern-cpp?view=vs-2019">Smart pointers (Modern C++) | Microsoft Docs</a></p>
+<p><a href="https://en.cppreference.com/w/cpp/memory">Dynamic memory management | cppreference.com</a></p>
+<p><a href="https://docs.huihoo.com/actor-framework/en/ReferenceCounting.html">Reference Counting | CAF</a></p>
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
       </tags>
   </entry>
   <entry>
@@ -2077,6 +2244,199 @@ In areas of the image with low contrast or subtle details, the quantization proc
         <tag>C/C++</tag>
         <tag>Linux</tag>
         <tag>Socket</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ Rvalue Reference</title>
+    <url>/2020/07/01/rvalue/</url>
+    <content><![CDATA[<h1>C++ Rvalue Reference</h1>
+<h2 id="Value-categories">Value categories</h2>
+<p><img src="value_categories.png" alt="Value-categories"></p>
+<p>每个 C++ 表达式（带有操作数的操作符、字面量、变量名等）都属于三种基本值类别中的一种：</p>
+<p>更具体的示例描述请查看 <a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories – cppreference.com</a></p>
+<ul>
+<li>
+<p>纯右值 (prvalue)</p>
+<p>纯右值表达式没有可通过程序访问的地址。</p>
+<p>纯右值表达式的示例包括：（除了字符串字面量之外的）字面量、返回非引用类型的函数调用，以及在表达式评估期间创建但仅由编译器访问的临时对象</p>
+</li>
+<li>
+<p>亡值 (xvalue)</p>
+<p>亡值表达式的地址不能再由您的程序访问，但可用于初始化 rvalue 引用，后者提供对表达式的访问。</p>
+<p>亡值表达式的示例包括返回右值引用的函数调用，以及数组下标、成员和指针到数组或对象为右值引用的成员表达式</p>
+</li>
+<li>
+<p>左值 (lvalue)</p>
+<p>左值具有程序可以访问的地址。</p>
+<p>左值表达式的示例包括变量名称，包括<strong>常量</strong>变量、数组元素、返回 lvalue 引用、位字段、联合和类成员的函数调用</p>
+</li>
+</ul>
+<p>随着移动语义引入到 C++11 之中，值类别被重新进行了定义，以区别表达式的两种独立的性质：</p>
+<ul>
+<li><em>拥有身份 ( has identity)</em>：可以确定表达式是否与另一表达式指代同一实体，例如通过比较它们所标识的对象或函数的（直接或间接获得的）地址；</li>
+<li><em>可被移动</em>：移动构造函数、移动赋值运算符或实现了移动语义的其他函数重载能够绑定于这个表达式。</li>
+</ul>
+<p>C++11 中：</p>
+<ul>
+<li>拥有身份且不可被移动的表达式被称作*左值 (lvalue)*表达式；</li>
+<li>拥有身份且可被移动的表达式被称作*亡值 (xvalue)*表达式；</li>
+<li>不拥有身份且可被移动的表达式被称作*纯右值 (prvalue)*表达式；</li>
+<li>不拥有身份且不可被移动的表达式无法使用。</li>
+</ul>
+<p>拥有身份的表达式被称作“泛左值 (glvalue) 表达式”。左值和亡值都是泛左值表达式。</p>
+<p>可被移动的表达式被称作“右值 (rvalue) 表达式”。纯右值和亡值都是右值表达式。</p>
+<p><img src=".value-categories.png" alt="value-categories"></p>
+<h2 id="Lvalue-Reference">Lvalue Reference</h2>
+<p>c++11之前，C 中仅存在一种引用类型，所以简单称之为<em>引用</em>，而在c11中其被称为左值引用</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">L-value reference</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">Yes</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<p>而对const对象的左值引用可以使用左值或右值进行初始化</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">L-value reference to const</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<p>对const对象的左值引用非常有用，因为它使得可以将任何类型的参数（左值或右值）传递给函数，而无需复制该参数</p>
+<h2 id="Rvalue-Reference">Rvalue Reference</h2>
+<p>右值引用可将左值和右值区分开，可以帮助您不必要的内存分配和复制操作需求，从而提高应用程序的性能。</p>
+<p>相比于左值引用，</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">R-value reference</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">Yes</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">R-value reference to const</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Move-Semantics">Move Semantics</h2>
+<p>要实现移动语义，通常向类提供<em>移动构造函数，</em> 并可以选择移动赋值运算符 （<strong>运算符 =</strong>）。 其源是右值的复制和赋值操作随后会自动利用移动语义。 与默认复制构造函数不同，编译器不提供默认移动构造函数。</p>
+<p>假设一个类X，其中包含一个/多个指向 创建和拷贝开销较大的对象(资源) 的指针，则无需取消引用该指针并复制其内容，移动构造（拷贝）函数只需复制指针的地址， 这就是移动构造函数带来的性能优势所在（只需要浅拷贝）。</p>
+<p>（由于参数是非常量引用，因此它可以修改传递给它的对象，可能具有破坏性）</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">X&amp; X::<span class="keyword">operator</span>=(<span class="type">const</span> X &amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//make a clone of what rhs&#x27;s member pointer refers to</span></span><br><span class="line">    <span class="comment">//destruct the resources that this member pointer refers to</span></span><br><span class="line">    <span class="comment">//attach the clone</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">X&amp; X::<span class="keyword">operator</span>=(X &amp;&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//swap this-&gt;pointer and rhs.pointer</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="built_in">main</span>()</span><br><span class="line">&#123;</span><br><span class="line">    X a;</span><br><span class="line">    a = <span class="built_in">X</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此，通过const lvalue 引用或 rvalue 引用参数重载函数，来编写区分不可修改对象 （lvalue） 和可修改临时值 （rvalue） 的代码。</p>
+<h3 id="Forcing-Move-Semantics">Forcing Move Semantics</h3>
+<p>如果你想通过一个变量(lvalue)来调用移动构造（拷贝）函数，std::move()会将变量(lvalue)转换为右值，使其绑定到移动构造(拷贝)函数</p>
+<blockquote>
+<p>std::move() does not move, it casts.</p>
+<p>std::move()实际上是通过static_cast实现的</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">return static_cast&lt;typename std::remove_reference&lt;T&gt;::type&amp;&amp;&gt;(t);</span><br></pre></td></tr></table></figure>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; </span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(T&amp; a, T&amp; b)</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="function">T <span class="title">tmp</span><span class="params">(std::move(a))</span></span>;</span><br><span class="line">  a = std::<span class="built_in">move</span>(b); </span><br><span class="line">  b = std::<span class="built_in">move</span>(tmp);</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X a, b;</span><br><span class="line">	<span class="built_in">swap</span>(a, b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为已经将变量强制转换为右值，而接收右值的函数可能会对该变量产生破坏性作用，在此之后使用变量的内容可能会导致不确定的行为，因此在变量经过std::move()之后，需要销毁或重新分配。</p>
+<h2 id="Perfect-forwarding">Perfect forwarding</h2>
+<p>完美转发可减少对重载函数的需求，并有助于避免转发问题。 当编写一个泛型函数，该函数将<em>引用</em>作为其参数，并将这些参数传递给（或<em>转发</em>）到另一个函数时，可能会出现<em>转发问题</em>。 例如，如果泛型函数采用 <code>const T&amp;</code> 类型的参数，则调用的函数无法修改该参数的值。 如果泛型函数采用 <code>T&amp;</code> 类型的参数，则无法使用右值（如临时对象或非字符串字面量）来调用该函数。</p>
+<p>通常，若要解决此问题，则必须提供为其每个参数采用 <code>T&amp;</code> 和 <code>const T&amp;</code> 的重载版本的泛型函数。 因此，重载函数的数量将基于参数的数量呈指数方式增加。 利用右值引用，函数模板会推导出其模板自变量类型，然后使用引用折叠规则，函数可接受任意参数并将其转发给另一个函数，就像已直接调用其他函数一样。</p>
+<p>引用折叠规则：</p>
+<ul>
+<li>T&amp; &amp; -&gt; T&amp;</li>
+<li>T&amp; &amp;&amp; -&gt; T&amp;</li>
+<li>T&amp;&amp; &amp; -&gt; T&amp;</li>
+<li>T&amp;&amp; &amp;&amp; -&gt; T&amp;&amp;</li>
+</ul>
+<p>使用示例:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Arg&gt; </span></span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">factory</span><span class="params">(Arg&amp;&amp; arg)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;T&gt;(<span class="keyword">new</span> <span class="built_in">T</span>(std::forward&lt;Arg&gt;(arg)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>std::forward从概念上所实现：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_lvalue_reference&lt;T&gt;::value)<span class="comment">//Code producing an lvalue reference expects the object to remain valid.</span></span><br><span class="line">  <span class="keyword">return</span> t;</span><br><span class="line"><span class="keyword">return</span> std::<span class="built_in">move</span>(t);</span><br></pre></td></tr></table></figure>
+<h2 id="References">References</h2>
+<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/rvalue-reference-declarator-amp-amp?view=vs-2019#syntax">Rvalue Reference Declarator: &amp;&amp; - Microsoft Docs</a></p>
+<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=vs-2015">Value Categories - Microsoft Docs</a></p>
+<p><a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories - cppreference.com</a></p>
+<p><a href="https://www.chromium.org/rvalue-references?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#TOC-1.-What-makes-rvalues.">Rvalue references in Chromium</a></p>
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
       </tags>
   </entry>
   <entry>
@@ -2955,257 +3315,6 @@ vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
       </categories>
       <tags>
         <tag>Operating System</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++ Smart Pointers</title>
-    <url>/2020/08/12/pointer/</url>
-    <content><![CDATA[<h1>C++ Smart Pointers</h1>
-<p>与托管语言不同，C没有自动垃圾回收功能（在程序运行时释放堆内存和其他资源）。C程序负责将获取的所有资源返回到操作系统，己动态分配的堆内存由于某种原因程序未释放或无法释放，造成系统内存的浪费被称为<strong>内存泄漏</strong>。在进程退出之前，泄漏的资源对其他程序不可用。总而言之，内存泄漏是 C-style编程中出现 bug 的一个常见原因。</p>
-<h3 id="RAII">RAII</h3>
-<p>现代c++通过在堆栈上声明对象来尽可能避免使用堆内存。当一个资源对于堆栈来说太大时，它应该被一个对象所拥有。当对象被初始化时，它获得它所拥有的资源。然后，该对象负责释放其析构函数中的资源。拥有的对象本身是在堆栈上声明的。对象拥有资源的原则也称为 “<strong>Resource Acquisition Is Initialization</strong>” 或 <strong>RAII</strong>。</p>
-<p>当拥有资源的堆栈对象超出作用域时，将自动调用其析构函数。这样，C ++中的垃圾回收与对象生存期密切相关，并且是确定性的。资源总是在程序的可控的已知位置释放。这利用了核心语言特性(对象生存期、范围退出、初始化顺序和堆栈展开)来消除资源泄漏并保证异常安全性。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">std::mutex m;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">bad</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m.<span class="built_in">lock</span>();                    <span class="comment">// acquire the mutex</span></span><br><span class="line">    <span class="built_in">f</span>();                         <span class="comment">// if f() throws an exception, the mutex is never released</span></span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">everything_ok</span>()) <span class="keyword">return</span>; <span class="comment">// early return, the mutex is never released</span></span><br><span class="line">    m.<span class="built_in">unlock</span>();                  <span class="comment">// if bad() reaches this statement, the mutex is released</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">good</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lk</span><span class="params">(m)</span></span>; <span class="comment">// RAII class: mutex acquisition is initialization</span></span><br><span class="line">    <span class="built_in">f</span>();                               <span class="comment">// if f() throws an exception, the mutex is released</span></span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">everything_ok</span>()) <span class="keyword">return</span>;       <span class="comment">// early return, the mutex is released</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>通过使用智能指针进行内存分配，可以消除内存泄漏的可能性。它们的行为类似常规指针，重要的区别是它负责自动释放所指向的对象。<code>shared_ptr</code> 和 <code>unique_ptr</code> 的区别在于管理底层指针的方式：<code>shared_ptr</code> 允许多个指针指向同一个对象；<code>unique_ptr</code> 则“独占”所指向的对象。<code>weak_ptr</code> 是一种弱引用，指向 <code>shared_ptr</code> 所管理的对象。</p>
-<p>智能指针是<strong>模板</strong>，当创建时，需要提供指针指向的类型。默认初始化的智能指针保存着一个空指针。</p>
-<h3 id="unique-ptr">unique_ptr</h3>
-<p>只允许底层指针有一个所有者，与原始指针一样高效。<code>unique_ptr</code> 的基本特征：大小是<strong>一个指针</strong>，可移动（将所有权转移到新 <code>unique_ptr</code> 并重置旧 <code>unique_ptr</code>），但<strong>不可复制或共享</strong>。<code>unique_ptr</code> 通过引用来传递，如果尝试通过此处的值传递，由于删除了 <code>unique_ptr</code> 复制构造函数，编译器将引发错误。</p>
-<p><img src="unique_ptr.png" alt="unique_ptr"></p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Use make_unique function.(C++14)</span></span><br><span class="line">    <span class="keyword">auto</span> p1 = <span class="built_in">make_unique</span>&lt;MyClass&gt;(<span class="string">&quot;argv&quot;</span>);</span><br><span class="line">    <span class="comment">// Move raw pointer from one unique_ptr to another.</span></span><br><span class="line">    unique_ptr&lt;MyClass&gt; p2 = std::<span class="built_in">move</span>(p1);</span><br><span class="line">    <span class="comment">// Create a unique_ptr to an array of 5 integers.</span></span><br><span class="line">    <span class="keyword">auto</span> p3 = <span class="built_in">make_unique</span>&lt;<span class="type">int</span>[]&gt;(<span class="number">5</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="shared-ptr">shared_ptr</h3>
-<p>采用引用计数的智能指针，专门用于可能需要多个所有者管理内存中对象的生命周期的方案。<strong>大小为两个指针</strong>；一个用于<strong>对象</strong>，另一个用于包指向<strong>共享控制块</strong>。</p>
-<p>控制块是一个动态分配的对象，其中包含：</p>
-<ul>
-<li>指向被管理对象的指针或被管理对象本身</li>
-<li>删除器（类型擦除）</li>
-<li>分配器（类型擦除）</li>
-<li>占有被管理对象的 <code>shared_ptr</code> 的数量</li>
-<li>涉及被管理对象的 <code>weak_ptr</code> 的数量</li>
-</ul>
-<p>初始化 <code>shared_ptr</code> 之后，您可以复制它，在函数参数中按值传递它，并将其分配给其他 <code>shared_ptr</code> 实例。 所有实例都指向同一个对象，并且共享对一个控制块的访问权，每当添加新的 <code>shared_ptr</code>，超出范围或对其进行重置时，该控制块都会递增和递减<code>shared_ptr</code> 引用计数。如果<code>shared_ptr</code> 引用计数减至零，控制块就会调用被管理对象的析构函数。但控制块本身直到 <code>weak_ptr</code> 计数器同样归零时才会释放。</p>
-<p><code>shared_ptr</code> 的默认内存布局（通过构造函数）</p>
-<img src="shared_ptr1.png" alt="shared_ptr" style="zoom:45%;" />
-<p>使用<code>make_shared</code> / <code>allocate_shared</code>创建时的内存布局：</p>
-<img src="shared_ptr.png" alt="shared_ptr" style="zoom:50%;" />
-<blockquote>
-<p><a href="https://stackoverflow.com/questions/34046070/why-are-two-raw-pointers-to-the-managed-object-needed-in-stdshared-ptr-impleme">Why are two raw pointers to the managed object needed in std::shared_ptr implementation?</a></p>
-</blockquote>
-<p>首次创建内存资源时，尽可能使用 <code>make_shared</code> 函数创建 <code>shared_ptr</code>。 <code>make_shared</code> 是 exception-safe 的。它在同一个调用中为控制块和资源分配内存 (<a href="https://stackoverflow.com/questions/20895648/difference-in-make-shared-and-normal-shared-ptr-in-c">Difference in make_shared and normal shared_ptr in C++</a>)，从而减少了构造开销。 如果不使用 <code>make_shared</code>，则必须先使用显式新表达式创建对象，然后再将其传递给<code>shared_ptr</code>构造函数。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Use make_shared function when possible.</span></span><br><span class="line">    <span class="keyword">auto</span> sp1 = <span class="built_in">make_shared</span>&lt;MyClass&gt;(<span class="string">&quot;argv&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Ok, but slightly less efficient. </span></span><br><span class="line">    <span class="function">shared_ptr&lt;MyClass&gt; <span class="title">sp2</span><span class="params">(<span class="keyword">new</span> MyClass(<span class="string">&quot;argv&quot;</span>))</span></span>;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//Initialize with copy constructor. Increments ref count.</span></span><br><span class="line">	<span class="function"><span class="keyword">auto</span> <span class="title">sp3</span><span class="params">(sp2)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//Initialize via assignment. Increments ref count.</span></span><br><span class="line">	<span class="keyword">auto</span> sp4 = sp2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="weak-ptr">weak_ptr</h3>
-<p>结合 <code>shared_ptr</code> 使用的特例智能指针，不控制所指向对象生命周期的智能指针。<strong>大小为两个指针</strong>；一个用于存储构建它的 <code>shared_ptr</code> 的指针，另一个用于指向 <strong>共享控制块</strong>。将一个 <code>weak_ptr</code> 绑定到一个 <code>shared_ptr</code> 不会改变 <code>shared_ptr</code> 的引用计数，一旦最后一个指向对象的 <code>shared_ptr</code> 被销毁，对象就会被释放。但控制块本身直到 <code>weak_ptr</code> 计数器同样归零时才会释放。</p>
-<p>当<code>weak_ptr</code>需要获得临时所有权时，需要将其转换为 <code>shared_ptr</code>，此时如果原来的 <code>shared_ptr</code> 被销毁，则该对象的生命期将被延长至这个临时的 <code>shared_ptr</code> 同样被销毁为止。</p>
-<p>最好的设计是尽可能<strong>避免共享</strong>指针的所有权。但是，如果必须共享 <code>shared_ptr</code> 实例的所有权，则应避免在它们之间循环引用。</p>
-<h4 id="circular-references">circular references</h4>
-<p>在基于引用计数的任何类型的系统中，对类的引用可以形成循环，即第一个对象引用第二个对象，第二个对象引用第三个对象，依此类推，直到某个最终对象引用回第一个对象。因此，引用计数永远不会达到0，对象也永远不会被释放。</p>
-<img src="cyclic.png" alt="cyclic reference" style="zoom:80%;" />
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Example</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    shared_ptr&lt;B&gt; b_ptr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:    </span><br><span class="line">    shared_ptr&lt;A&gt; a_ptr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> obj1 = <span class="built_in">make_shared</span>&lt;A&gt;(<span class="keyword">new</span> <span class="built_in">A</span>());</span><br><span class="line">    <span class="keyword">auto</span> obj2 = <span class="built_in">make_shared</span>&lt;B&gt;(<span class="keyword">new</span> <span class="built_in">B</span>());</span><br><span class="line">    obj1-&gt;b_ptr = obj2;</span><br><span class="line">    obj2-&gt;a_ptr = obj1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当 <code>shared_ptr</code> 离开作用域时，引用计数仍然都是1，因此A和B对象不会被删除。</p>
-<img src="cyclic_solution.png" alt="solution" style="zoom:67%;" />
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Solution</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    shared_ptr&lt;B&gt; b_ptr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:    </span><br><span class="line">    weak_ptr&lt;A&gt; a_ptr;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">useA</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">auto</span> a = a_ptr.<span class="built_in">lock</span>();</span><br><span class="line">        <span class="keyword">if</span>(a) &#123;	<span class="comment">//<span class="doctag">TODO:</span> do something to a &#125;</span></span><br><span class="line">        <span class="keyword">else</span> &#123; <span class="comment">//<span class="doctag">TODO:</span> a has been deleted &#125;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> obj1 = <span class="built_in">make_shared</span>&lt;A&gt;(<span class="keyword">new</span> <span class="built_in">A</span>());</span><br><span class="line">    <span class="keyword">auto</span> obj2 = <span class="built_in">make_shared</span>&lt;B&gt;(<span class="keyword">new</span> <span class="built_in">B</span>());</span><br><span class="line">    obj1-&gt;b_ptr = obj2;</span><br><span class="line">    obj2-&gt;a_ptr = obj1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="References">References</h3>
-<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/smart-pointers-modern-cpp?view=vs-2019">Smart pointers (Modern C++) | Microsoft Docs</a></p>
-<p><a href="https://en.cppreference.com/w/cpp/memory">Dynamic memory management | cppreference.com</a></p>
-<p><a href="https://docs.huihoo.com/actor-framework/en/ReferenceCounting.html">Reference Counting | CAF</a></p>
-]]></content>
-      <categories>
-        <category>Concepts</category>
-      </categories>
-      <tags>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++ Rvalue Reference</title>
-    <url>/2020/07/01/rvalue/</url>
-    <content><![CDATA[<h1>C++ Rvalue Reference</h1>
-<h2 id="Value-categories">Value categories</h2>
-<p><img src="value_categories.png" alt="Value-categories"></p>
-<p>每个 C++ 表达式（带有操作数的操作符、字面量、变量名等）都属于三种基本值类别中的一种：</p>
-<p>更具体的示例描述请查看 <a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories – cppreference.com</a></p>
-<ul>
-<li>
-<p>纯右值 (prvalue)</p>
-<p>纯右值表达式没有可通过程序访问的地址。</p>
-<p>纯右值表达式的示例包括：（除了字符串字面量之外的）字面量、返回非引用类型的函数调用，以及在表达式评估期间创建但仅由编译器访问的临时对象</p>
-</li>
-<li>
-<p>亡值 (xvalue)</p>
-<p>亡值表达式的地址不能再由您的程序访问，但可用于初始化 rvalue 引用，后者提供对表达式的访问。</p>
-<p>亡值表达式的示例包括返回右值引用的函数调用，以及数组下标、成员和指针到数组或对象为右值引用的成员表达式</p>
-</li>
-<li>
-<p>左值 (lvalue)</p>
-<p>左值具有程序可以访问的地址。</p>
-<p>左值表达式的示例包括变量名称，包括<strong>常量</strong>变量、数组元素、返回 lvalue 引用、位字段、联合和类成员的函数调用</p>
-</li>
-</ul>
-<p>随着移动语义引入到 C++11 之中，值类别被重新进行了定义，以区别表达式的两种独立的性质：</p>
-<ul>
-<li><em>拥有身份 ( has identity)</em>：可以确定表达式是否与另一表达式指代同一实体，例如通过比较它们所标识的对象或函数的（直接或间接获得的）地址；</li>
-<li><em>可被移动</em>：移动构造函数、移动赋值运算符或实现了移动语义的其他函数重载能够绑定于这个表达式。</li>
-</ul>
-<p>C++11 中：</p>
-<ul>
-<li>拥有身份且不可被移动的表达式被称作*左值 (lvalue)*表达式；</li>
-<li>拥有身份且可被移动的表达式被称作*亡值 (xvalue)*表达式；</li>
-<li>不拥有身份且可被移动的表达式被称作*纯右值 (prvalue)*表达式；</li>
-<li>不拥有身份且不可被移动的表达式无法使用。</li>
-</ul>
-<p>拥有身份的表达式被称作“泛左值 (glvalue) 表达式”。左值和亡值都是泛左值表达式。</p>
-<p>可被移动的表达式被称作“右值 (rvalue) 表达式”。纯右值和亡值都是右值表达式。</p>
-<p><img src=".value-categories.png" alt="value-categories"></p>
-<h2 id="Lvalue-Reference">Lvalue Reference</h2>
-<p>c++11之前，C 中仅存在一种引用类型，所以简单称之为<em>引用</em>，而在c11中其被称为左值引用</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">L-value reference</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">Yes</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-</tbody>
-</table>
-<p>而对const对象的左值引用可以使用左值或右值进行初始化</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">L-value reference to const</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-</tbody>
-</table>
-<p>对const对象的左值引用非常有用，因为它使得可以将任何类型的参数（左值或右值）传递给函数，而无需复制该参数</p>
-<h2 id="Rvalue-Reference">Rvalue Reference</h2>
-<p>右值引用可将左值和右值区分开，可以帮助您不必要的内存分配和复制操作需求，从而提高应用程序的性能。</p>
-<p>相比于左值引用，</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">R-value reference</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">Yes</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">R-value reference to const</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-</tbody>
-</table>
-<h2 id="Move-Semantics">Move Semantics</h2>
-<p>要实现移动语义，通常向类提供<em>移动构造函数，</em> 并可以选择移动赋值运算符 （<strong>运算符 =</strong>）。 其源是右值的复制和赋值操作随后会自动利用移动语义。 与默认复制构造函数不同，编译器不提供默认移动构造函数。</p>
-<p>假设一个类X，其中包含一个/多个指向 创建和拷贝开销较大的对象(资源) 的指针，则无需取消引用该指针并复制其内容，移动构造（拷贝）函数只需复制指针的地址， 这就是移动构造函数带来的性能优势所在（只需要浅拷贝）。</p>
-<p>（由于参数是非常量引用，因此它可以修改传递给它的对象，可能具有破坏性）</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">X&amp; X::<span class="keyword">operator</span>=(<span class="type">const</span> X &amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//make a clone of what rhs&#x27;s member pointer refers to</span></span><br><span class="line">    <span class="comment">//destruct the resources that this member pointer refers to</span></span><br><span class="line">    <span class="comment">//attach the clone</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">X&amp; X::<span class="keyword">operator</span>=(X &amp;&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//swap this-&gt;pointer and rhs.pointer</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="built_in">main</span>()</span><br><span class="line">&#123;</span><br><span class="line">    X a;</span><br><span class="line">    a = <span class="built_in">X</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因此，通过const lvalue 引用或 rvalue 引用参数重载函数，来编写区分不可修改对象 （lvalue） 和可修改临时值 （rvalue） 的代码。</p>
-<h3 id="Forcing-Move-Semantics">Forcing Move Semantics</h3>
-<p>如果你想通过一个变量(lvalue)来调用移动构造（拷贝）函数，std::move()会将变量(lvalue)转换为右值，使其绑定到移动构造(拷贝)函数</p>
-<blockquote>
-<p>std::move() does not move, it casts.</p>
-<p>std::move()实际上是通过static_cast实现的</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">return static_cast&lt;typename std::remove_reference&lt;T&gt;::type&amp;&amp;&gt;(t);</span><br></pre></td></tr></table></figure>
-</blockquote>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; </span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(T&amp; a, T&amp; b)</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="function">T <span class="title">tmp</span><span class="params">(std::move(a))</span></span>;</span><br><span class="line">  a = std::<span class="built_in">move</span>(b); </span><br><span class="line">  b = std::<span class="built_in">move</span>(tmp);</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X a, b;</span><br><span class="line">	<span class="built_in">swap</span>(a, b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因为已经将变量强制转换为右值，而接收右值的函数可能会对该变量产生破坏性作用，在此之后使用变量的内容可能会导致不确定的行为，因此在变量经过std::move()之后，需要销毁或重新分配。</p>
-<h2 id="Perfect-forwarding">Perfect forwarding</h2>
-<p>完美转发可减少对重载函数的需求，并有助于避免转发问题。 当编写一个泛型函数，该函数将<em>引用</em>作为其参数，并将这些参数传递给（或<em>转发</em>）到另一个函数时，可能会出现<em>转发问题</em>。 例如，如果泛型函数采用 <code>const T&amp;</code> 类型的参数，则调用的函数无法修改该参数的值。 如果泛型函数采用 <code>T&amp;</code> 类型的参数，则无法使用右值（如临时对象或非字符串字面量）来调用该函数。</p>
-<p>通常，若要解决此问题，则必须提供为其每个参数采用 <code>T&amp;</code> 和 <code>const T&amp;</code> 的重载版本的泛型函数。 因此，重载函数的数量将基于参数的数量呈指数方式增加。 利用右值引用，函数模板会推导出其模板自变量类型，然后使用引用折叠规则，函数可接受任意参数并将其转发给另一个函数，就像已直接调用其他函数一样。</p>
-<p>引用折叠规则：</p>
-<ul>
-<li>T&amp; &amp; -&gt; T&amp;</li>
-<li>T&amp; &amp;&amp; -&gt; T&amp;</li>
-<li>T&amp;&amp; &amp; -&gt; T&amp;</li>
-<li>T&amp;&amp; &amp;&amp; -&gt; T&amp;&amp;</li>
-</ul>
-<p>使用示例:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Arg&gt; </span></span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">factory</span><span class="params">(Arg&amp;&amp; arg)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;T&gt;(<span class="keyword">new</span> <span class="built_in">T</span>(std::forward&lt;Arg&gt;(arg)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>std::forward从概念上所实现：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_lvalue_reference&lt;T&gt;::value)<span class="comment">//Code producing an lvalue reference expects the object to remain valid.</span></span><br><span class="line">  <span class="keyword">return</span> t;</span><br><span class="line"><span class="keyword">return</span> std::<span class="built_in">move</span>(t);</span><br></pre></td></tr></table></figure>
-<h2 id="References">References</h2>
-<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/rvalue-reference-declarator-amp-amp?view=vs-2019#syntax">Rvalue Reference Declarator: &amp;&amp; - Microsoft Docs</a></p>
-<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=vs-2015">Value Categories - Microsoft Docs</a></p>
-<p><a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories - cppreference.com</a></p>
-<p><a href="https://www.chromium.org/rvalue-references?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#TOC-1.-What-makes-rvalues.">Rvalue references in Chromium</a></p>
-]]></content>
-      <categories>
-        <category>Concepts</category>
-      </categories>
-      <tags>
-        <tag>C/C++</tag>
       </tags>
   </entry>
 </search>

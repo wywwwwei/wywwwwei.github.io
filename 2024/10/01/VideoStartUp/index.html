@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="First Open Time is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Optimizing First Open Time in Media Player Applications">
+<meta property="og:url" content="https://wywwwwei.github.io/2024/10/01/VideoStartUp/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="First Open Time is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-10T20:07:35.179Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Multimedia">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2024/10/01/VideoStartUp/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2024/10/01/VideoStartUp/","path":"2024/10/01/VideoStartUp/","title":"Optimizing First Open Time in Media Player Applications"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Optimizing First Open Time in Media Player Applications | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Definition-of-First-Open-Time"><span class="nav-number">1.</span> <span class="nav-text">Definition of First Open Time</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step-by-Step-Breakdown-and-Optimization"><span class="nav-number">2.</span> <span class="nav-text">Step-by-Step Breakdown and Optimization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Request-Initialization"><span class="nav-number">2.1.</span> <span class="nav-text">1. Request Initialization</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Process-Overview"><span class="nav-number">2.1.1.</span> <span class="nav-text">Process Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Optimization"><span class="nav-number">2.1.2.</span> <span class="nav-text">Optimization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Media-Resource-Loading"><span class="nav-number">2.2.</span> <span class="nav-text">2. Media Resource Loading</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Process-Overview-2"><span class="nav-number">2.2.1.</span> <span class="nav-text">Process Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Optimization-2"><span class="nav-number">2.2.2.</span> <span class="nav-text">Optimization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Demuxing-and-Parsing"><span class="nav-number">2.3.</span> <span class="nav-text">3. Demuxing and Parsing</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Process-Overview-3"><span class="nav-number">2.3.1.</span> <span class="nav-text">Process Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Optimization-3"><span class="nav-number">2.3.2.</span> <span class="nav-text">Optimization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Codec-Initialization"><span class="nav-number">2.4.</span> <span class="nav-text">4. Codec Initialization</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Process-Overview-4"><span class="nav-number">2.4.1.</span> <span class="nav-text">Process Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Optimization-4"><span class="nav-number">2.4.2.</span> <span class="nav-text">Optimization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Buffering"><span class="nav-number">2.5.</span> <span class="nav-text">5. Buffering</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Process-Overview-5"><span class="nav-number">2.5.1.</span> <span class="nav-text">Process Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Optimization-5"><span class="nav-number">2.5.2.</span> <span class="nav-text">Optimization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Rendering"><span class="nav-number">2.6.</span> <span class="nav-text">6. Rendering</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Process-Overview-6"><span class="nav-number">2.6.1.</span> <span class="nav-text">Process Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Optimization-6"><span class="nav-number">2.6.2.</span> <span class="nav-text">Optimization</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Additional-Best-Practices"><span class="nav-number">3.</span> <span class="nav-text">Additional Best Practices</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Device-Specific-Optimizations"><span class="nav-number">3.0.1.</span> <span class="nav-text">Device-Specific Optimizations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Graceful-Degradation"><span class="nav-number">3.0.2.</span> <span class="nav-text">Graceful Degradation</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">4.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2024/10/01/VideoStartUp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Optimizing First Open Time in Media Player Applications | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Optimizing First Open Time in Media Player Applications
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2024-10-01T00:00:00+08:00">2024-10-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Application/" itemprop="url" rel="index"><span itemprop="name">Application</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>747</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
+<h2 id="Definition-of-First-Open-Time">Definition of First Open Time</h2>
+<p>First open time is the duration from when the user presses the “play” button (or triggers media playback) to the moment the first audio or video frame is successfully decoded and presented. It typically includes the following steps:</p>
+<ol>
+<li><strong>Request Initialization</strong>: Setting up the network request for the media resource.</li>
+<li><strong>Media Resource Loading</strong>: Downloading the initial segments of the media file.</li>
+<li><strong>Demuxing and Parsing</strong>: Extracting audio and video streams from the media container.</li>
+<li><strong>Codec Initialization</strong>: Setting up audio and video decoders.</li>
+<li><strong>Buffering</strong>: Pre-loading enough data to ensure smooth playback.</li>
+<li><strong>Rendering</strong>: Displaying the first frame or playing the first audio sample.</li>
+</ol>
+<h2 id="Step-by-Step-Breakdown-and-Optimization">Step-by-Step Breakdown and Optimization</h2>
+<h3 id="1-Request-Initialization">1. Request Initialization</h3>
+<h4 id="Process-Overview">Process Overview</h4>
+<ul>
+<li>Establishing the connection to the media server.</li>
+<li>Resolving DNS, negotiating SSL/TLS (if applicable), and sending the HTTP(S) request.</li>
+</ul>
+<h4 id="Optimization">Optimization</h4>
+<ul>
+<li><strong>DNS Pre-fetching</strong>: Resolve domain names in advance to reduce lookup time.</li>
+<li><strong>Persistent Connections</strong>: Use HTTP/2 or keep-alive connections to eliminate the need to re-establish TCP connections.</li>
+<li><strong>Edge Caching</strong>: Deploy CDN (Content Delivery Network) servers close to the user to reduce latency.</li>
+<li><strong>Reduce Redirects</strong>: Ensure direct access to the media URL to avoid unnecessary HTTP redirections.</li>
+</ul>
+<h3 id="2-Media-Resource-Loading">2. Media Resource Loading</h3>
+<h4 id="Process-Overview-2">Process Overview</h4>
+<ul>
+<li>Retrieving the initial media segments (e.g., initialization segments, first GOP for video).</li>
+</ul>
+<h4 id="Optimization-2">Optimization</h4>
+<ul>
+<li>
+<p><strong>Smaller Initialization Segments</strong>: Minimize the size of the first chunk of data required for playback.</p>
+</li>
+<li>
+<p><strong>Adaptive Bitrate (ABR)</strong>: Start playback with a lower bitrate to reduce the initial data load.</p>
+</li>
+<li>
+<p><strong>Parallel Requests</strong>: Fetch audio and video segments simultaneously to save time.</p>
+</li>
+<li>
+<p><strong>Preloading</strong>: Predict and prefetch media segments based on user behavior or autoplay scenarios.</p>
+</li>
+</ul>
+<h3 id="3-Demuxing-and-Parsing">3. Demuxing and Parsing</h3>
+<h4 id="Process-Overview-3">Process Overview</h4>
+<ul>
+<li>Splitting the media container into audio and video streams.</li>
+<li>Parsing metadata (e.g., timestamps, codec information).</li>
+</ul>
+<h4 id="Optimization-3">Optimization</h4>
+<ul>
+<li><strong>Efficient Parsers</strong>: Use highly optimized demuxing libraries to reduce processing time.</li>
+<li><strong>Streamlined Containers</strong>: Favor lightweight media containers like MP4 or WebM with minimal overhead. Placing the ‘moov’ atom at the start of the MP4 file (instead of the default location at the end) allows the player to access this critical metadata immediately, without having to download the entire file first.</li>
+<li><strong>Lazy Parsing</strong>: Parse only essential metadata needed for playback, deferring deeper parsing for later.</li>
+</ul>
+<h3 id="4-Codec-Initialization">4. Codec Initialization</h3>
+<h4 id="Process-Overview-4">Process Overview</h4>
+<ul>
+<li>Setting up decoders for audio and video based on the codec information (e.g., H.264, AAC).</li>
+</ul>
+<h4 id="Optimization-4">Optimization</h4>
+<ul>
+<li><strong>Hardware Acceleration</strong>: Leverage GPU or hardware decoders for faster codec initialization.</li>
+<li><strong>Pre-initialized Decoders</strong>: Keep decoders ready for commonly used codecs to avoid setup delays.</li>
+<li><strong>Codec Negotiation</strong>: Ensure client and server agree on the optimal codec during the handshake phase.</li>
+</ul>
+<h3 id="5-Buffering">5. Buffering</h3>
+<h4 id="Process-Overview-5">Process Overview</h4>
+<ul>
+<li>Filling the playback buffer with enough data to start playback while avoiding interruptions.</li>
+</ul>
+<h4 id="Optimization-5">Optimization</h4>
+<ul>
+<li><strong>Dynamic Buffering Thresholds</strong>: Start playback with minimal buffering for faster startup and dynamically adjust thresholds during playback.</li>
+<li><strong>Predictive Buffering</strong>: Use machine learning to predict network conditions and pre-buffer accordingly.</li>
+<li><strong>Low-Latency Protocols</strong>: Implement protocols like HTTP/3 or QUIC to reduce latency during data transfer.</li>
+</ul>
+<h3 id="6-Rendering">6. Rendering</h3>
+<h4 id="Process-Overview-6">Process Overview</h4>
+<ul>
+<li>Decoding and rendering the first frame of video or playing the first audio sample.</li>
+</ul>
+<h4 id="Optimization-6">Optimization</h4>
+<ul>
+<li><strong>Skip Unnecessary Frames</strong>: Drop non-essential frames (e.g., B-frames) during startup to prioritize the first I-frame.</li>
+<li><strong>Frame Preprocessing</strong>: Pre-decode and cache the first frame during media loading.</li>
+<li><strong>Audio-First Start</strong>: If video decoding takes longer, start with audio playback to give the illusion of faster startup.</li>
+</ul>
+<h2 id="Additional-Best-Practices">Additional Best Practices</h2>
+<h4 id="Device-Specific-Optimizations">Device-Specific Optimizations</h4>
+<p>Optimize for popular devices and browsers by identifying bottlenecks in specific platforms.</p>
+<h4 id="Graceful-Degradation">Graceful Degradation</h4>
+<p>Provide fallback mechanisms (e.g., lower resolution or audio-only playback) for users on slow networks.</p>
+<h2 id="Conclusion">Conclusion</h2>
+<p>Optimizing first open time is a multi-faceted challenge that requires improvements at every step of the media playback pipeline. By implementing the techniques outlined above, developers can significantly reduce startup delays, leading to a smoother and more engaging user experience.</p>
+<p>Reducing first open time isn’t just about technical enhancements—it’s about providing a seamless experience that keeps users coming back. With continuous monitoring and iteration, these optimizations can have a lasting impact on user satisfaction and retention.</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2024/10/01/VideoStartUp/" title="Optimizing First Open Time in Media Player Applications">https://wywwwwei.github.io/2024/10/01/VideoStartUp/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Multimedia/" rel="tag"># Multimedia</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/05/02/image-processing/" rel="prev" title="Image Processing">
+                  <i class="fa fa-angle-left"></i> Image Processing
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
