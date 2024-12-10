@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Optimizing First Open Time in Media Player Applications</title>
+    <title>Player First Open Time Optimizition</title>
     <url>/2024/10/01/VideoStartUp/</url>
     <content><![CDATA[<p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
 <h2 id="Definition-of-First-Open-Time">Definition of First Open Time</h2>
