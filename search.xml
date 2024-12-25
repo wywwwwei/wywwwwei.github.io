@@ -1874,6 +1874,8 @@ In areas of the image with low contrast or subtle details, the quantization proc
 <li>
 <p>Histogram</p>
 <p>A histogram represents the distribution of pixel intensity values in an image. It provides a visual summary of how light or dark an image is and helps us understand its contrast and brightness characteristics.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">k=<span class="number">8</span></span><br><span class="line">random_image = np.random.random([<span class="number">10</span>, <span class="number">10</span>])</span><br><span class="line">random_image = random_image * <span class="number">2</span>**k</span><br><span class="line"></span><br><span class="line">plt.imshow(random_image, cmap=<span class="string">&#x27;gray&#x27;</span>,vmin=<span class="number">0</span>, vmax=<span class="number">2</span>**k-<span class="number">1</span>)</span><br><span class="line">plt.show()</span><br><span class="line">plt.hist(random_image.ravel(), bins=np.arange(<span class="number">2</span>**k+<span class="number">1</span>)-<span class="number">.5</span>, edgecolor=<span class="string">&#x27;red&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Intensity&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Count&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="image-20241226040145412.png" alt="image-20241226040145412" style="zoom:30%;" /><img src="image-20241226040202942.png" alt="image-20241226040202942" style="zoom:35%;" /></p>
 </li>
 <li>
 <p>Cumulative Histogram</p>

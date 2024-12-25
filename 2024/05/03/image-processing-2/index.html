@@ -26,16 +26,18 @@
 <meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
 <meta property="og:description" content="Image Processing &amp; Computer Vision Part 2 - Image Enhancement &amp; Restoration">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226040145412.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226040202942.png">
 <meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035043501.png">
 <meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035312141.png">
 <meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035444591.png">
 <meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226034447077.png">
 <meta property="article:published_time" content="2024-05-02T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-12-25T19:57:21.357Z">
+<meta property="article:modified_time" content="2024-12-25T20:03:38.205Z">
 <meta property="article:author" content="Wu Yongwei">
 <meta property="article:tag" content="Multimedia">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035043501.png">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226040145412.png">
 
 
 <link rel="canonical" href="https://wywwwwei.github.io/2024/05/03/image-processing-2/">
@@ -257,14 +259,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>1.2k</span>
+      <span>1.3k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -280,6 +282,8 @@
 <li>
 <p>Histogram</p>
 <p>A histogram represents the distribution of pixel intensity values in an image. It provides a visual summary of how light or dark an image is and helps us understand its contrast and brightness characteristics.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">k=<span class="number">8</span></span><br><span class="line">random_image = np.random.random([<span class="number">10</span>, <span class="number">10</span>])</span><br><span class="line">random_image = random_image * <span class="number">2</span>**k</span><br><span class="line"></span><br><span class="line">plt.imshow(random_image, cmap=<span class="string">&#x27;gray&#x27;</span>,vmin=<span class="number">0</span>, vmax=<span class="number">2</span>**k-<span class="number">1</span>)</span><br><span class="line">plt.show()</span><br><span class="line">plt.hist(random_image.ravel(), bins=np.arange(<span class="number">2</span>**k+<span class="number">1</span>)-<span class="number">.5</span>, edgecolor=<span class="string">&#x27;red&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Intensity&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Count&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="image-20241226040145412.png" alt="image-20241226040145412" style="zoom:30%;" /><img src="image-20241226040202942.png" alt="image-20241226040202942" style="zoom:35%;" /></p>
 </li>
 <li>
 <p>Cumulative Histogram</p>
