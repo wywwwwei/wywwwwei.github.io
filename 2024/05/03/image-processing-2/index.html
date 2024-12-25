@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Image Processing &amp; Computer Vision Part 2 - Image Enhancement &amp; Restoration">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Image Processing - Image Enhancement &amp; Restoration">
+<meta property="og:url" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="Image Processing &amp; Computer Vision Part 2 - Image Enhancement &amp; Restoration">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035043501.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035312141.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035444591.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226034447077.png">
+<meta property="article:published_time" content="2024-05-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-25T19:57:21.357Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Multimedia">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2024/05/03/image-processing-2/image-20241226035043501.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2024/05/03/image-processing-2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2024/05/03/image-processing-2/","path":"2024/05/03/image-processing-2/","title":"Image Processing - Image Enhancement & Restoration"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Image Processing - Image Enhancement & Restoration | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Image-Enhancement"><span class="nav-number">1.</span> <span class="nav-text">Image Enhancement</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Key-Concepts"><span class="nav-number">1.1.</span> <span class="nav-text">Key Concepts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Spatial-Domain-Process"><span class="nav-number">1.2.</span> <span class="nav-text">Spatial Domain Process</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Frequency-Domain-Process"><span class="nav-number">1.3.</span> <span class="nav-text">Frequency Domain Process</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Image-Restoration"><span class="nav-number">2.</span> <span class="nav-text">Image Restoration</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Key-Concepts-2"><span class="nav-number">2.1.</span> <span class="nav-text">Key Concepts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Restoration-in-the-presence-of-Noise-only-Spatial-filtering"><span class="nav-number">2.2.</span> <span class="nav-text">Restoration in the presence of Noise only - Spatial filtering</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Periodic-Noise-By-Frequency-Domain-Filtering"><span class="nav-number">2.3.</span> <span class="nav-text">Periodic Noise By Frequency Domain Filtering</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2024/05/03/image-processing-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Image Processing - Image Enhancement & Restoration | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Image Processing - Image Enhancement & Restoration
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-05-03 00:00:00" itemprop="dateCreated datePublished" datetime="2024-05-03T00:00:00+08:00">2024-05-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Concepts/" itemprop="url" rel="index"><span itemprop="name">Concepts</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>4 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="Image-Enhancement">Image Enhancement</h3>
+<h4 id="Key-Concepts">Key Concepts</h4>
+<ul>
+<li>
+<p>Histogram</p>
+<p>A histogram represents the distribution of pixel intensity values in an image. It provides a visual summary of how light or dark an image is and helps us understand its contrast and brightness characteristics.</p>
+</li>
+<li>
+<p>Cumulative Histogram</p>
+<p>The cumulative histogram is an extension of the basic histogram. Instead of showing individual intensity frequencies, it shows the cumulative frequency of intensities. This is particularly useful in operations like histogram equalization, where we aim to redistribute intensity values for better contrast.</p>
+</li>
+</ul>
+<p>Image enhancement is the process of improving the visual quality of an image to make it more suitable for a specific application. These techniques are primarily divided into spatial domain processing and frequency domain processing.</p>
+<h4 id="Spatial-Domain-Process">Spatial Domain Process</h4>
+<p>Two principal categories of spatial processing are intensity transformations and spatial filtering.</p>
+<ul>
+<li>
+<p>Intensity Transformations</p>
+<p>Intensity transformations are pixel-based operations that adjust brightness, contrast, or other pixel properties.</p>
+<ul>
+<li>
+<p>Grey Level Transformation</p>
+<ul>
+<li>
+<p>Image Negative: Inverts the pixel intensities, transforming bright areas into dark and vice versa. This is particularly useful in applications like medical imaging.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">util.invert(img) <span class="comment"># image negative</span></span><br></pre></td></tr></table></figure>
+<img src="image-20241226035043501.png" alt="image-20241226035043501" style="zoom:25%;" />
+</li>
+<li>
+<p>Log Transformation: Expands the dynamic range of dark regions in an image, making details more visible.</p>
+</li>
+<li>
+<p>Gamma (Power-Law) Transformation: Corrects non-linear intensity variations, often used in display systems.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">image6 = image**<span class="number">.6</span></span><br><span class="line">image4 = image**<span class="number">.4</span></span><br><span class="line">image3 = image**<span class="number">.3</span></span><br></pre></td></tr></table></figure>
+<img src="image-20241226035312141.png" alt="image-20241226035312141" style="zoom: 40%;" />
+</li>
+</ul>
+</li>
+<li>
+<p>Histogram Equalization</p>
+<p>A popular method to improve contrast by redistributing intensity values. It’s particularly effective for images with poor lighting or low contrast.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image1_eq = img_as_ubyte(exposure.equalize_hist(image1))</span><br></pre></td></tr></table></figure>
+<img src="image-20241226035444591.png" alt="image-20241226035444591" style="zoom:40%;" />
+</li>
+<li>
+<p>Local Enhancement</p>
+<p>Instead of applying transformations globally, local enhancement focuses on specific regions of an image, enabling finer control over the output.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Spatial Filtering</p>
+<p>Spatial filtering involves modifying pixel values based on their surrounding neighbors. This is where techniques like <strong>image smoothing</strong> and <strong>sharpening</strong> come into play.</p>
+<ul>
+<li>
+<p>Smoothing Filters (Low-pass Filters):<br>
+These filters reduce noise by averaging neighboring pixels, resulting in a blur effect. They are ideal for removing minor imperfections but may reduce sharpness.</p>
+</li>
+<li>
+<p>Sharpening Filters (High-pass Filters):<br>
+These filters enhance edges and fine details by emphasizing intensity changes. Applications include edge detection and feature extraction.</p>
+</li>
+<li>
+<p>Combining Enhancement Methods:<br>
+Often, multiple enhancement techniques are combined for optimal results. For example, smoothing can be applied to reduce noise before sharpening to enhance edges.</p>
+</li>
+</ul>
+<p>Arithmetic operations like addition, subtraction, multiplication, and division can also be used to manipulate images.</p>
+</li>
+</ul>
+<h4 id="Frequency-Domain-Process">Frequency Domain Process</h4>
+<p>Unlike spatial domain processing, frequency domain techniques focus on the frequency components of an image rather than its pixels. By transforming an image into the frequency domain (using tools like the Fourier Transform), we can manipulate specific frequency ranges to achieve desired effects.</p>
+<ul>
+<li>
+<p>Frequency Domain Filtering</p>
+<p>Frequency domain filtering differs from spatial filtering in that it targets specific frequency components:</p>
+<ul>
+<li><strong>Low frequencies</strong> represent smooth regions of the image.</li>
+<li><strong>High frequencies</strong> correspond to edges and fine details.</li>
+</ul>
+</li>
+<li>
+<p>Unsharp Masking</p>
+<p>Unsharp masking is a method that enhances image sharpness by amplifying high frequencies. It works by subtracting a blurred version of the image (low frequencies) from the original image, leaving behind the high-frequency details.</p>
+</li>
+<li>
+<p>Homomorphic Filtering</p>
+<p>Homomorphic filtering is a technique that simultaneously enhances contrast and reduces noise. It separates the illumination and reflectance components of an image, allowing for targeted adjustments.</p>
+</li>
+</ul>
+<h3 id="Image-Restoration">Image Restoration</h3>
+<p>While image enhancement focuses on improving the visual appearance of an image, <strong>image restoration</strong> takes a different approach. Restoration aims to recover an image’s original quality by reversing known degradations. The goal is to reconstruct the image as closely as possible to its true form, often requiring a deeper understanding of the degradation process.</p>
+<h4 id="Key-Concepts-2">Key Concepts</h4>
+<ul>
+<li>
+<p>Enhancement vs. Restoration</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Image Enhancement</th>
+<th>Image Restoration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Objective</td>
+<td>Improves subjective visual quality</td>
+<td>Reconstructs the original image</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td>Emphasis on human perception</td>
+<td>Focus on mathematical models of degradation</td>
+</tr>
+<tr>
+<td>Approach</td>
+<td>Heuristic techniques (e.g., contrast adjustment, smoothing)</td>
+<td>Algorithmic corrections (e.g., noise removal, deblurring)</td>
+</tr>
+<tr>
+<td>Use Case</td>
+<td>Enhancing medical images for better viewing</td>
+<td>Restoring damaged satellite images</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>Noise Models</p>
+<p>Noise is often introduced into images during acquisition, transmission, or processing. Understanding the type of noise is critical for selecting the appropriate restoration technique. Some common noise models include:</p>
+<ol>
+<li><strong>Gaussian Noise</strong>: A random distribution of intensity values, typically caused by sensor limitations.</li>
+<li><strong>Salt-and-Pepper Noise</strong>: Appears as random black and white pixels, often caused by transmission errors.</li>
+<li><strong>Poisson Noise</strong>: Associated with photon counting in low-light conditions, such as in microscopy or astronomy.</li>
+<li><strong>Periodic Noise</strong>: Results in periodic patterns, often caused by electrical interference during image acquisition.</li>
+</ol>
+<p>Each of these noise models requires a tailored restoration strategy. Let’s explore two primary approaches: spatial filtering and frequency domain filtering.</p>
+</li>
+</ul>
+<h4 id="Restoration-in-the-presence-of-Noise-only-Spatial-filtering">Restoration in the presence of Noise only - Spatial filtering</h4>
+<p>When noise is the primary degradation factor, spatial filtering can effectively suppress it while preserving important image details.</p>
+<ol>
+<li>Mean Filters</li>
+</ol>
+<ul>
+<li>
+<p><strong>Averaging Filter</strong>: Reduces noise by calculating the mean of neighboring pixels. While it smooths the image, it can blur edges.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">noisy_images_5 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">5</span>), dtype=np.float64)</span><br><span class="line">noisy_images_10 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">10</span>), dtype=np.float64)</span><br><span class="line">noisy_images_50 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">50</span>), dtype=np.float64)</span><br><span class="line">noisy_images_100 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">100</span>), dtype=np.float64)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    noisy_images_5[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    noisy_images_10[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">50</span>):</span><br><span class="line">    noisy_images_50[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">    noisy_images_100[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line">mean_image_5 = np.mean(noisy_images_5, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_10 = np.mean(noisy_images_10, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_50 = np.mean(noisy_images_50, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_100 = np.mean(noisy_images_100, axis=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241226034447077.png" alt="image-20241226034447077" style="zoom: 25%;" />
+</li>
+<li>
+<p><strong>Weighted Mean Filter</strong>: Assigns higher weights to closer pixels, reducing blur while maintaining noise suppression.</p>
+</li>
+</ul>
+<ol start="2">
+<li>Median Filters</li>
+</ol>
+<ul>
+<li>Particularly effective for <strong>salt-and-pepper noise</strong>, median filters replace the central pixel in a sliding window with the median value of its neighbors. This preserves edges better than mean filters.</li>
+</ul>
+<ol start="3">
+<li>Adaptive Filters</li>
+</ol>
+<ul>
+<li>Adaptive filters adjust their behavior based on local image characteristics, such as noise variance. They are versatile and effective for non-uniform noise.</li>
+</ul>
+<p>Spatial domain techniques are often straightforward to implement, but they may struggle with complex noise patterns, such as periodic noise. For such cases, frequency domain filtering is more appropriate.</p>
+<h4 id="Periodic-Noise-By-Frequency-Domain-Filtering">Periodic Noise By Frequency Domain Filtering</h4>
+<p>Periodic noise often manifests as sinusoidal patterns or regular distortions in an image. Frequency domain filtering provides an effective solution by isolating and removing these patterns.</p>
+<ol>
+<li>
+<p>Band-Stop Filtering</p>
+<p>Band-stop filters are designed to suppress specific frequency ranges. For periodic noise:</p>
+<ul>
+<li>
+<p>The noise frequency is identified in the Fourier Transform.</p>
+</li>
+<li>
+<p>A band-stop filter is applied to block these specific frequencies while preserving the rest of the image.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Notch Filters</p>
+<p>A <strong>notch filter</strong> is a more targeted approach to periodic noise removal. It zeroes out frequencies corresponding to the noise spikes while leaving other frequencies untouched, ensuring minimal impact on the image quality.</p>
+</li>
+<li>
+<p>Homomorphic Filtering</p>
+<p>Homomorphic filtering, while often used for image enhancement, can also be applied to combat periodic noise. By separating illumination and reflectance components, it can suppress unwanted interference patterns.</p>
+</li>
+</ol>
+<p>Periodic noise removal through frequency domain techniques is especially useful in scenarios like:</p>
+<ul>
+<li>Restoring scanned documents affected by electrical interference.</li>
+<li>Processing satellite images with regular transmission noise.</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2024/05/03/image-processing-2/" title="Image Processing - Image Enhancement &amp; Restoration">https://wywwwwei.github.io/2024/05/03/image-processing-2/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Multimedia/" rel="tag"># Multimedia</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/05/02/image-processing/" rel="prev" title="Image Processing - Image Sampling & Quantization">
+                  <i class="fa fa-angle-left"></i> Image Processing - Image Sampling & Quantization
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/10/01/VideoStartUp/" rel="next" title="Player First Open Time Optimizition">
+                  Player First Open Time Optimizition <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
