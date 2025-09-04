@@ -1,6 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Optimizing Bandwidth Costs for Short Video Downloads</title>
+    <url>/2025/02/01/bandwidth-cost/</url>
+    <content><![CDATA[<h2 id="Introduction">Introduction</h2>
+<p>The explosion of short-form video content on platforms like TikTok, YouTube Shorts has driven unprecedented demand for bandwidth. As users consume vast amounts of video content daily, service providers face the challenge of delivering high-quality experiences while managing escalating bandwidth and infrastructure costs. Optimizing bandwidth usage is critical not only for cost efficiency but also for ensuring scalability and sustainability in a competitive digital landscape. This blog explores why bandwidth optimization is essential, the trade-offs involved, and actionable strategies to achieve cost-effective video delivery without compromising user experience.</p>
+<h2 id="Why-Optimize-Bandwidth-Costs">Why Optimize Bandwidth Costs?</h2>
+<p>The need for bandwidth optimization stems from several key factors:</p>
+<ul>
+<li><strong>Cost Efficiency</strong>: Bandwidth is a significant operational expense for video platforms, especially with the rise of high-definition (HD) and 4K content. Reducing unnecessary data transfers directly lowers costs.</li>
+<li><strong>Scalability</strong>: As user bases grow, unoptimized systems can lead to exponential cost increases, straining infrastructure and budgets.</li>
+<li><strong>User Expectations</strong>: Modern users demand fast load times and seamless playback, even on variable network conditions. Efficient bandwidth use ensures low latency and minimal buffering.</li>
+<li><strong>Environmental Impact</strong>: Reducing bandwidth consumption lowers energy usage in data centers and networks, contributing to greener operations.</li>
+</ul>
+<p>Balancing these factors requires a strategic approach to resource allocation, leveraging cutting-edge technologies and data-driven insights.</p>
+<h2 id="Trade-offs-Between-User-Experience-and-Optimization">Trade-offs Between User Experience and Optimization</h2>
+<p>Optimizing bandwidth often involves trade-offs with user experience (UX). For instance:</p>
+<ul>
+<li><strong>Quality vs. Cost</strong>: Higher video quality (e.g., 4K resolution) enhances UX but increases bandwidth and storage costs. Lowering quality saves resources but risks user dissatisfaction.</li>
+<li><strong>Latency vs. Preloading</strong>: Preloading content reduces playback delays but consumes bandwidth upfront, which may be wasteful for unwatched videos.</li>
+<li><strong>Complexity vs. Simplicity</strong>: Advanced optimization techniques, like adaptive bitrate streaming, improve efficiency but require sophisticated infrastructure and monitoring.</li>
+</ul>
+<p>The goal is to strike a balance where cost savings do not degrade the viewing experience. This requires intelligent systems that adapt to user behavior, network conditions, and content popularity.</p>
+<h2 id="Methods-for-Bandwidth-Optimization">Methods for Bandwidth Optimization</h2>
+<h3 id="1-Leveraging-Hybrid-Content-Delivery-and-Edge-Computing-Strategies">1. Leveraging Hybrid Content Delivery and Edge Computing Strategies</h3>
+<h4 id="Peer-to-Peer-Content-Delivery-Networks-PCDN">Peer-to-Peer Content Delivery Networks (PCDN)</h4>
+<p>A PCDN combines traditional Content Delivery Networks (CDNs) with peer-to-peer (P2P) technology. Unlike CDNs, which rely on centralized servers to cache and deliver content, PCDNs leverage user devices as temporary nodes to distribute data. This reduces reliance on origin servers and lowers bandwidth costs.</p>
+<img src="PCDN-banner.png" alt="pcdn" style="zoom:50%;" />
+<ul>
+<li><strong>What is PCDN?</strong>: PCDN operates by turning users’ devices into temporary distribution nodes. When a user requests a video, the system first checks for nearby peers who have already downloaded parts of the content. If available, data segments are fetched from these peers instead of the origin server or CDN edge nodes. This peer-assisted model is particularly effective for short video platforms where content is consumed in bursts and user density is high. For example, in live streaming or viral short videos, PCDN can handle peak loads by distributing the delivery burden across the user base. Technologies like WebRTC or proprietary protocols enable secure, real-time peer connections, ensuring data integrity and privacy through encryption and access controls.</li>
+<li><strong>Advantages of PCDN</strong>:
+<ul>
+<li><strong>Cost Reduction</strong>: By utilizing users’ idle resources, PCDN can cut bandwidth costs to as low as one-quarter of traditional CDNs, as reported in various implementations.</li>
+<li><strong>Scalability</strong>: It excels in handling high concurrency, such as during viral events, without proportional infrastructure scaling.</li>
+<li><strong>Improved Performance</strong>: In regions with poor CDN coverage, PCDN can reduce latency by sourcing content from local peers.</li>
+<li><strong>Bandwidth Efficiency</strong>: It minimizes redundant data transfers from origin servers, making it ideal for bandwidth-intensive short video downloads.</li>
+</ul>
+</li>
+</ul>
+<p>However, PCDN requires careful management to address challenges like peer churn (users leaving the network), varying device capabilities, and potential security risks.</p>
+<ul>
+<li><strong>Comparison with P2P and CDN</strong>:
+<ul>
+<li><strong>PCDN vs. Pure P2P</strong>: Pure P2P networks, like those used in early file-sharing systems (e.g., BitTorrent), rely entirely on user devices for content distribution without centralized control. This makes P2P highly cost-effective and scalable but prone to inconsistencies—performance varies based on peer availability, leading to higher latency or incomplete transfers. Privacy and security are also concerns, as data passes directly between users. In contrast, PCDN integrates P2P with CDN infrastructure, using P2P opportunistically to offload traffic while falling back on reliable CDN servers for guaranteed delivery. This hybrid approach mitigates P2P’s variability, ensuring better quality of service (QoS) for video streaming.</li>
+<li><strong>PCDN vs. Traditional CDN</strong>: CDNs use a network of geographically distributed servers to cache and deliver content closer to users, excelling in low-latency and reliable delivery. However, they are expensive due to high infrastructure and bandwidth costs, especially for global scale. PCDN enhances CDNs by incorporating P2P elements, reducing the load on CDN servers (up to 70-90% in some cases) and lowering costs without sacrificing reliability. For short video platforms, PCDN provides a cost-optimized alternative during peak times, while CDNs handle baseline traffic.</li>
+</ul>
+</li>
+<li><strong>How to Apply PCDN</strong>: To implement PCDN, platforms can integrate solutions from providers like Alibaba Cloud PCDN or open-source frameworks. Start by analyzing user distribution and content popularity to determine P2P offload ratios. Use SDKs for client-side integration, ensuring compatibility with mobile devices. Incentives, such as reduced ads or priority access, can encourage user participation. For short videos, focus on segmenting content into small chunks for efficient peer sharing.</li>
+</ul>
+<h4 id="Edge-Node-Utilization-and-Off-Peak-Optimization">Edge Node Utilization and Off-Peak Optimization</h4>
+<p>Edge computing brings content closer to users, reducing latency and bandwidth demands on origin servers.</p>
+<ul>
+<li><strong>Pre-Warming Video Content</strong>: By analyzing viewing patterns, platforms can pre-cache popular videos at edge nodes during off-peak hours. For example, trending short videos can be pushed to edge servers overnight, minimizing peak-time origin fetches.</li>
+<li><strong>Off-Peak Collaboration</strong>: Partnering with ISPs or cloud providers to leverage off-peak bandwidth for content distribution can further reduce costs. For instance, scheduling large-scale content updates during low-traffic periods optimizes resource use.</li>
+</ul>
+<h3 id="2-Encoding-Optimization">2. Encoding Optimization</h3>
+<h4 id="Advanced-Codecs-H-265-HEVC-and-AV1">Advanced Codecs: H.265/HEVC and AV1</h4>
+<p>Modern codecs like H.265/High Efficiency Video Coding (HEVC) and AV1 offer superior compression compared to older standards like H.264.</p>
+<ul>
+<li><strong>H.265/HEVC</strong>: Achieves up to 50% better compression than H.264, reducing bandwidth while maintaining quality. However, it requires more computational power for encoding/decoding.</li>
+<li><strong>AV1</strong>: An open-source codec developed by the Alliance for Open Media, AV1 provides even better compression than H.265 and is royalty-free, making it ideal for cost-conscious platforms. Its adoption is growing, especially for web-based streaming.</li>
+</ul>
+<img src="Codec-Landscape-Graphs_Graph2-700x474.png" alt="codec" style="zoom:67%;" />
+<h4 id="Intelligent-Bitrate-Control-and-Adaptive-Transcoding">Intelligent Bitrate Control and Adaptive Transcoding</h4>
+<p>Not all videos require the same encoding parameters. By leveraging data analytics, platforms can optimize transcoding based on content popularity:</p>
+<ul>
+<li><strong>Popular (Hot) Videos</strong>: Use multi-bitrate encoding with high-quality settings (e.g., H.265 at 4K) to ensure a premium experience. Adaptive bitrate streaming (ABR) dynamically adjusts quality based on network conditions.</li>
+<li><strong>Long-Tail (Cold) Videos</strong>: Opt for lower bitrates or single-bitrate encoding to save storage and transcoding costs. For example, a rarely watched video might be encoded at 720p with a lower bitrate to minimize resource use.</li>
+<li><strong>Implementation</strong>: Machine learning models can predict video popularity based on historical data, guiding transcoding decisions. Tools like FFmpeg can automate adaptive transcoding pipelines.</li>
+</ul>
+<h3 id="3-Transmission-Strategies-Improving-Effective-Bandwidth-Utilization">3. Transmission Strategies: Improving Effective Bandwidth Utilization</h3>
+<h4 id="Segmented-Downloads-and-Intelligent-Preloading">Segmented Downloads and Intelligent Preloading</h4>
+<p>Segmented downloads break videos into smaller chunks, allowing partial downloads and reducing wasted bandwidth if a user stops watching.</p>
+<ul>
+<li><strong>Intelligent Preloading</strong>: By predicting user behavior (e.g., based on watch history), platforms can preload segments of likely-to-be-watched videos, reducing start-up times without overloading bandwidth.</li>
+<li><strong>Implementation</strong>: Use HTTP-based protocols like MPEG-DASH or HLS (HTTP Live Streaming) for segmented delivery, coupled with predictive algorithms.</li>
+</ul>
+<h4 id="Advanced-Transport-Protocols-QUIC">Advanced Transport Protocols: QUIC</h4>
+<p>QUIC, a UDP-based protocol, improves video delivery efficiency by reducing connection establishment time and handling packet loss better than TCP.</p>
+<ul>
+<li><strong>Benefits</strong>: QUIC minimizes latency, supports multiplexing, and adapts to network congestion, ensuring smoother playback for short videos.</li>
+<li><strong>Implementation</strong>: Platforms can adopt QUIC via libraries like quiche or integrate it with CDNs supporting HTTP/3.</li>
+</ul>
+<img src="QUIC-PICTURE-05-1024x560.jpg" alt="quic" style="zoom:50%;" />
+<h3 id="4-Data-and-Storage-Management-Reducing-Redundancy-and-Implementing-Intelligent-Caching">4. Data and Storage Management: Reducing Redundancy and Implementing Intelligent Caching</h3>
+<h4 id="Intelligent-Storage-Management">Intelligent Storage Management</h4>
+<p>Efficient storage management reduces costs while ensuring content accessibility.</p>
+<ul>
+<li><strong>Tiered Storage</strong>: Store frequently accessed (hot) videos on fast, expensive storage (e.g., SSDs) and move less popular (cold) videos to cheaper, slower storage (e.g., HDDs or cloud archives). Tools like AWS S3 Intelligent-Tiering automate this process.</li>
+<li><strong>Proactive Cleanup</strong>: Regularly purge redundant transcoded versions of videos (e.g., unused low-bitrate copies) to reclaim storage space. Automated scripts can identify and delete outdated files based on access patterns.</li>
+</ul>
+<h4 id="Adaptive-Bitrate-and-Compression-Techniques">Adaptive Bitrate and Compression Techniques</h4>
+<p>Dynamic adjustments to video resolution and compression optimize both bandwidth and storage.</p>
+<ul>
+<li><strong>Dynamic Resolution Selection</strong>: Match video resolution to user device capabilities (e.g., 480p for mobile devices on slow networks, 1080p for desktops). ABR protocols like HLS enable this seamlessly.</li>
+<li><strong>Efficient Image Formats</strong>: For thumbnails or preview images, use modern formats like WebP or AVIF, which offer better compression than JPEG, reducing storage and bandwidth needs.</li>
+</ul>
+<h2 id="Conclusion">Conclusion</h2>
+<p>Optimizing bandwidth costs for short video downloads requires a multifaceted approach. However, these efforts must be supported by a robust data monitoring system that tracks metrics like bandwidth utilization, stalling rates, and start-up times. Such a system enables continuous optimization, ensuring that cost savings align with user expectations. As video consumption continues to grow, platforms that adopt these strategies will be well-positioned to scale efficiently and sustainably.</p>
+]]></content>
+      <categories>
+        <category>Application</category>
+      </categories>
+      <tags>
+        <tag>Multimedia</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Player First Open Time Optimizition</title>
     <url>/2024/10/01/VideoStartUp/</url>
     <content><![CDATA[<p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
@@ -1769,6 +1875,88 @@
       </tags>
   </entry>
   <entry>
+    <title>Interprocess Communications</title>
+    <url>/2020/08/25/interprocess-communication/</url>
+    <content><![CDATA[<h2 id="消息传递">消息传递</h2>
+<h3 id="管道">管道</h3>
+<blockquote>
+<p>匿名管道随进程的创建而建立，随进程的结束而销毁</p>
+</blockquote>
+<p>管道是基于Linux &amp; Unix的操作系统的核心概念之一。管道允许您以一种非常优雅的方式 <code>|</code> 将命令链接在一起，将一个程序的输出传递为另一个程序的输入。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> -la | <span class="built_in">sort</span> | less</span><br></pre></td></tr></table></figure>
+<p><code>bash</code> 的执行过程</p>
+<ol>
+<li><code>bash</code> 创建2个管道，一个从 <code>ls</code> 到 <code>sort</code>，一个从 <code>sort</code> 到 <code>less</code></li>
+<li><code>bash</code> <code>fork</code> 三个子进程分别用于每个命令</li>
+<li>子进程1 <code>ls</code> 设置 <code>stdout</code> 为 <code>pipe A</code> 的写端</li>
+<li>子进程2 <code>sort</code> 设置 <code>stdin</code> 为 <code>pipe A</code> 的读端，设置 <code>stdout</code> 为 <code>pipe B</code> 的写端</li>
+<li>子进程3 <code>less</code> 设置 <code>stdin</code> 为 <code>pipe B</code> 的读端</li>
+</ol>
+<blockquote>
+<p>Linux has a VFS (virtual file system) module called <code>pipefs</code>, that gets mounted in kernel space during boot. <code>pipefs</code> is mounted <strong>alongside the root file system</strong> (/), not in it (pipe’s root is <code>pipe:</code> ). <code>pipefs</code> is stored using an in-memory file system.</p>
+<p><code>pipefs</code> cannot be directly examined by the user unlike most file systems. The entry point to <code>pipefs</code> is the <strong><code>pipe</code> syscall</strong>. The <strong><code>pipe</code> syscall</strong> is used by shells and other programs to implement piping, and just creates a new file in pipefs, returning two file descriptors (one for the read end, opening using <code>O_RDONLY</code>, and one for the write end, opened using <code>O_WRONLY</code>).</p>
+<img src="./interprocess-communication.assets/pipe_impl.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<img src="./interprocess-communication.assets/pipe.png" alt="pipe" style="zoom:33%;" />
+<p>使用 <code>fork</code> 创建子进程，<strong>创建的子进程会复制父进程的文件描述符</strong>，这样就做到了两个进程各有两个 <code>fd[0]</code> 与 <code>fd[1]</code>，两个进程就可以通过各自的 fd 写入和读取同一个管道文件实现跨进程通信。</p>
+<p>父子进程间的单向数据流（半双工管道）</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd);</span><br><span class="line">    </span><br><span class="line">    <span class="type">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        close(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd[0]);</span></span><br><span class="line">        <span class="comment">// TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	close(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd[1]);</span></span><br><span class="line"></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>父子进程间的双向数据流的两个管道（全双工管道，有两个半双工管道构成）</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd1[<span class="number">2</span>],pipe_fd2[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd1);</span><br><span class="line">    pipe(pipe_fd2);</span><br><span class="line">    </span><br><span class="line">    <span class="type">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        close(pipe_fd1[<span class="number">1</span>]);</span><br><span class="line">        close(pipe_fd2[<span class="number">0</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd1[0]);</span></span><br><span class="line">        <span class="comment">//close(pipe_fd2[1]);</span></span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	close(pipe_fd1[<span class="number">0</span>]);</span><br><span class="line">	close(pipe_fd2[<span class="number">1</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd1[1]);</span></span><br><span class="line">	<span class="comment">//close(pipe_fd2[0]);</span></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="FIFO">FIFO</h4>
+<blockquote>
+<p>名字空间</p>
+<p>当两个或多个无亲缘关系的进程使用某种类型的IPC对象来彼此交换信息时，该IPC对象必须有一个某种形式的 <strong>名字(name)</strong> 或 <strong>标识符(identifier)</strong> ，这样其中一个进程（往往是服务器）可以创建该IPC对象，其余进程则可以指定同一个IPC对象</p>
+</blockquote>
+<p>管道没有名字，因此它们的最大劣势就是智能用于有一个共同祖先进程的各个进程之间。而 <strong>FIFO（指代first in, first out）</strong> 类似于管道（单向数据流），且有一个文件路径名与之关联从而实现无亲缘关系进程访问同一个FIFO，所以也被称为 <strong>命名管道(named pipe)</strong></p>
+<blockquote>
+<p>Any FIFO is much like a pipe: rather than owning disk blocks in the filesystems, an opened FIFO is associated with a kernel buffer that temporarily stores the data exchanged by two or more processes. Thanks to the disk inode, however, a FIFO can be accessed by any process, since the FIFO filename is included in the system’s directory tree. FIFO inodes <strong>appear on the system directory tree rather than on the pipefs special filesystem</strong>.</p>
+<img src="./interprocess-communication.assets/fifo.png" alt="impl" style="zoom:50%;" />
+<p>Allocates a <code>pipe_inode_info</code> object (the actual pipe) for providing buffer space when fifo_open(…)</p>
+<img src="./interprocess-communication.assets/linux_pipe.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<p>通过 <code>mkfifo</code> 命令来创建并指定管道名字</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">mkfifo myFifo</span><br><span class="line"><span class="comment">//Example: write first</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> * myfifo = <span class="string">&quot;/tmp/myfifo&quot;</span>; </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Creating the named file(FIFO) </span></span><br><span class="line">    <span class="comment">// mkfifo(&lt;pathname&gt;, &lt;permission&gt;) </span></span><br><span class="line">    mkfifo(myfifo, <span class="number">0666</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="type">char</span> arr1[<span class="number">80</span>], arr2[<span class="number">80</span>]; </span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="comment">// Open FIFO for write only </span></span><br><span class="line">        fd = open(myfifo, O_WRONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Take an input arr2ing from user. </span></span><br><span class="line">        <span class="comment">// 80 is maximum length </span></span><br><span class="line">        fgets(arr2, <span class="number">80</span>, <span class="built_in">stdin</span>); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Write the input arr2ing on FIFO </span></span><br><span class="line">        <span class="comment">// and close it </span></span><br><span class="line">        write(fd, arr2, <span class="built_in">strlen</span>(arr2)+<span class="number">1</span>); </span><br><span class="line">        close(fd); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Open FIFO for Read only </span></span><br><span class="line">        fd = open(myfifo, O_RDONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Read from FIFO </span></span><br><span class="line">        read(fd, arr1, <span class="keyword">sizeof</span>(arr1)); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Print the read message </span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;User2: %s\n&quot;</span>, arr1); </span><br><span class="line">        close(fd); </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="消息队列">消息队列</h3>
+<blockquote>
+<p>随内核的持续性</p>
+</blockquote>
+<p>消息队列可认为时一个<strong>消息链表</strong>，有足够写权限的线程可往队列中放置消息，有足够读权限的线程可从队列中取走消息。</p>
+<p>每个消息都具有如下属性：</p>
+<ul>
+<li>一个无符号整数优先级（Posix） / 一个长整数类型（System V）</li>
+<li>消息的数据部分长度</li>
+<li>数据本身</li>
+</ul>
+<h4 id="System-V-消息队列">System V 消息队列</h4>
+<blockquote>
+<img src="./interprocess-communication.assets/SystemVmq.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"><span class="comment">// structure for message queue</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msg_buffer</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">long</span> msg_type;</span><br><span class="line">    <span class="type">char</span> msg[<span class="number">100</span>];</span><br><span class="line">&#125; message;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">send</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> my_key;</span><br><span class="line">    <span class="type">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">&quot;progfile&quot;</span>, <span class="number">65</span>);             <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT); <span class="comment">//create message queue and return id</span></span><br><span class="line">    message.msg_type = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Write Message : &quot;</span>);</span><br><span class="line">    fgets(message.msg, <span class="number">100</span>, <span class="built_in">stdin</span>);</span><br><span class="line">    msgsnd(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">0</span>); <span class="comment">//send message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Sent message is : %s \n&quot;</span>, message.msg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">receive</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> my_key;</span><br><span class="line">    <span class="type">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">&quot;progfile&quot;</span>, <span class="number">65</span>);                   <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT);       <span class="comment">//create message queue and return id</span></span><br><span class="line">    msgrcv(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">1</span>, <span class="number">0</span>); <span class="comment">//used to receive message</span></span><br><span class="line">    <span class="comment">// display the message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Received Message is : %s \n&quot;</span>, message.msg);</span><br><span class="line">    msgctl(msg_id, IPC_RMID, <span class="literal">NULL</span>); <span class="comment">//destroy the message queue</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Posix-消息队列">Posix 消息队列</h4>
+<blockquote>
+<p>POSIX message queues implement <strong>priority-ordered</strong> messages. Each message written by a sender process is associated with an integer number which is interpreted as message priority; messages with a higher number are considered higher in priority.</p>
+<img src="./interprocess-communication.assets/Posixmq.png" alt="impl" style="zoom:50%;" />
+</blockquote>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mqueue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE 1024</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> QUEUE_NAME <span class="string">&quot;/test&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">createAndReceive</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">mqd_t</span> mq;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mq_attr</span> <span class="title">attr</span>;</span></span><br><span class="line">    <span class="type">char</span> buffer[MAX_SIZE + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* initialize the queue attributes */</span></span><br><span class="line">    attr.mq_flags = <span class="number">0</span>;</span><br><span class="line">    attr.mq_maxmsg = <span class="number">10</span>;</span><br><span class="line">    attr.mq_msgsize = MAX_SIZE;</span><br><span class="line">    attr.mq_curmsgs = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* create the message queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY, <span class="number">0644</span>, &amp;attr);</span><br><span class="line"></span><br><span class="line">    <span class="type">ssize_t</span> bytes_read;</span><br><span class="line">    <span class="comment">/* receive the message */</span></span><br><span class="line">    bytes_read = mq_receive(mq, buffer, MAX_SIZE, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    mq_close(mq);</span><br><span class="line">    mq_unlink(QUEUE_NAME);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">send</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">mqd_t</span> mq;</span><br><span class="line">    <span class="type">char</span> buffer[MAX_SIZE];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* open the mail queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_WRONLY);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(buffer, <span class="number">0</span>, MAX_SIZE);</span><br><span class="line">    fgets(buffer, MAX_SIZE, <span class="built_in">stdin</span>);</span><br><span class="line"></span><br><span class="line">    mq_send(mq, buffer, MAX_SIZE, <span class="number">0</span>);</span><br><span class="line">    mq_close(mq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="区别">区别</h4>
+<ul>
+<li>对Posix消息队列的读总是返回最高优先级的最早消息，对SystemV消息队列的读则可以返回任意优先级的消息</li>
+<li>当往一个空队列放置一个消息时，Posix消息队列允许产生一个信号或启动一个线程，SystemV消息队列则不提供类似机制</li>
+</ul>
+<h2 id="参考">参考</h2>
+<p><a href="https://wywwwwei.github.io/2020/08/25/interprocess-communication/">Unix 网络编程 卷2: 进程间通信</a></p>
+<p><a href="https://www.slideshare.net/divyekapoor/linux-kernel-implementation-of-pipes-and-fifos">Slide - Linux Kernel Implementation of Pipes FIFOs</a></p>
+<p><a href="https://mp.weixin.qq.com/s/mblyh6XrLj1bCwL0Evs-Vg">进程间通信</a></p>
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>Operating System</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Image Processing - Image Sampling &amp; Quantization</title>
     <url>/2024/05/02/image-processing/</url>
     <content><![CDATA[<h2 id="Concepts">Concepts</h2>
@@ -1863,298 +2051,6 @@ In areas of the image with low contrast or subtle details, the quantization proc
       </categories>
       <tags>
         <tag>Multimedia</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Image Processing - Image Enhancement &amp; Restoration</title>
-    <url>/2024/05/03/image-processing-2/</url>
-    <content><![CDATA[<h3 id="Image-Enhancement">Image Enhancement</h3>
-<h4 id="Key-Concepts">Key Concepts</h4>
-<ul>
-<li>
-<p>Histogram</p>
-<p>A histogram represents the distribution of pixel intensity values in an image. It provides a visual summary of how light or dark an image is and helps us understand its contrast and brightness characteristics.</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">k=<span class="number">8</span></span><br><span class="line">random_image = np.random.random([<span class="number">10</span>, <span class="number">10</span>])</span><br><span class="line">random_image = random_image * <span class="number">2</span>**k</span><br><span class="line"></span><br><span class="line">plt.imshow(random_image, cmap=<span class="string">&#x27;gray&#x27;</span>,vmin=<span class="number">0</span>, vmax=<span class="number">2</span>**k-<span class="number">1</span>)</span><br><span class="line">plt.show()</span><br><span class="line">plt.hist(random_image.ravel(), bins=np.arange(<span class="number">2</span>**k+<span class="number">1</span>)-<span class="number">.5</span>, edgecolor=<span class="string">&#x27;red&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Intensity&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Count&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-<p><img src="image-20241226040145412.png" alt="image-20241226040145412" style="zoom:30%;" /><img src="image-20241226040202942.png" alt="image-20241226040202942" style="zoom:35%;" /></p>
-</li>
-<li>
-<p>Cumulative Histogram</p>
-<p>The cumulative histogram is an extension of the basic histogram. Instead of showing individual intensity frequencies, it shows the cumulative frequency of intensities. This is particularly useful in operations like histogram equalization, where we aim to redistribute intensity values for better contrast.</p>
-</li>
-</ul>
-<p>Image enhancement is the process of improving the visual quality of an image to make it more suitable for a specific application. These techniques are primarily divided into spatial domain processing and frequency domain processing.</p>
-<h4 id="Spatial-Domain-Process">Spatial Domain Process</h4>
-<p>Two principal categories of spatial processing are intensity transformations and spatial filtering.</p>
-<ul>
-<li>
-<p>Intensity Transformations</p>
-<p>Intensity transformations are pixel-based operations that adjust brightness, contrast, or other pixel properties.</p>
-<ul>
-<li>
-<p>Grey Level Transformation</p>
-<ul>
-<li>
-<p>Image Negative: Inverts the pixel intensities, transforming bright areas into dark and vice versa. This is particularly useful in applications like medical imaging.</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">util.invert(img) <span class="comment"># image negative</span></span><br></pre></td></tr></table></figure>
-<img src="image-20241226035043501.png" alt="image-20241226035043501" style="zoom:25%;" />
-</li>
-<li>
-<p>Log Transformation: Expands the dynamic range of dark regions in an image, making details more visible.</p>
-</li>
-<li>
-<p>Gamma (Power-Law) Transformation: Corrects non-linear intensity variations, often used in display systems.</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">image6 = image**<span class="number">.6</span></span><br><span class="line">image4 = image**<span class="number">.4</span></span><br><span class="line">image3 = image**<span class="number">.3</span></span><br></pre></td></tr></table></figure>
-<img src="image-20241226035312141.png" alt="image-20241226035312141" style="zoom: 40%;" />
-</li>
-</ul>
-</li>
-<li>
-<p>Histogram Equalization</p>
-<p>A popular method to improve contrast by redistributing intensity values. It’s particularly effective for images with poor lighting or low contrast.</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">image1_eq = img_as_ubyte(exposure.equalize_hist(image1))</span><br></pre></td></tr></table></figure>
-<img src="image-20241226035444591.png" alt="image-20241226035444591" style="zoom:40%;" />
-</li>
-<li>
-<p>Local Enhancement</p>
-<p>Instead of applying transformations globally, local enhancement focuses on specific regions of an image, enabling finer control over the output.</p>
-</li>
-</ul>
-</li>
-<li>
-<p>Spatial Filtering</p>
-<p>Spatial filtering involves modifying pixel values based on their surrounding neighbors. This is where techniques like <strong>image smoothing</strong> and <strong>sharpening</strong> come into play.</p>
-<ul>
-<li>
-<p>Smoothing Filters (Low-pass Filters):<br>
-These filters reduce noise by averaging neighboring pixels, resulting in a blur effect. They are ideal for removing minor imperfections but may reduce sharpness.</p>
-</li>
-<li>
-<p>Sharpening Filters (High-pass Filters):<br>
-These filters enhance edges and fine details by emphasizing intensity changes. Applications include edge detection and feature extraction.</p>
-</li>
-<li>
-<p>Combining Enhancement Methods:<br>
-Often, multiple enhancement techniques are combined for optimal results. For example, smoothing can be applied to reduce noise before sharpening to enhance edges.</p>
-</li>
-</ul>
-<p>Arithmetic operations like addition, subtraction, multiplication, and division can also be used to manipulate images.</p>
-</li>
-</ul>
-<h4 id="Frequency-Domain-Process">Frequency Domain Process</h4>
-<p>Unlike spatial domain processing, frequency domain techniques focus on the frequency components of an image rather than its pixels. By transforming an image into the frequency domain (using tools like the Fourier Transform), we can manipulate specific frequency ranges to achieve desired effects.</p>
-<ul>
-<li>
-<p>Frequency Domain Filtering</p>
-<p>Frequency domain filtering differs from spatial filtering in that it targets specific frequency components:</p>
-<ul>
-<li><strong>Low frequencies</strong> represent smooth regions of the image.</li>
-<li><strong>High frequencies</strong> correspond to edges and fine details.</li>
-</ul>
-</li>
-<li>
-<p>Unsharp Masking</p>
-<p>Unsharp masking is a method that enhances image sharpness by amplifying high frequencies. It works by subtracting a blurred version of the image (low frequencies) from the original image, leaving behind the high-frequency details.</p>
-</li>
-<li>
-<p>Homomorphic Filtering</p>
-<p>Homomorphic filtering is a technique that simultaneously enhances contrast and reduces noise. It separates the illumination and reflectance components of an image, allowing for targeted adjustments.</p>
-</li>
-</ul>
-<h3 id="Image-Restoration">Image Restoration</h3>
-<p>While image enhancement focuses on improving the visual appearance of an image, <strong>image restoration</strong> takes a different approach. Restoration aims to recover an image’s original quality by reversing known degradations. The goal is to reconstruct the image as closely as possible to its true form, often requiring a deeper understanding of the degradation process.</p>
-<h4 id="Key-Concepts-2">Key Concepts</h4>
-<ul>
-<li>
-<p>Enhancement vs. Restoration</p>
-<table>
-<thead>
-<tr>
-<th>Aspect</th>
-<th>Image Enhancement</th>
-<th>Image Restoration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Objective</td>
-<td>Improves subjective visual quality</td>
-<td>Reconstructs the original image</td>
-</tr>
-<tr>
-<td>Focus</td>
-<td>Emphasis on human perception</td>
-<td>Focus on mathematical models of degradation</td>
-</tr>
-<tr>
-<td>Approach</td>
-<td>Heuristic techniques (e.g., contrast adjustment, smoothing)</td>
-<td>Algorithmic corrections (e.g., noise removal, deblurring)</td>
-</tr>
-<tr>
-<td>Use Case</td>
-<td>Enhancing medical images for better viewing</td>
-<td>Restoring damaged satellite images</td>
-</tr>
-</tbody>
-</table>
-</li>
-<li>
-<p>Noise Models</p>
-<p>Noise is often introduced into images during acquisition, transmission, or processing. Understanding the type of noise is critical for selecting the appropriate restoration technique. Some common noise models include:</p>
-<ol>
-<li><strong>Gaussian Noise</strong>: A random distribution of intensity values, typically caused by sensor limitations.</li>
-<li><strong>Salt-and-Pepper Noise</strong>: Appears as random black and white pixels, often caused by transmission errors.</li>
-<li><strong>Poisson Noise</strong>: Associated with photon counting in low-light conditions, such as in microscopy or astronomy.</li>
-<li><strong>Periodic Noise</strong>: Results in periodic patterns, often caused by electrical interference during image acquisition.</li>
-</ol>
-<p>Each of these noise models requires a tailored restoration strategy. Let’s explore two primary approaches: spatial filtering and frequency domain filtering.</p>
-</li>
-</ul>
-<h4 id="Restoration-in-the-presence-of-Noise-only-Spatial-filtering">Restoration in the presence of Noise only - Spatial filtering</h4>
-<p>When noise is the primary degradation factor, spatial filtering can effectively suppress it while preserving important image details.</p>
-<ol>
-<li>Mean Filters</li>
-</ol>
-<ul>
-<li>
-<p><strong>Averaging Filter</strong>: Reduces noise by calculating the mean of neighboring pixels. While it smooths the image, it can blur edges.</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">noisy_images_5 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">5</span>), dtype=np.float64)</span><br><span class="line">noisy_images_10 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">10</span>), dtype=np.float64)</span><br><span class="line">noisy_images_50 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">50</span>), dtype=np.float64)</span><br><span class="line">noisy_images_100 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">100</span>), dtype=np.float64)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    noisy_images_5[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    noisy_images_10[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">50</span>):</span><br><span class="line">    noisy_images_50[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">    noisy_images_100[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line">mean_image_5 = np.mean(noisy_images_5, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_10 = np.mean(noisy_images_10, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_50 = np.mean(noisy_images_50, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_100 = np.mean(noisy_images_100, axis=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
-<img src="image-20241226034447077.png" alt="image-20241226034447077" style="zoom: 25%;" />
-</li>
-<li>
-<p><strong>Weighted Mean Filter</strong>: Assigns higher weights to closer pixels, reducing blur while maintaining noise suppression.</p>
-</li>
-</ul>
-<ol start="2">
-<li>Median Filters</li>
-</ol>
-<ul>
-<li>Particularly effective for <strong>salt-and-pepper noise</strong>, median filters replace the central pixel in a sliding window with the median value of its neighbors. This preserves edges better than mean filters.</li>
-</ul>
-<ol start="3">
-<li>Adaptive Filters</li>
-</ol>
-<ul>
-<li>Adaptive filters adjust their behavior based on local image characteristics, such as noise variance. They are versatile and effective for non-uniform noise.</li>
-</ul>
-<p>Spatial domain techniques are often straightforward to implement, but they may struggle with complex noise patterns, such as periodic noise. For such cases, frequency domain filtering is more appropriate.</p>
-<h4 id="Periodic-Noise-By-Frequency-Domain-Filtering">Periodic Noise By Frequency Domain Filtering</h4>
-<p>Periodic noise often manifests as sinusoidal patterns or regular distortions in an image. Frequency domain filtering provides an effective solution by isolating and removing these patterns.</p>
-<ol>
-<li>
-<p>Band-Stop Filtering</p>
-<p>Band-stop filters are designed to suppress specific frequency ranges. For periodic noise:</p>
-<ul>
-<li>
-<p>The noise frequency is identified in the Fourier Transform.</p>
-</li>
-<li>
-<p>A band-stop filter is applied to block these specific frequencies while preserving the rest of the image.</p>
-</li>
-</ul>
-</li>
-<li>
-<p>Notch Filters</p>
-<p>A <strong>notch filter</strong> is a more targeted approach to periodic noise removal. It zeroes out frequencies corresponding to the noise spikes while leaving other frequencies untouched, ensuring minimal impact on the image quality.</p>
-</li>
-<li>
-<p>Homomorphic Filtering</p>
-<p>Homomorphic filtering, while often used for image enhancement, can also be applied to combat periodic noise. By separating illumination and reflectance components, it can suppress unwanted interference patterns.</p>
-</li>
-</ol>
-<p>Periodic noise removal through frequency domain techniques is especially useful in scenarios like:</p>
-<ul>
-<li>Restoring scanned documents affected by electrical interference.</li>
-<li>Processing satellite images with regular transmission noise.</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Concepts</category>
-      </categories>
-      <tags>
-        <tag>Multimedia</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Interprocess Communications</title>
-    <url>/2020/08/25/interprocess-communication/</url>
-    <content><![CDATA[<h2 id="消息传递">消息传递</h2>
-<h3 id="管道">管道</h3>
-<blockquote>
-<p>匿名管道随进程的创建而建立，随进程的结束而销毁</p>
-</blockquote>
-<p>管道是基于Linux &amp; Unix的操作系统的核心概念之一。管道允许您以一种非常优雅的方式 <code>|</code> 将命令链接在一起，将一个程序的输出传递为另一个程序的输入。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> -la | <span class="built_in">sort</span> | less</span><br></pre></td></tr></table></figure>
-<p><code>bash</code> 的执行过程</p>
-<ol>
-<li><code>bash</code> 创建2个管道，一个从 <code>ls</code> 到 <code>sort</code>，一个从 <code>sort</code> 到 <code>less</code></li>
-<li><code>bash</code> <code>fork</code> 三个子进程分别用于每个命令</li>
-<li>子进程1 <code>ls</code> 设置 <code>stdout</code> 为 <code>pipe A</code> 的写端</li>
-<li>子进程2 <code>sort</code> 设置 <code>stdin</code> 为 <code>pipe A</code> 的读端，设置 <code>stdout</code> 为 <code>pipe B</code> 的写端</li>
-<li>子进程3 <code>less</code> 设置 <code>stdin</code> 为 <code>pipe B</code> 的读端</li>
-</ol>
-<blockquote>
-<p>Linux has a VFS (virtual file system) module called <code>pipefs</code>, that gets mounted in kernel space during boot. <code>pipefs</code> is mounted <strong>alongside the root file system</strong> (/), not in it (pipe’s root is <code>pipe:</code> ). <code>pipefs</code> is stored using an in-memory file system.</p>
-<p><code>pipefs</code> cannot be directly examined by the user unlike most file systems. The entry point to <code>pipefs</code> is the <strong><code>pipe</code> syscall</strong>. The <strong><code>pipe</code> syscall</strong> is used by shells and other programs to implement piping, and just creates a new file in pipefs, returning two file descriptors (one for the read end, opening using <code>O_RDONLY</code>, and one for the write end, opened using <code>O_WRONLY</code>).</p>
-<img src="./interprocess-communication.assets/pipe_impl.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<img src="./interprocess-communication.assets/pipe.png" alt="pipe" style="zoom:33%;" />
-<p>使用 <code>fork</code> 创建子进程，<strong>创建的子进程会复制父进程的文件描述符</strong>，这样就做到了两个进程各有两个 <code>fd[0]</code> 与 <code>fd[1]</code>，两个进程就可以通过各自的 fd 写入和读取同一个管道文件实现跨进程通信。</p>
-<p>父子进程间的单向数据流（半双工管道）</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd);</span><br><span class="line">    </span><br><span class="line">    <span class="type">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        close(pipe_fd[<span class="number">1</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd[0]);</span></span><br><span class="line">        <span class="comment">// TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	close(pipe_fd[<span class="number">0</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd[1]);</span></span><br><span class="line"></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>父子进程间的双向数据流的两个管道（全双工管道，有两个半双工管道构成）</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> pipe_fd1[<span class="number">2</span>],pipe_fd2[<span class="number">2</span>];</span><br><span class="line">    pipe(pipe_fd1);</span><br><span class="line">    pipe(pipe_fd2);</span><br><span class="line">    </span><br><span class="line">    <span class="type">pid_t</span> childpid = fork();</span><br><span class="line">    <span class="keyword">if</span>(childpid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        close(pipe_fd1[<span class="number">1</span>]);</span><br><span class="line">        close(pipe_fd2[<span class="number">0</span>]);</span><br><span class="line">        <span class="comment">//close(pipe_fd1[0]);</span></span><br><span class="line">        <span class="comment">//close(pipe_fd2[1]);</span></span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	close(pipe_fd1[<span class="number">0</span>]);</span><br><span class="line">	close(pipe_fd2[<span class="number">1</span>]);</span><br><span class="line">	<span class="comment">//close(pipe_fd1[1]);</span></span><br><span class="line">	<span class="comment">//close(pipe_fd2[0]);</span></span><br><span class="line">    waitpid(childpid,null,<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="FIFO">FIFO</h4>
-<blockquote>
-<p>名字空间</p>
-<p>当两个或多个无亲缘关系的进程使用某种类型的IPC对象来彼此交换信息时，该IPC对象必须有一个某种形式的 <strong>名字(name)</strong> 或 <strong>标识符(identifier)</strong> ，这样其中一个进程（往往是服务器）可以创建该IPC对象，其余进程则可以指定同一个IPC对象</p>
-</blockquote>
-<p>管道没有名字，因此它们的最大劣势就是智能用于有一个共同祖先进程的各个进程之间。而 <strong>FIFO（指代first in, first out）</strong> 类似于管道（单向数据流），且有一个文件路径名与之关联从而实现无亲缘关系进程访问同一个FIFO，所以也被称为 <strong>命名管道(named pipe)</strong></p>
-<blockquote>
-<p>Any FIFO is much like a pipe: rather than owning disk blocks in the filesystems, an opened FIFO is associated with a kernel buffer that temporarily stores the data exchanged by two or more processes. Thanks to the disk inode, however, a FIFO can be accessed by any process, since the FIFO filename is included in the system’s directory tree. FIFO inodes <strong>appear on the system directory tree rather than on the pipefs special filesystem</strong>.</p>
-<img src="./interprocess-communication.assets/fifo.png" alt="impl" style="zoom:50%;" />
-<p>Allocates a <code>pipe_inode_info</code> object (the actual pipe) for providing buffer space when fifo_open(…)</p>
-<img src="./interprocess-communication.assets/linux_pipe.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<p>通过 <code>mkfifo</code> 命令来创建并指定管道名字</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">mkfifo myFifo</span><br><span class="line"><span class="comment">//Example: write first</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> * myfifo = <span class="string">&quot;/tmp/myfifo&quot;</span>; </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Creating the named file(FIFO) </span></span><br><span class="line">    <span class="comment">// mkfifo(&lt;pathname&gt;, &lt;permission&gt;) </span></span><br><span class="line">    mkfifo(myfifo, <span class="number">0666</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="type">char</span> arr1[<span class="number">80</span>], arr2[<span class="number">80</span>]; </span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="comment">// Open FIFO for write only </span></span><br><span class="line">        fd = open(myfifo, O_WRONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Take an input arr2ing from user. </span></span><br><span class="line">        <span class="comment">// 80 is maximum length </span></span><br><span class="line">        fgets(arr2, <span class="number">80</span>, <span class="built_in">stdin</span>); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Write the input arr2ing on FIFO </span></span><br><span class="line">        <span class="comment">// and close it </span></span><br><span class="line">        write(fd, arr2, <span class="built_in">strlen</span>(arr2)+<span class="number">1</span>); </span><br><span class="line">        close(fd); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Open FIFO for Read only </span></span><br><span class="line">        fd = open(myfifo, O_RDONLY); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Read from FIFO </span></span><br><span class="line">        read(fd, arr1, <span class="keyword">sizeof</span>(arr1)); </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Print the read message </span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;User2: %s\n&quot;</span>, arr1); </span><br><span class="line">        close(fd); </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="消息队列">消息队列</h3>
-<blockquote>
-<p>随内核的持续性</p>
-</blockquote>
-<p>消息队列可认为时一个<strong>消息链表</strong>，有足够写权限的线程可往队列中放置消息，有足够读权限的线程可从队列中取走消息。</p>
-<p>每个消息都具有如下属性：</p>
-<ul>
-<li>一个无符号整数优先级（Posix） / 一个长整数类型（System V）</li>
-<li>消息的数据部分长度</li>
-<li>数据本身</li>
-</ul>
-<h4 id="System-V-消息队列">System V 消息队列</h4>
-<blockquote>
-<img src="./interprocess-communication.assets/SystemVmq.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"><span class="comment">// structure for message queue</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msg_buffer</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">long</span> msg_type;</span><br><span class="line">    <span class="type">char</span> msg[<span class="number">100</span>];</span><br><span class="line">&#125; message;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">send</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> my_key;</span><br><span class="line">    <span class="type">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">&quot;progfile&quot;</span>, <span class="number">65</span>);             <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT); <span class="comment">//create message queue and return id</span></span><br><span class="line">    message.msg_type = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Write Message : &quot;</span>);</span><br><span class="line">    fgets(message.msg, <span class="number">100</span>, <span class="built_in">stdin</span>);</span><br><span class="line">    msgsnd(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">0</span>); <span class="comment">//send message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Sent message is : %s \n&quot;</span>, message.msg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">receive</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> my_key;</span><br><span class="line">    <span class="type">int</span> msg_id;</span><br><span class="line">    my_key = ftok(<span class="string">&quot;progfile&quot;</span>, <span class="number">65</span>);                   <span class="comment">//create unique key</span></span><br><span class="line">    msg_id = msgget(my_key, <span class="number">0666</span> | IPC_CREAT);       <span class="comment">//create message queue and return id</span></span><br><span class="line">    msgrcv(msg_id, &amp;message, <span class="keyword">sizeof</span>(message), <span class="number">1</span>, <span class="number">0</span>); <span class="comment">//used to receive message</span></span><br><span class="line">    <span class="comment">// display the message</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Received Message is : %s \n&quot;</span>, message.msg);</span><br><span class="line">    msgctl(msg_id, IPC_RMID, <span class="literal">NULL</span>); <span class="comment">//destroy the message queue</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="Posix-消息队列">Posix 消息队列</h4>
-<blockquote>
-<p>POSIX message queues implement <strong>priority-ordered</strong> messages. Each message written by a sender process is associated with an integer number which is interpreted as message priority; messages with a higher number are considered higher in priority.</p>
-<img src="./interprocess-communication.assets/Posixmq.png" alt="impl" style="zoom:50%;" />
-</blockquote>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mqueue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE 1024</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> QUEUE_NAME <span class="string">&quot;/test&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">createAndReceive</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">mqd_t</span> mq;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mq_attr</span> <span class="title">attr</span>;</span></span><br><span class="line">    <span class="type">char</span> buffer[MAX_SIZE + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* initialize the queue attributes */</span></span><br><span class="line">    attr.mq_flags = <span class="number">0</span>;</span><br><span class="line">    attr.mq_maxmsg = <span class="number">10</span>;</span><br><span class="line">    attr.mq_msgsize = MAX_SIZE;</span><br><span class="line">    attr.mq_curmsgs = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* create the message queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY, <span class="number">0644</span>, &amp;attr);</span><br><span class="line"></span><br><span class="line">    <span class="type">ssize_t</span> bytes_read;</span><br><span class="line">    <span class="comment">/* receive the message */</span></span><br><span class="line">    bytes_read = mq_receive(mq, buffer, MAX_SIZE, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    mq_close(mq);</span><br><span class="line">    mq_unlink(QUEUE_NAME);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">send</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">mqd_t</span> mq;</span><br><span class="line">    <span class="type">char</span> buffer[MAX_SIZE];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* open the mail queue */</span></span><br><span class="line">    mq = mq_open(QUEUE_NAME, O_WRONLY);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(buffer, <span class="number">0</span>, MAX_SIZE);</span><br><span class="line">    fgets(buffer, MAX_SIZE, <span class="built_in">stdin</span>);</span><br><span class="line"></span><br><span class="line">    mq_send(mq, buffer, MAX_SIZE, <span class="number">0</span>);</span><br><span class="line">    mq_close(mq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="区别">区别</h4>
-<ul>
-<li>对Posix消息队列的读总是返回最高优先级的最早消息，对SystemV消息队列的读则可以返回任意优先级的消息</li>
-<li>当往一个空队列放置一个消息时，Posix消息队列允许产生一个信号或启动一个线程，SystemV消息队列则不提供类似机制</li>
-</ul>
-<h2 id="参考">参考</h2>
-<p><a href="https://wywwwwei.github.io/2020/08/25/interprocess-communication/">Unix 网络编程 卷2: 进程间通信</a></p>
-<p><a href="https://www.slideshare.net/divyekapoor/linux-kernel-implementation-of-pipes-and-fifos">Slide - Linux Kernel Implementation of Pipes FIFOs</a></p>
-<p><a href="https://mp.weixin.qq.com/s/mblyh6XrLj1bCwL0Evs-Vg">进程间通信</a></p>
-]]></content>
-      <categories>
-        <category>Concepts</category>
-      </categories>
-      <tags>
-        <tag>Operating System</tag>
       </tags>
   </entry>
   <entry>
@@ -2399,355 +2295,196 @@ Often, multiple enhancement techniques are combined for optimal results. For exa
       </tags>
   </entry>
   <entry>
-    <title>Notes for OSTEP</title>
-    <url>/2020/09/10/ostep-2/</url>
-    <content><![CDATA[<h1><em>Operating Systems: Three Easy Pieces</em></h1>
-<blockquote>
-<p>Notes - Part Two</p>
-<p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
-</blockquote>
-<h2 id="Virtualization">Virtualization</h2>
-<h3 id="Scheduling-Introduction">Scheduling: Introduction</h3>
-<blockquote>
-<p>How to develop a basic framework for thinking about scheduling policies</p>
-</blockquote>
+    <title>C++ Rvalue Reference</title>
+    <url>/2020/07/01/rvalue/</url>
+    <content><![CDATA[<h1>C++ Rvalue Reference</h1>
+<h2 id="Value-categories">Value categories</h2>
+<p><img src="value_categories.png" alt="Value-categories"></p>
+<p>每个 C++ 表达式（带有操作数的操作符、字面量、变量名等）都属于三种基本值类别中的一种：</p>
+<p>更具体的示例描述请查看 <a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories – cppreference.com</a></p>
 <ul>
 <li>
-<p>Workload Assumptions</p>
-<p>Before getting into the range of possible policies, let us first make a number of <strong>simplifying assumptions</strong> about the process running in the system, sometimes collectively called <strong>workload</strong>.</p>
-<ol>
-<li>Each job runs for the same amount of time</li>
-<li>All jobs arrive at the same time</li>
-<li>Once started, each job runs to completion</li>
-<li>All jobs only use the CPU (i.e., they perform no I/O)</li>
-<li>The run-time of each job is known</li>
-</ol>
-<p>The workload assumptions are mostly <strong>unrealistic</strong>, but that is alright (for now), because we will <strong>relax</strong> them as we go, and eventually develop what we will refer to as a <strong>fully-operational scheduling discipline</strong>.</p>
+<p>纯右值 (prvalue)</p>
+<p>纯右值表达式没有可通过程序访问的地址。</p>
+<p>纯右值表达式的示例包括：（除了字符串字面量之外的）字面量、返回非引用类型的函数调用，以及在表达式评估期间创建但仅由编译器访问的临时对象</p>
 </li>
 <li>
-<p>Scheduling Metrics</p>
-<p>A metric is just something that we use to measure something. Here we simply use a single metric: <strong>turnaround time</strong>. The turnaround time of a job is defined as the time at which job completes minus the time at which the job arrived in the system.</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>r</mi><mi>o</mi><mi>u</mi><mi>n</mi><mi>d</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{turnaround}=T_{completion}−T_{arrival}
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">na</span><span class="mord mathnormal mtight">ro</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">co</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">pl</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
-<p>It is a <strong>performance metric</strong>, and another metric of interest is <strong>fairness</strong>, as measured (for example) by <strong>Jain’s Fairness Index</strong>. Performance and fairness are often <strong>at odds</strong> in scheduling.</p>
+<p>亡值 (xvalue)</p>
+<p>亡值表达式的地址不能再由您的程序访问，但可用于初始化 rvalue 引用，后者提供对表达式的访问。</p>
+<p>亡值表达式的示例包括返回右值引用的函数调用，以及数组下标、成员和指针到数组或对象为右值引用的成员表达式</p>
+</li>
+<li>
+<p>左值 (lvalue)</p>
+<p>左值具有程序可以访问的地址。</p>
+<p>左值表达式的示例包括变量名称，包括<strong>常量</strong>变量、数组元素、返回 lvalue 引用、位字段、联合和类成员的函数调用</p>
 </li>
 </ul>
+<p>随着移动语义引入到 C++11 之中，值类别被重新进行了定义，以区别表达式的两种独立的性质：</p>
+<ul>
+<li><em>拥有身份 ( has identity)</em>：可以确定表达式是否与另一表达式指代同一实体，例如通过比较它们所标识的对象或函数的（直接或间接获得的）地址；</li>
+<li><em>可被移动</em>：移动构造函数、移动赋值运算符或实现了移动语义的其他函数重载能够绑定于这个表达式。</li>
+</ul>
+<p>C++11 中：</p>
+<ul>
+<li>拥有身份且不可被移动的表达式被称作*左值 (lvalue)*表达式；</li>
+<li>拥有身份且可被移动的表达式被称作*亡值 (xvalue)*表达式；</li>
+<li>不拥有身份且可被移动的表达式被称作*纯右值 (prvalue)*表达式；</li>
+<li>不拥有身份且不可被移动的表达式无法使用。</li>
+</ul>
+<p>拥有身份的表达式被称作“泛左值 (glvalue) 表达式”。左值和亡值都是泛左值表达式。</p>
+<p>可被移动的表达式被称作“右值 (rvalue) 表达式”。纯右值和亡值都是右值表达式。</p>
+<p><img src=".value-categories.png" alt="value-categories"></p>
+<h2 id="Lvalue-Reference">Lvalue Reference</h2>
+<p>c++11之前，C 中仅存在一种引用类型，所以简单称之为<em>引用</em>，而在c11中其被称为左值引用</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left"></th>
-<th style="text-align:left">FIFO</th>
-<th style="text-align:left">SJF</th>
-<th style="text-align:left">STCF / PSJF / SRTF</th>
+<th style="text-align:left">L-value reference</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"></td>
-<td style="text-align:left">non-preemptive</td>
-<td style="text-align:left">non-preemptive</td>
-<td style="text-align:left">preemptive</td>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">Yes</td>
 </tr>
 <tr>
-<td style="text-align:left">Principle</td>
-<td style="text-align:left">run the jobs that arrives earlier</td>
-<td style="text-align:left">runs the shortest job first</td>
-<td style="text-align:left">runs the jobs has the least time left</td>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
 </tr>
 <tr>
-<td style="text-align:left">Timing</td>
-<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
-<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
-<td style="text-align:left">any time a new job arrives (switch to ready state)</td>
-</tr>
-<tr>
-<td style="text-align:left">Problem</td>
-<td style="text-align:left"><a href="https://www.geeksforgeeks.org/convoy-effect-operating-systems/">convoy effect</a></td>
-<td style="text-align:left">convoy effect</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left">Solve</td>
-<td style="text-align:left"></td>
-<td style="text-align:left">jobs that run for different amounts of time</td>
-<td style="text-align:left">convoy effect</td>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
 </tr>
 </tbody>
 </table>
-<hr>
-<blockquote>
-<p>A new metric for those demand interactive performance</p>
-</blockquote>
-<p>Now users would sit at a terminal and <strong>demand interactive performance</strong> from the system as well. And thus, a new metric was born: <strong>response time</strong>. We define response time as from when the job arrives in a system to the first time it is scheduled.</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi><mi>p</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi><mi>r</mi><mi>u</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{response}=T_{firstrun}−T_{arrival}
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">res</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">se</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">rs</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
-<p>But STCF and related disciplines are <strong>not particularly good for response time</strong>. For example, if three jobs arrive at the same time, the third job has to wait for the previous two jobs to run in their entirely before being scheduled just once.</p>
-<p>The general technique of <strong>amortization</strong> is commonly used in systems when there is a fixed cost of some operation. So a new scheduling algorithm, <strong>Round-Robin</strong> scheduling, is proposed. The basic idea is simple, instead of running jobs to completion, RR runs a job for a <strong>time slice</strong> (<strong>scheduling quantum</strong>) and then switch to the <strong>next job in the run queue</strong>.</p>
-<p>The length of the time slice is critical for RR, making it <strong>long enough</strong> to amortize the cost of switching without making it so long that the system is no longer responsive.</p>
-<blockquote>
-<p>Note that the cost of context switching does not arise solely from the <strong>OS actions of saving and restoring a few registers</strong>. When program runs, they build up <strong>a great deal of state in CPU caches, TLBs, branch prediction, and other on-chip hardware</strong>. Switching to another job causes this state to be flushed and new state relevant to the currently-running job to be brought in, which may exact <strong>a noticeable performance cost</strong>.</p>
-</blockquote>
-<p>RR, with a reasonable time slice, is thus an <strong>excellent</strong> scheduler if <strong>response time</strong> is the only metric. But it is indeed one of the <strong>worst policies</strong> if <strong>turnaround time</strong> is the metric.</p>
-<p>An inherent trade-off:</p>
-<p>If you are willing to unfair, you can run shortest jobs to completion, but at the cost of response time;</p>
-<p>if you instead value fairness, response time is lower, but at the cost of turnaround time.</p>
-<hr>
-<blockquote>
-<p>Relax Assumption 4: all programs perform I/O.</p>
-</blockquote>
-<p>A scheduler clearly has a decision to make both when a job initiates an I/O request and when the I/O completes.</p>
-<p>The scheduler incorporate I/O by <strong>treating each CPU burst as a job</strong>, the scheduler makes sure process that are “interactive” get <strong>run frequently</strong>. While those interactive jobs are performing I/O, other <strong>CPU-intensive</strong> jobs run, thus better utilizing the processor.</p>
-<p>Take the STCF scheduler for example, both A and B need 50ms CPU time, but A runs for 10ms and then issues an I/O request whereas B performs no I/O.</p>
+<p>而对const对象的左值引用可以使用左值或右值进行初始化</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Treating A as a single job</th>
-<th style="text-align:center">Treating each CPU burst of A as a job</th>
+<th style="text-align:left">L-value reference to const</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center"><img src="sub_job_1.png" alt="before"></td>
-<td style="text-align:center"><img src="sub_job_2.png" alt="after"></td>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
 </tr>
 </tbody>
 </table>
-<hr>
+<p>对const对象的左值引用非常有用，因为它使得可以将任何类型的参数（左值或右值）传递给函数，而无需复制该参数</p>
+<h2 id="Rvalue-Reference">Rvalue Reference</h2>
+<p>右值引用可将左值和右值区分开，可以帮助您不必要的内存分配和复制操作需求，从而提高应用程序的性能。</p>
+<p>相比于左值引用，</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">R-value reference</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">Yes</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">R-value reference to const</th>
+<th style="text-align:left">Can be initialized with</th>
+<th style="text-align:left">Can modify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">Non-modifiable l-values</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left">No</td>
+</tr>
+<tr>
+<td style="text-align:left">R-values</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">No</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Move-Semantics">Move Semantics</h2>
+<p>要实现移动语义，通常向类提供<em>移动构造函数，</em> 并可以选择移动赋值运算符 （<strong>运算符 =</strong>）。 其源是右值的复制和赋值操作随后会自动利用移动语义。 与默认复制构造函数不同，编译器不提供默认移动构造函数。</p>
+<p>假设一个类X，其中包含一个/多个指向 创建和拷贝开销较大的对象(资源) 的指针，则无需取消引用该指针并复制其内容，移动构造（拷贝）函数只需复制指针的地址， 这就是移动构造函数带来的性能优势所在（只需要浅拷贝）。</p>
+<p>（由于参数是非常量引用，因此它可以修改传递给它的对象，可能具有破坏性）</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">X&amp; X::<span class="keyword">operator</span>=(<span class="type">const</span> X &amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//make a clone of what rhs&#x27;s member pointer refers to</span></span><br><span class="line">    <span class="comment">//destruct the resources that this member pointer refers to</span></span><br><span class="line">    <span class="comment">//attach the clone</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">X&amp; X::<span class="keyword">operator</span>=(X &amp;&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//swap this-&gt;pointer and rhs.pointer</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="built_in">main</span>()</span><br><span class="line">&#123;</span><br><span class="line">    X a;</span><br><span class="line">    a = <span class="built_in">X</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此，通过const lvalue 引用或 rvalue 引用参数重载函数，来编写区分不可修改对象 （lvalue） 和可修改临时值 （rvalue） 的代码。</p>
+<h3 id="Forcing-Move-Semantics">Forcing Move Semantics</h3>
+<p>如果你想通过一个变量(lvalue)来调用移动构造（拷贝）函数，std::move()会将变量(lvalue)转换为右值，使其绑定到移动构造(拷贝)函数</p>
 <blockquote>
-<p>Relax Assumption 5:</p>
-<p>In a general-purpose OS, it usually knows very <strong>little about the length of each job</strong>. So how can we build an approach that behaves like SJF/STCF <strong>without such a priori knowledge</strong>?</p>
+<p>std::move() does not move, it casts.</p>
+<p>std::move()实际上是通过static_cast实现的</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">return static_cast&lt;typename std::remove_reference&lt;T&gt;::type&amp;&amp;&gt;(t);</span><br></pre></td></tr></table></figure>
 </blockquote>
-<h3 id="Scheduling-The-Multi-Level-Feedback-Queue">Scheduling: The Multi-Level Feedback Queue</h3>
-<blockquote>
-<p>Basic Rule</p>
-</blockquote>
-<p>The MLFQ has a number of distinct queues, each assigned a different <strong>priority level</strong>. At any time, a job that is ready to run is on a single queue.</p>
-<p>Basic principle of decision:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; </span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(T&amp; a, T&amp; b)</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="function">T <span class="title">tmp</span><span class="params">(std::move(a))</span></span>;</span><br><span class="line">  a = std::<span class="built_in">move</span>(b); </span><br><span class="line">  b = std::<span class="built_in">move</span>(tmp);</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X a, b;</span><br><span class="line">	<span class="built_in">swap</span>(a, b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为已经将变量强制转换为右值，而接收右值的函数可能会对该变量产生破坏性作用，在此之后使用变量的内容可能会导致不确定的行为，因此在变量经过std::move()之后，需要销毁或重新分配。</p>
+<h2 id="Perfect-forwarding">Perfect forwarding</h2>
+<p>完美转发可减少对重载函数的需求，并有助于避免转发问题。 当编写一个泛型函数，该函数将<em>引用</em>作为其参数，并将这些参数传递给（或<em>转发</em>）到另一个函数时，可能会出现<em>转发问题</em>。 例如，如果泛型函数采用 <code>const T&amp;</code> 类型的参数，则调用的函数无法修改该参数的值。 如果泛型函数采用 <code>T&amp;</code> 类型的参数，则无法使用右值（如临时对象或非字符串字面量）来调用该函数。</p>
+<p>通常，若要解决此问题，则必须提供为其每个参数采用 <code>T&amp;</code> 和 <code>const T&amp;</code> 的重载版本的泛型函数。 因此，重载函数的数量将基于参数的数量呈指数方式增加。 利用右值引用，函数模板会推导出其模板自变量类型，然后使用引用折叠规则，函数可接受任意参数并将其转发给另一个函数，就像已直接调用其他函数一样。</p>
+<p>引用折叠规则：</p>
 <ul>
-<li>Rule 1: if Priority(A) &gt; Priority(B), A runs (B doesn’t)</li>
-<li>Rule 2: if Priority(A) = Priority(B), A &amp; B run in RR</li>
+<li>T&amp; &amp; -&gt; T&amp;</li>
+<li>T&amp; &amp;&amp; -&gt; T&amp;</li>
+<li>T&amp;&amp; &amp; -&gt; T&amp;</li>
+<li>T&amp;&amp; &amp;&amp; -&gt; T&amp;&amp;</li>
 </ul>
-<p>The key to MLFQ scheduling therefore lies in how the scheduler sets priorities. Rather than giving a fixed priority to each job, MLFQ <strong>varies the priority of a job based on its observed behavior</strong>. For example,</p>
-<p>a job repeatedly relinquishes the CPU -&gt; (might be) interactive -&gt; priority high</p>
-<p>a job uses the CPU intensively -&gt; reduce its priority</p>
-<blockquote>
-<p>How to change priority</p>
-</blockquote>
-<p>First attempt at a priority adjustment algorithm:</p>
-<ul>
-<li>
-<p>Rule 3: when a job enters the system, it is placed at the highest priority (the topmost queue)</p>
-</li>
-<li>
-<p>Rule 4a: if a job uses up an entire time slice while running, its priority is reduced.</p>
-</li>
-<li>
-<p>Rule 4b: if a job gives up the CPU before the time slice is up, it stays at the same priority level.</p>
-<blockquote>
-<p>Problems with current MLFQ</p>
-</blockquote>
-<ol>
-<li>
-<p>Starvation</p>
-<p>if there are “too many” interactive jobs in the system, they will combine to consume all CPU time, and thus long-running jobs will never receive any CPU time (they starve).</p>
-</li>
-<li>
-<p>A smart user could rewrite their program to <strong>game the scheduler</strong> which refers to the idea of doing something sneaky to <strong>trick</strong> the scheduler into giving you <strong>more than your fair share of the resource</strong>.</p>
-</li>
-<li>
-<p>A program may change its behavior over time; what was CPU-bound may transition to a phase of interactivity.</p>
-</li>
-</ol>
-</li>
-</ul>
-<blockquote>
-<p>The priority boost to avoid starvation</p>
-</blockquote>
-<ul>
-<li>Rule 5: After some time period S, move all the jobs in the system to the topmost queue.</li>
-</ul>
-<p>In fact, this new rule solves two problems at once. First, processes are <strong>guaranteed not to starve</strong>. Second, if a CPU-bound job has <strong>become interactive</strong>, the scheduler <strong>treats it properly</strong> once it has <strong>received the priority boost</strong>.</p>
-<p>Of course, the addition of the time period S leads to the obvious question: what should S be set to? If it is set too high, long-running jobs could starve; too slow, and interactive jobs may not get a proper share of the CPU.</p>
-<blockquote>
-<p>Better accounting to avoid gaming of scheduler</p>
-</blockquote>
-<p>The real culprit are rules 4a and 4b, which let a job <strong>retain its priority by relinquishing</strong> the CPU before the time slice expires.</p>
-<p>Rewrite them to be the following single rule:</p>
-<ul>
-<li>Rule 4: Once a job uses up its time allotment at a given level (regardless of how many times it has given up the CPU), its priority is reduced.</li>
-</ul>
-<h4 id="Summary">Summary</h4>
-<p>As for how to parameterize a scheduler, there are <strong>no easy answers</strong> to these questions, and thus only some <strong>experience with workloads and subsequent tuning</strong> of the scheduler will lead to a satisfactory balance.</p>
-<img src="MLFQ.png" alt="MLFQ" style="zoom:60%;" />
-<h3 id="Scheduling-Proportional-Share">Scheduling: Proportional Share</h3>
-<p>Instead of optimizing for turnaround time or response time, a scheduler might instead try to guarantee that each job obtain a certain percentage of CPU time.</p>
-<blockquote>
-<p>How to share the CPU proportionally?</p>
-</blockquote>
-<p>Not Deterministic - Lottery scheduling</p>
-<ol>
-<li>
-<p>Use of randomness</p>
-<p>It achieves this probabilistically (but not deterministically) by holding a lottery every time slice. Holding a lottery is straightforward: the scheduler must know how many total tickets there are. The scheduler then picks a winning ticket to determine which process to run.</p>
-<p>For example: Process A holds tickets 0 through 74 and process B holds tickets 75 through 99</p>
-<p>Then the scheduler choose from 0 - 99 and loads the state of the winning process.</p>
-<p>The <strong>randomness</strong> in lottery scheduling leads to <strong>a probabilistic correctness in meeting the desire proportion, but no guarantee</strong>.</p>
-</li>
-<li>
-<p>Ticket currency</p>
-<p>Currency allows a user with a set of tickets to <strong>allocate tickets among their jobs</strong> in whatever currency they would like; the system automatically converts said currency into the <strong>correct global value</strong>.</p>
-</li>
-<li>
-<p>Ticket transfer</p>
-<p>With transfers, a process can <strong>temporarily hand off its tickets</strong> to another process and it is especially useful in a client/server setting.</p>
-</li>
-<li>
-<p>Ticket inflation</p>
-<p>With inflation, a process can <strong>temporarily raise or lower the number of tickets it owns</strong>. (Apply in an environment where a group of processes trust one another)</p>
-</li>
-</ol>
-<p>But the ticket-assignment problem remains open.</p>
-<p>While randomness gets us a simple scheduler, it occasionally will not deliver the exact right proportions, especially over short time scales.</p>
-<hr>
-<p>Deterministic - Stride scheduling</p>
-<p>Each job in the system has a <strong>stride</strong>, which is <strong>inverse</strong> in proportion to the number of tickets it has. Every time a process runs, we will increment a counter for it (called its <strong>pass value</strong>) by its stride to track its global progress. Then pick the process to run that has the lowest pass value so far.</p>
-<p>pick client with min pass -&gt; run for quantum -&gt; update pass using stride -&gt; return the client to queue</p>
-<blockquote>
-<p>Disadvantage compared with lottery scheduling</p>
-</blockquote>
-<p>It owns a <strong>global state</strong>.</p>
-<p>Imagine a new job enters in the middle of our stride scheduling, <strong>what should its pass value be</strong>? If it is set to 0, it will monopolize the CPU.</p>
-<p>With lottery scheduling, there is no global state per process; we simply add a new process with whatever tickets it has, update the single global variable to track <strong>how many total tickets we have</strong>, and go from there.</p>
-<hr>
-<p>Linux Completely Fair Scheduler</p>
-<p>Goal: to fairly divide a CPU evenly among all competing processes.</p>
-<p>It does so through a simple <strong>counting-based</strong> technique known as <strong>virtual runtime</strong>. As each process runs, it <strong>accumulates vruntime</strong>. When a scheduling decision occurs, CFS will pick the process with the <strong>lowest vruntime to run next</strong>.</p>
-<blockquote>
-<p>How does the scheduler know when to stop the currently running process, and run the next one?</p>
-</blockquote>
-<p>If CFS switches too often, fairness is increased, as CFS will ensure that each process receives its share of CPU even over miniscule time windows, but at the cost of performance (too much context switching).</p>
-<p>If CFS switches less often, performance is increased (reduced context switching), but at cost of near-term fairness.</p>
-<blockquote>
-<p>CFS manage the tension above through various control parameters</p>
-</blockquote>
-<ul>
-<li>
-<p><code>sched_latency</code> (A typical value is 48ms)</p>
-<p>Determine how long one process should run before considering a switch (effectively determining its time slice but in a dynamic fashion). <strong>CFS divides this value by the number (n) of processes running on the CPU to determine the time slice for a process</strong>, and thus ensures that over this period of time, CFS will be completely fair.</p>
-<p>If there are too many processes running, it leads to too small of a time slice and thus too many context switches.</p>
-</li>
-<li>
-<p><code>min_granularity</code> (usually set to a value like 6ms)</p>
-<p>CFS will <strong>never set the time slice of a process to less than this value</strong>, ensuring that not too much time is spent in scheduling overhead. Although CFS won’t be perfectly fair over the target scheduling latency, it will be close, while still achieving high CPU efficiency.</p>
-</li>
-</ul>
-<p>CFS tracks vruntime precisely which allows a job has a time slice that is not a perfect multiple of the time interrupt interval.</p>
-<blockquote>
-<p>Weighting design (niceness)</p>
-</blockquote>
-<p>The <strong>nice</strong> level of a process. (can be set anywhere from -20 to +19 with a default of 0. Positive nice value imply lower priority and negative values imply higher priority)</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>l</mi><mi>i</mi><mi>c</mi><msub><mi>e</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>k</mi></msub></mrow><mrow><munderover><mo>∑</mo><mn>0</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub><mo>∗</mo><mi>s</mi><mi>c</mi><mi>h</mi><mi>e</mi><mi>d</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></mfrac><mspace linebreak="newline"></mspace><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>+</mo><mfrac><mrow><mi>N</mi><mi>I</mi><mi>C</mi><mi>E</mi><mi mathvariant="normal">_</mi><mi>O</mi><mi mathvariant="normal">_</mi><mi>L</mi><mi>O</mi><mi>A</mi><mi>D</mi></mrow><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow></mfrac><mo>∗</mo><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">time\_slice_k=\frac{weight_k}{\sum_{0}^{n-1}weight_i*sched\_latency}\\
-vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">s</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5254em;vertical-align:-1.154em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.156em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">sc</span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.03588em;">cy</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.154em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2638em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3833em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.7em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal" style="margin-right:0.05764em;">CE</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">L</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
-<p>NICE_O_LOAD is a constant default weight of a process.</p>
-<blockquote>
-<p>Using Red-Black Trees</p>
-<p>To find the next job to run quickly as soon as possible</p>
-</blockquote>
-<p>CFS only keep running (or runnable) processes in this structure.</p>
-<p>Insert / delete job: O( log(n) )</p>
-<blockquote>
-<p>Dealing with I/O and Sleeping processes</p>
-</blockquote>
-<p>CFS handles them by <strong>altering the vruntime of a job when it wakes up</strong>. Specially, CFS sets the vruntime of that job to the <strong>minimum value</strong> found in the tree to avoid starvation of other processes.</p>
-<h4 id="Summary-2">Summary</h4>
-<p>No scheduler is a panacea, and fair-share schedulers have their fair share of problems.</p>
-<ol>
-<li>do not particularly mesh well with I/O</li>
-<li>ticket or priority assignment problem</li>
-</ol>
-<h3 id="Multiprocessor-Scheduling">Multiprocessor Scheduling</h3>
-<blockquote>
-<p>difference between single-CPU hardware and multi-CPU hardware</p>
-</blockquote>
-<p>The use of hardware caches and exactly how data is shared across multiple processors.</p>
-<p>Caches fast memories that <strong>hold copies of popular data</strong> that is found in the <strong>main memory</strong> of the system.</p>
-<p>Caches are based on the <strong>notion of locality</strong>.</p>
-<ul>
-<li>
-<p>Temporal locality</p>
-<p>When a piece of data is accessed, it is likely to be accessed again in the near future</p>
-</li>
-<li>
-<p>Spatial locality</p>
-<p>If a program accesses a data item at address <em>x</em>, it is likely to access data item near <em>x</em> as well.</p>
-</li>
-</ul>
-<p>Caching with multiple CPUs is much more complicated. For example, it will cause a general problem - <strong>cache coherence</strong></p>
-<blockquote>
-<p>Solution to maintain a cache coherence</p>
-</blockquote>
-<p>Basic solution provided by the hardware: by <strong>monitoring memory accesses</strong>, hardware can ensure that basically the <strong>“right thing” happens</strong> and that the view of a single shared memory is preserved.</p>
-<p>One way to do this on a bus-based system is to use an old technique known as <strong>bus snooping</strong>; each cache pays attention to memory updates by observing the bus that connects them to main memory. When a CPU then sees an update for a data item it holds in memory, it will <strong>notice the change</strong> and either <strong>invalidate</strong> (remove it from its own cache) its copy or <strong>update</strong> it (put the new value into its cache).</p>
-<blockquote>
-<p>Synchronization</p>
-</blockquote>
-<p>When accessing / updating shared data items or structures across CPUs, <strong>mutual exclusion primitives</strong> (such as <strong>locks</strong>) should likely to be used to guarantee correctness (other approaches, such as <strong>building lock-free data structures</strong>). But locking will create the problem with regards to performance especially as the number of CPU grows.</p>
-<blockquote>
-<p>Cache affinity</p>
-</blockquote>
-<p>A process, when run on a particular CPU, builds up a fair bit of state in the caches (and TLBs) of the CPU. The next time the process runs, it is often advantageous to run it <strong>on the same CPU</strong>, as it will run faster if <strong>some of its state is already present</strong> in the caches on that CPU.</p>
-<p>A multiprocessor scheduler should consider cache affinity when making its scheduling decisions, perhaps <strong>preferring to keep a process on the same CPU</strong> if all at possible.</p>
-<h4 id="Single-Queue-Scheduling">Single-Queue Scheduling</h4>
-<p>The most basic approach is to simply reuse the basic framework for single processor scheduling, by <strong>putting all jobs that need to scheduled into a single queue</strong>; we call this single-queue multiprocessor scheduling (SQMS).</p>
-<p>Advantage:</p>
-<ul>
-<li>Simplicity. Not require much work to take an existing pick policy and adapt it to work on more than one CPU.</li>
-</ul>
-<p>Disadvantage:</p>
-<ul>
-<li>
-<p>Lack of scalability. The developers have to inserted some form of locking into code which greatly reduce performance to ensure correct access to the single queue.</p>
-</li>
-<li>
-<p>Cache affinity</p>
-<p>Each CPU simply picks the next job to run from the globally shared queue, each job ends up bouncing around from CPU to CPU, thus doing exactly the opposite of what would make sense from the stand point of cache affinity.</p>
-<p>To handle this problem, most SQMS schedulers include some kind of affinity mechanism. One might provide affinity for some jobs, but move others around to balance load.</p>
-</li>
-</ul>
-<h4 id="Multi-Queue-Scheduling">Multi-Queue Scheduling</h4>
-<p>Some system opt for multiple queues, e.g., one per CPU. We call it multi-queue multiprocessor scheduling (MQMS)</p>
-<p>In MQMS, our basic scheduling framework consists of multiple scheduling queues. <strong>Each queue will likely follow a particular scheduling discipline</strong>, such as round-robin, though of any algorithm can be used.</p>
-<p>When a job enters the system, it is placed on exactly one scheduling queue, according to some heuristic. Then it is scheduled essentially independently.</p>
-<p>Advantage:</p>
-<ul>
-<li>Avoiding the problems of information sharing and synchronization found in the single-queue approach</li>
-<li>Inherently more scalable ( lock and cache contention not become a central problem; intrinsically provides cache affinity)</li>
-</ul>
-<p>Disadvantage:</p>
-<ul>
-<li><strong>load imbalance</strong></li>
-</ul>
-<blockquote>
-<p>How to deal with load imbalance</p>
-</blockquote>
-<p>By <strong>migrating</strong> a job from one CPU to another, true load balance can be achieved.</p>
-<blockquote>
-<p>How should the system decide to enact a migration</p>
-</blockquote>
-<p><strong>Work stealing</strong>. A queue that is low on jobs will occasionally peek at another queue, to see how full it is. If the target queue is more full than the source queue, the source will steal one or more jobs from the target to help balance load.</p>
-<p>However, if you look around at other queues too often, you will suffer from <strong>high overhead and have trouble scaling</strong>. If you don’t look at other queues very often, you are in danger of <strong>suffering from severe load imbalances</strong>.</p>
-<h4 id="Linux-Multiprocessor-Schedulers">Linux Multiprocessor Schedulers</h4>
-<p>Both O(1) and CFS use multiple queues, whereas BFS uses a single queue.</p>
-<p>O(1) scheduler is a priority-based scheduler (similar to the MLFQ), changing a process’s priority over time and then scheduling those with highest priority in order to meet various scheduling objectives.</p>
-<p>CFS, in contrast, is a deterministic proportional-share approach (more like stride scheduling).</p>
-<p>BFS, is also proportional-share, but based on a more complicated scheme known as Earliest Eligible Virtual Deadline First (EEVDF).</p>
+<p>使用示例:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Arg&gt; </span></span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">factory</span><span class="params">(Arg&amp;&amp; arg)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;T&gt;(<span class="keyword">new</span> <span class="built_in">T</span>(std::forward&lt;Arg&gt;(arg)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>std::forward从概念上所实现：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_lvalue_reference&lt;T&gt;::value)<span class="comment">//Code producing an lvalue reference expects the object to remain valid.</span></span><br><span class="line">  <span class="keyword">return</span> t;</span><br><span class="line"><span class="keyword">return</span> std::<span class="built_in">move</span>(t);</span><br></pre></td></tr></table></figure>
+<h2 id="References">References</h2>
+<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/rvalue-reference-declarator-amp-amp?view=vs-2019#syntax">Rvalue Reference Declarator: &amp;&amp; - Microsoft Docs</a></p>
+<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=vs-2015">Value Categories - Microsoft Docs</a></p>
+<p><a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories - cppreference.com</a></p>
+<p><a href="https://www.chromium.org/rvalue-references?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#TOC-1.-What-makes-rvalues.">Rvalue references in Chromium</a></p>
 ]]></content>
       <categories>
-        <category>Notes</category>
+        <category>Concepts</category>
       </categories>
       <tags>
-        <tag>Operating System</tag>
+        <tag>C/C++</tag>
       </tags>
   </entry>
   <entry>
@@ -3335,196 +3072,565 @@ vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
       </tags>
   </entry>
   <entry>
-    <title>C++ Rvalue Reference</title>
-    <url>/2020/07/01/rvalue/</url>
-    <content><![CDATA[<h1>C++ Rvalue Reference</h1>
-<h2 id="Value-categories">Value categories</h2>
-<p><img src="value_categories.png" alt="Value-categories"></p>
-<p>每个 C++ 表达式（带有操作数的操作符、字面量、变量名等）都属于三种基本值类别中的一种：</p>
-<p>更具体的示例描述请查看 <a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories – cppreference.com</a></p>
+    <title>Image Processing - Image Enhancement &amp; Restoration</title>
+    <url>/2024/05/03/image-processing-2/</url>
+    <content><![CDATA[<h3 id="Image-Enhancement">Image Enhancement</h3>
+<h4 id="Key-Concepts">Key Concepts</h4>
 <ul>
 <li>
-<p>纯右值 (prvalue)</p>
-<p>纯右值表达式没有可通过程序访问的地址。</p>
-<p>纯右值表达式的示例包括：（除了字符串字面量之外的）字面量、返回非引用类型的函数调用，以及在表达式评估期间创建但仅由编译器访问的临时对象</p>
+<p>Histogram</p>
+<p>A histogram represents the distribution of pixel intensity values in an image. It provides a visual summary of how light or dark an image is and helps us understand its contrast and brightness characteristics.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">k=<span class="number">8</span></span><br><span class="line">random_image = np.random.random([<span class="number">10</span>, <span class="number">10</span>])</span><br><span class="line">random_image = random_image * <span class="number">2</span>**k</span><br><span class="line"></span><br><span class="line">plt.imshow(random_image, cmap=<span class="string">&#x27;gray&#x27;</span>,vmin=<span class="number">0</span>, vmax=<span class="number">2</span>**k-<span class="number">1</span>)</span><br><span class="line">plt.show()</span><br><span class="line">plt.hist(random_image.ravel(), bins=np.arange(<span class="number">2</span>**k+<span class="number">1</span>)-<span class="number">.5</span>, edgecolor=<span class="string">&#x27;red&#x27;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;Intensity&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Count&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="image-20241226040145412.png" alt="image-20241226040145412" style="zoom:30%;" /><img src="image-20241226040202942.png" alt="image-20241226040202942" style="zoom:35%;" /></p>
 </li>
 <li>
-<p>亡值 (xvalue)</p>
-<p>亡值表达式的地址不能再由您的程序访问，但可用于初始化 rvalue 引用，后者提供对表达式的访问。</p>
-<p>亡值表达式的示例包括返回右值引用的函数调用，以及数组下标、成员和指针到数组或对象为右值引用的成员表达式</p>
+<p>Cumulative Histogram</p>
+<p>The cumulative histogram is an extension of the basic histogram. Instead of showing individual intensity frequencies, it shows the cumulative frequency of intensities. This is particularly useful in operations like histogram equalization, where we aim to redistribute intensity values for better contrast.</p>
+</li>
+</ul>
+<p>Image enhancement is the process of improving the visual quality of an image to make it more suitable for a specific application. These techniques are primarily divided into spatial domain processing and frequency domain processing.</p>
+<h4 id="Spatial-Domain-Process">Spatial Domain Process</h4>
+<p>Two principal categories of spatial processing are intensity transformations and spatial filtering.</p>
+<ul>
+<li>
+<p>Intensity Transformations</p>
+<p>Intensity transformations are pixel-based operations that adjust brightness, contrast, or other pixel properties.</p>
+<ul>
+<li>
+<p>Grey Level Transformation</p>
+<ul>
+<li>
+<p>Image Negative: Inverts the pixel intensities, transforming bright areas into dark and vice versa. This is particularly useful in applications like medical imaging.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">util.invert(img) <span class="comment"># image negative</span></span><br></pre></td></tr></table></figure>
+<img src="image-20241226035043501.png" alt="image-20241226035043501" style="zoom:25%;" />
 </li>
 <li>
-<p>左值 (lvalue)</p>
-<p>左值具有程序可以访问的地址。</p>
-<p>左值表达式的示例包括变量名称，包括<strong>常量</strong>变量、数组元素、返回 lvalue 引用、位字段、联合和类成员的函数调用</p>
+<p>Log Transformation: Expands the dynamic range of dark regions in an image, making details more visible.</p>
+</li>
+<li>
+<p>Gamma (Power-Law) Transformation: Corrects non-linear intensity variations, often used in display systems.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">image6 = image**<span class="number">.6</span></span><br><span class="line">image4 = image**<span class="number">.4</span></span><br><span class="line">image3 = image**<span class="number">.3</span></span><br></pre></td></tr></table></figure>
+<img src="image-20241226035312141.png" alt="image-20241226035312141" style="zoom: 40%;" />
 </li>
 </ul>
-<p>随着移动语义引入到 C++11 之中，值类别被重新进行了定义，以区别表达式的两种独立的性质：</p>
-<ul>
-<li><em>拥有身份 ( has identity)</em>：可以确定表达式是否与另一表达式指代同一实体，例如通过比较它们所标识的对象或函数的（直接或间接获得的）地址；</li>
-<li><em>可被移动</em>：移动构造函数、移动赋值运算符或实现了移动语义的其他函数重载能够绑定于这个表达式。</li>
+</li>
+<li>
+<p>Histogram Equalization</p>
+<p>A popular method to improve contrast by redistributing intensity values. It’s particularly effective for images with poor lighting or low contrast.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">image1_eq = img_as_ubyte(exposure.equalize_hist(image1))</span><br></pre></td></tr></table></figure>
+<img src="image-20241226035444591.png" alt="image-20241226035444591" style="zoom:40%;" />
+</li>
+<li>
+<p>Local Enhancement</p>
+<p>Instead of applying transformations globally, local enhancement focuses on specific regions of an image, enabling finer control over the output.</p>
+</li>
 </ul>
-<p>C++11 中：</p>
+</li>
+<li>
+<p>Spatial Filtering</p>
+<p>Spatial filtering involves modifying pixel values based on their surrounding neighbors. This is where techniques like <strong>image smoothing</strong> and <strong>sharpening</strong> come into play.</p>
 <ul>
-<li>拥有身份且不可被移动的表达式被称作*左值 (lvalue)*表达式；</li>
-<li>拥有身份且可被移动的表达式被称作*亡值 (xvalue)*表达式；</li>
-<li>不拥有身份且可被移动的表达式被称作*纯右值 (prvalue)*表达式；</li>
-<li>不拥有身份且不可被移动的表达式无法使用。</li>
+<li>
+<p>Smoothing Filters (Low-pass Filters):<br>
+These filters reduce noise by averaging neighboring pixels, resulting in a blur effect. They are ideal for removing minor imperfections but may reduce sharpness.</p>
+</li>
+<li>
+<p>Sharpening Filters (High-pass Filters):<br>
+These filters enhance edges and fine details by emphasizing intensity changes. Applications include edge detection and feature extraction.</p>
+</li>
+<li>
+<p>Combining Enhancement Methods:<br>
+Often, multiple enhancement techniques are combined for optimal results. For example, smoothing can be applied to reduce noise before sharpening to enhance edges.</p>
+</li>
 </ul>
-<p>拥有身份的表达式被称作“泛左值 (glvalue) 表达式”。左值和亡值都是泛左值表达式。</p>
-<p>可被移动的表达式被称作“右值 (rvalue) 表达式”。纯右值和亡值都是右值表达式。</p>
-<p><img src=".value-categories.png" alt="value-categories"></p>
-<h2 id="Lvalue-Reference">Lvalue Reference</h2>
-<p>c++11之前，C 中仅存在一种引用类型，所以简单称之为<em>引用</em>，而在c11中其被称为左值引用</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">L-value reference</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">Yes</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-</tbody>
-</table>
-<p>而对const对象的左值引用可以使用左值或右值进行初始化</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">L-value reference to const</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-</tbody>
-</table>
-<p>对const对象的左值引用非常有用，因为它使得可以将任何类型的参数（左值或右值）传递给函数，而无需复制该参数</p>
-<h2 id="Rvalue-Reference">Rvalue Reference</h2>
-<p>右值引用可将左值和右值区分开，可以帮助您不必要的内存分配和复制操作需求，从而提高应用程序的性能。</p>
-<p>相比于左值引用，</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">R-value reference</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">Yes</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">R-value reference to const</th>
-<th style="text-align:left">Can be initialized with</th>
-<th style="text-align:left">Can modify</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">Non-modifiable l-values</td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">No</td>
-</tr>
-<tr>
-<td style="text-align:left">R-values</td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">No</td>
-</tr>
-</tbody>
-</table>
-<h2 id="Move-Semantics">Move Semantics</h2>
-<p>要实现移动语义，通常向类提供<em>移动构造函数，</em> 并可以选择移动赋值运算符 （<strong>运算符 =</strong>）。 其源是右值的复制和赋值操作随后会自动利用移动语义。 与默认复制构造函数不同，编译器不提供默认移动构造函数。</p>
-<p>假设一个类X，其中包含一个/多个指向 创建和拷贝开销较大的对象(资源) 的指针，则无需取消引用该指针并复制其内容，移动构造（拷贝）函数只需复制指针的地址， 这就是移动构造函数带来的性能优势所在（只需要浅拷贝）。</p>
-<p>（由于参数是非常量引用，因此它可以修改传递给它的对象，可能具有破坏性）</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">X&amp; X::<span class="keyword">operator</span>=(<span class="type">const</span> X &amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//make a clone of what rhs&#x27;s member pointer refers to</span></span><br><span class="line">    <span class="comment">//destruct the resources that this member pointer refers to</span></span><br><span class="line">    <span class="comment">//attach the clone</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">X&amp; X::<span class="keyword">operator</span>=(X &amp;&amp; rhs)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//swap this-&gt;pointer and rhs.pointer</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="built_in">main</span>()</span><br><span class="line">&#123;</span><br><span class="line">    X a;</span><br><span class="line">    a = <span class="built_in">X</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因此，通过const lvalue 引用或 rvalue 引用参数重载函数，来编写区分不可修改对象 （lvalue） 和可修改临时值 （rvalue） 的代码。</p>
-<h3 id="Forcing-Move-Semantics">Forcing Move Semantics</h3>
-<p>如果你想通过一个变量(lvalue)来调用移动构造（拷贝）函数，std::move()会将变量(lvalue)转换为右值，使其绑定到移动构造(拷贝)函数</p>
-<blockquote>
-<p>std::move() does not move, it casts.</p>
-<p>std::move()实际上是通过static_cast实现的</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">return static_cast&lt;typename std::remove_reference&lt;T&gt;::type&amp;&amp;&gt;(t);</span><br></pre></td></tr></table></figure>
-</blockquote>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; </span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(T&amp; a, T&amp; b)</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="function">T <span class="title">tmp</span><span class="params">(std::move(a))</span></span>;</span><br><span class="line">  a = std::<span class="built_in">move</span>(b); </span><br><span class="line">  b = std::<span class="built_in">move</span>(tmp);</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X a, b;</span><br><span class="line">	<span class="built_in">swap</span>(a, b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因为已经将变量强制转换为右值，而接收右值的函数可能会对该变量产生破坏性作用，在此之后使用变量的内容可能会导致不确定的行为，因此在变量经过std::move()之后，需要销毁或重新分配。</p>
-<h2 id="Perfect-forwarding">Perfect forwarding</h2>
-<p>完美转发可减少对重载函数的需求，并有助于避免转发问题。 当编写一个泛型函数，该函数将<em>引用</em>作为其参数，并将这些参数传递给（或<em>转发</em>）到另一个函数时，可能会出现<em>转发问题</em>。 例如，如果泛型函数采用 <code>const T&amp;</code> 类型的参数，则调用的函数无法修改该参数的值。 如果泛型函数采用 <code>T&amp;</code> 类型的参数，则无法使用右值（如临时对象或非字符串字面量）来调用该函数。</p>
-<p>通常，若要解决此问题，则必须提供为其每个参数采用 <code>T&amp;</code> 和 <code>const T&amp;</code> 的重载版本的泛型函数。 因此，重载函数的数量将基于参数的数量呈指数方式增加。 利用右值引用，函数模板会推导出其模板自变量类型，然后使用引用折叠规则，函数可接受任意参数并将其转发给另一个函数，就像已直接调用其他函数一样。</p>
-<p>引用折叠规则：</p>
+<p>Arithmetic operations like addition, subtraction, multiplication, and division can also be used to manipulate images.</p>
+</li>
+</ul>
+<h4 id="Frequency-Domain-Process">Frequency Domain Process</h4>
+<p>Unlike spatial domain processing, frequency domain techniques focus on the frequency components of an image rather than its pixels. By transforming an image into the frequency domain (using tools like the Fourier Transform), we can manipulate specific frequency ranges to achieve desired effects.</p>
 <ul>
-<li>T&amp; &amp; -&gt; T&amp;</li>
-<li>T&amp; &amp;&amp; -&gt; T&amp;</li>
-<li>T&amp;&amp; &amp; -&gt; T&amp;</li>
-<li>T&amp;&amp; &amp;&amp; -&gt; T&amp;&amp;</li>
+<li>
+<p>Frequency Domain Filtering</p>
+<p>Frequency domain filtering differs from spatial filtering in that it targets specific frequency components:</p>
+<ul>
+<li><strong>Low frequencies</strong> represent smooth regions of the image.</li>
+<li><strong>High frequencies</strong> correspond to edges and fine details.</li>
 </ul>
-<p>使用示例:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Arg&gt; </span></span><br><span class="line"><span class="function">shared_ptr&lt;T&gt; <span class="title">factory</span><span class="params">(Arg&amp;&amp; arg)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;T&gt;(<span class="keyword">new</span> <span class="built_in">T</span>(std::forward&lt;Arg&gt;(arg)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>std::forward从概念上所实现：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_lvalue_reference&lt;T&gt;::value)<span class="comment">//Code producing an lvalue reference expects the object to remain valid.</span></span><br><span class="line">  <span class="keyword">return</span> t;</span><br><span class="line"><span class="keyword">return</span> std::<span class="built_in">move</span>(t);</span><br></pre></td></tr></table></figure>
-<h2 id="References">References</h2>
-<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/rvalue-reference-declarator-amp-amp?view=vs-2019#syntax">Rvalue Reference Declarator: &amp;&amp; - Microsoft Docs</a></p>
-<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=vs-2015">Value Categories - Microsoft Docs</a></p>
-<p><a href="https://en.cppreference.com/w/cpp/language/value_category">Value categories - cppreference.com</a></p>
-<p><a href="https://www.chromium.org/rvalue-references?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#TOC-1.-What-makes-rvalues.">Rvalue references in Chromium</a></p>
+</li>
+<li>
+<p>Unsharp Masking</p>
+<p>Unsharp masking is a method that enhances image sharpness by amplifying high frequencies. It works by subtracting a blurred version of the image (low frequencies) from the original image, leaving behind the high-frequency details.</p>
+</li>
+<li>
+<p>Homomorphic Filtering</p>
+<p>Homomorphic filtering is a technique that simultaneously enhances contrast and reduces noise. It separates the illumination and reflectance components of an image, allowing for targeted adjustments.</p>
+</li>
+</ul>
+<h3 id="Image-Restoration">Image Restoration</h3>
+<p>While image enhancement focuses on improving the visual appearance of an image, <strong>image restoration</strong> takes a different approach. Restoration aims to recover an image’s original quality by reversing known degradations. The goal is to reconstruct the image as closely as possible to its true form, often requiring a deeper understanding of the degradation process.</p>
+<h4 id="Key-Concepts-2">Key Concepts</h4>
+<ul>
+<li>
+<p>Enhancement vs. Restoration</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Image Enhancement</th>
+<th>Image Restoration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Objective</td>
+<td>Improves subjective visual quality</td>
+<td>Reconstructs the original image</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td>Emphasis on human perception</td>
+<td>Focus on mathematical models of degradation</td>
+</tr>
+<tr>
+<td>Approach</td>
+<td>Heuristic techniques (e.g., contrast adjustment, smoothing)</td>
+<td>Algorithmic corrections (e.g., noise removal, deblurring)</td>
+</tr>
+<tr>
+<td>Use Case</td>
+<td>Enhancing medical images for better viewing</td>
+<td>Restoring damaged satellite images</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>Noise Models</p>
+<p>Noise is often introduced into images during acquisition, transmission, or processing. Understanding the type of noise is critical for selecting the appropriate restoration technique. Some common noise models include:</p>
+<ol>
+<li><strong>Gaussian Noise</strong>: A random distribution of intensity values, typically caused by sensor limitations.</li>
+<li><strong>Salt-and-Pepper Noise</strong>: Appears as random black and white pixels, often caused by transmission errors.</li>
+<li><strong>Poisson Noise</strong>: Associated with photon counting in low-light conditions, such as in microscopy or astronomy.</li>
+<li><strong>Periodic Noise</strong>: Results in periodic patterns, often caused by electrical interference during image acquisition.</li>
+</ol>
+<p>Each of these noise models requires a tailored restoration strategy. Let’s explore two primary approaches: spatial filtering and frequency domain filtering.</p>
+</li>
+</ul>
+<h4 id="Restoration-in-the-presence-of-Noise-only-Spatial-filtering">Restoration in the presence of Noise only - Spatial filtering</h4>
+<p>When noise is the primary degradation factor, spatial filtering can effectively suppress it while preserving important image details.</p>
+<ol>
+<li>Mean Filters</li>
+</ol>
+<ul>
+<li>
+<p><strong>Averaging Filter</strong>: Reduces noise by calculating the mean of neighboring pixels. While it smooths the image, it can blur edges.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">noisy_images_5 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">5</span>), dtype=np.float64)</span><br><span class="line">noisy_images_10 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">10</span>), dtype=np.float64)</span><br><span class="line">noisy_images_50 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">50</span>), dtype=np.float64)</span><br><span class="line">noisy_images_100 = np.zeros((image.shape[<span class="number">0</span>], image.shape[<span class="number">1</span>], <span class="number">100</span>), dtype=np.float64)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    noisy_images_5[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    noisy_images_10[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">50</span>):</span><br><span class="line">    noisy_images_50[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">    noisy_images_100[:, :, i] = util.random_noise(image, var=<span class="number">0.1</span>)</span><br><span class="line">mean_image_5 = np.mean(noisy_images_5, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_10 = np.mean(noisy_images_10, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_50 = np.mean(noisy_images_50, axis=<span class="number">2</span>)</span><br><span class="line">mean_image_100 = np.mean(noisy_images_100, axis=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<img src="image-20241226034447077.png" alt="image-20241226034447077" style="zoom: 25%;" />
+</li>
+<li>
+<p><strong>Weighted Mean Filter</strong>: Assigns higher weights to closer pixels, reducing blur while maintaining noise suppression.</p>
+</li>
+</ul>
+<ol start="2">
+<li>Median Filters</li>
+</ol>
+<ul>
+<li>Particularly effective for <strong>salt-and-pepper noise</strong>, median filters replace the central pixel in a sliding window with the median value of its neighbors. This preserves edges better than mean filters.</li>
+</ul>
+<ol start="3">
+<li>Adaptive Filters</li>
+</ol>
+<ul>
+<li>Adaptive filters adjust their behavior based on local image characteristics, such as noise variance. They are versatile and effective for non-uniform noise.</li>
+</ul>
+<p>Spatial domain techniques are often straightforward to implement, but they may struggle with complex noise patterns, such as periodic noise. For such cases, frequency domain filtering is more appropriate.</p>
+<h4 id="Periodic-Noise-By-Frequency-Domain-Filtering">Periodic Noise By Frequency Domain Filtering</h4>
+<p>Periodic noise often manifests as sinusoidal patterns or regular distortions in an image. Frequency domain filtering provides an effective solution by isolating and removing these patterns.</p>
+<ol>
+<li>
+<p>Band-Stop Filtering</p>
+<p>Band-stop filters are designed to suppress specific frequency ranges. For periodic noise:</p>
+<ul>
+<li>
+<p>The noise frequency is identified in the Fourier Transform.</p>
+</li>
+<li>
+<p>A band-stop filter is applied to block these specific frequencies while preserving the rest of the image.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Notch Filters</p>
+<p>A <strong>notch filter</strong> is a more targeted approach to periodic noise removal. It zeroes out frequencies corresponding to the noise spikes while leaving other frequencies untouched, ensuring minimal impact on the image quality.</p>
+</li>
+<li>
+<p>Homomorphic Filtering</p>
+<p>Homomorphic filtering, while often used for image enhancement, can also be applied to combat periodic noise. By separating illumination and reflectance components, it can suppress unwanted interference patterns.</p>
+</li>
+</ol>
+<p>Periodic noise removal through frequency domain techniques is especially useful in scenarios like:</p>
+<ul>
+<li>Restoring scanned documents affected by electrical interference.</li>
+<li>Processing satellite images with regular transmission noise.</li>
+</ul>
 ]]></content>
       <categories>
         <category>Concepts</category>
       </categories>
       <tags>
-        <tag>C/C++</tag>
+        <tag>Multimedia</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Notes for OSTEP</title>
+    <url>/2020/09/10/ostep-2/</url>
+    <content><![CDATA[<h1><em>Operating Systems: Three Easy Pieces</em></h1>
+<blockquote>
+<p>Notes - Part Two</p>
+<p>Links to the book: <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">http://pages.cs.wisc.edu/~remzi/OSTEP/</a></p>
+</blockquote>
+<h2 id="Virtualization">Virtualization</h2>
+<h3 id="Scheduling-Introduction">Scheduling: Introduction</h3>
+<blockquote>
+<p>How to develop a basic framework for thinking about scheduling policies</p>
+</blockquote>
+<ul>
+<li>
+<p>Workload Assumptions</p>
+<p>Before getting into the range of possible policies, let us first make a number of <strong>simplifying assumptions</strong> about the process running in the system, sometimes collectively called <strong>workload</strong>.</p>
+<ol>
+<li>Each job runs for the same amount of time</li>
+<li>All jobs arrive at the same time</li>
+<li>Once started, each job runs to completion</li>
+<li>All jobs only use the CPU (i.e., they perform no I/O)</li>
+<li>The run-time of each job is known</li>
+</ol>
+<p>The workload assumptions are mostly <strong>unrealistic</strong>, but that is alright (for now), because we will <strong>relax</strong> them as we go, and eventually develop what we will refer to as a <strong>fully-operational scheduling discipline</strong>.</p>
+</li>
+<li>
+<p>Scheduling Metrics</p>
+<p>A metric is just something that we use to measure something. Here we simply use a single metric: <strong>turnaround time</strong>. The turnaround time of a job is defined as the time at which job completes minus the time at which the job arrived in the system.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>r</mi><mi>o</mi><mi>u</mi><mi>n</mi><mi>d</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{turnaround}=T_{completion}−T_{arrival}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">na</span><span class="mord mathnormal mtight">ro</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">co</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">pl</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>It is a <strong>performance metric</strong>, and another metric of interest is <strong>fairness</strong>, as measured (for example) by <strong>Jain’s Fairness Index</strong>. Performance and fairness are often <strong>at odds</strong> in scheduling.</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">FIFO</th>
+<th style="text-align:left">SJF</th>
+<th style="text-align:left">STCF / PSJF / SRTF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">non-preemptive</td>
+<td style="text-align:left">non-preemptive</td>
+<td style="text-align:left">preemptive</td>
+</tr>
+<tr>
+<td style="text-align:left">Principle</td>
+<td style="text-align:left">run the jobs that arrives earlier</td>
+<td style="text-align:left">runs the shortest job first</td>
+<td style="text-align:left">runs the jobs has the least time left</td>
+</tr>
+<tr>
+<td style="text-align:left">Timing</td>
+<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
+<td style="text-align:left">a job complete its burst time or switches to waiting state</td>
+<td style="text-align:left">any time a new job arrives (switch to ready state)</td>
+</tr>
+<tr>
+<td style="text-align:left">Problem</td>
+<td style="text-align:left"><a href="https://www.geeksforgeeks.org/convoy-effect-operating-systems/">convoy effect</a></td>
+<td style="text-align:left">convoy effect</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">Solve</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">jobs that run for different amounts of time</td>
+<td style="text-align:left">convoy effect</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<blockquote>
+<p>A new metric for those demand interactive performance</p>
+</blockquote>
+<p>Now users would sit at a terminal and <strong>demand interactive performance</strong> from the system as well. And thus, a new metric was born: <strong>response time</strong>. We define response time as from when the job arrives in a system to the first time it is scheduled.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>T</mi><mrow><mi>r</mi><mi>e</mi><mi>s</mi><mi>p</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi><mi>r</mi><mi>u</mi><mi>n</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{response}=T_{firstrun}−T_{arrival}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">res</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">se</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">rs</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>But STCF and related disciplines are <strong>not particularly good for response time</strong>. For example, if three jobs arrive at the same time, the third job has to wait for the previous two jobs to run in their entirely before being scheduled just once.</p>
+<p>The general technique of <strong>amortization</strong> is commonly used in systems when there is a fixed cost of some operation. So a new scheduling algorithm, <strong>Round-Robin</strong> scheduling, is proposed. The basic idea is simple, instead of running jobs to completion, RR runs a job for a <strong>time slice</strong> (<strong>scheduling quantum</strong>) and then switch to the <strong>next job in the run queue</strong>.</p>
+<p>The length of the time slice is critical for RR, making it <strong>long enough</strong> to amortize the cost of switching without making it so long that the system is no longer responsive.</p>
+<blockquote>
+<p>Note that the cost of context switching does not arise solely from the <strong>OS actions of saving and restoring a few registers</strong>. When program runs, they build up <strong>a great deal of state in CPU caches, TLBs, branch prediction, and other on-chip hardware</strong>. Switching to another job causes this state to be flushed and new state relevant to the currently-running job to be brought in, which may exact <strong>a noticeable performance cost</strong>.</p>
+</blockquote>
+<p>RR, with a reasonable time slice, is thus an <strong>excellent</strong> scheduler if <strong>response time</strong> is the only metric. But it is indeed one of the <strong>worst policies</strong> if <strong>turnaround time</strong> is the metric.</p>
+<p>An inherent trade-off:</p>
+<p>If you are willing to unfair, you can run shortest jobs to completion, but at the cost of response time;</p>
+<p>if you instead value fairness, response time is lower, but at the cost of turnaround time.</p>
+<hr>
+<blockquote>
+<p>Relax Assumption 4: all programs perform I/O.</p>
+</blockquote>
+<p>A scheduler clearly has a decision to make both when a job initiates an I/O request and when the I/O completes.</p>
+<p>The scheduler incorporate I/O by <strong>treating each CPU burst as a job</strong>, the scheduler makes sure process that are “interactive” get <strong>run frequently</strong>. While those interactive jobs are performing I/O, other <strong>CPU-intensive</strong> jobs run, thus better utilizing the processor.</p>
+<p>Take the STCF scheduler for example, both A and B need 50ms CPU time, but A runs for 10ms and then issues an I/O request whereas B performs no I/O.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Treating A as a single job</th>
+<th style="text-align:center">Treating each CPU burst of A as a job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="sub_job_1.png" alt="before"></td>
+<td style="text-align:center"><img src="sub_job_2.png" alt="after"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<blockquote>
+<p>Relax Assumption 5:</p>
+<p>In a general-purpose OS, it usually knows very <strong>little about the length of each job</strong>. So how can we build an approach that behaves like SJF/STCF <strong>without such a priori knowledge</strong>?</p>
+</blockquote>
+<h3 id="Scheduling-The-Multi-Level-Feedback-Queue">Scheduling: The Multi-Level Feedback Queue</h3>
+<blockquote>
+<p>Basic Rule</p>
+</blockquote>
+<p>The MLFQ has a number of distinct queues, each assigned a different <strong>priority level</strong>. At any time, a job that is ready to run is on a single queue.</p>
+<p>Basic principle of decision:</p>
+<ul>
+<li>Rule 1: if Priority(A) &gt; Priority(B), A runs (B doesn’t)</li>
+<li>Rule 2: if Priority(A) = Priority(B), A &amp; B run in RR</li>
+</ul>
+<p>The key to MLFQ scheduling therefore lies in how the scheduler sets priorities. Rather than giving a fixed priority to each job, MLFQ <strong>varies the priority of a job based on its observed behavior</strong>. For example,</p>
+<p>a job repeatedly relinquishes the CPU -&gt; (might be) interactive -&gt; priority high</p>
+<p>a job uses the CPU intensively -&gt; reduce its priority</p>
+<blockquote>
+<p>How to change priority</p>
+</blockquote>
+<p>First attempt at a priority adjustment algorithm:</p>
+<ul>
+<li>
+<p>Rule 3: when a job enters the system, it is placed at the highest priority (the topmost queue)</p>
+</li>
+<li>
+<p>Rule 4a: if a job uses up an entire time slice while running, its priority is reduced.</p>
+</li>
+<li>
+<p>Rule 4b: if a job gives up the CPU before the time slice is up, it stays at the same priority level.</p>
+<blockquote>
+<p>Problems with current MLFQ</p>
+</blockquote>
+<ol>
+<li>
+<p>Starvation</p>
+<p>if there are “too many” interactive jobs in the system, they will combine to consume all CPU time, and thus long-running jobs will never receive any CPU time (they starve).</p>
+</li>
+<li>
+<p>A smart user could rewrite their program to <strong>game the scheduler</strong> which refers to the idea of doing something sneaky to <strong>trick</strong> the scheduler into giving you <strong>more than your fair share of the resource</strong>.</p>
+</li>
+<li>
+<p>A program may change its behavior over time; what was CPU-bound may transition to a phase of interactivity.</p>
+</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>The priority boost to avoid starvation</p>
+</blockquote>
+<ul>
+<li>Rule 5: After some time period S, move all the jobs in the system to the topmost queue.</li>
+</ul>
+<p>In fact, this new rule solves two problems at once. First, processes are <strong>guaranteed not to starve</strong>. Second, if a CPU-bound job has <strong>become interactive</strong>, the scheduler <strong>treats it properly</strong> once it has <strong>received the priority boost</strong>.</p>
+<p>Of course, the addition of the time period S leads to the obvious question: what should S be set to? If it is set too high, long-running jobs could starve; too slow, and interactive jobs may not get a proper share of the CPU.</p>
+<blockquote>
+<p>Better accounting to avoid gaming of scheduler</p>
+</blockquote>
+<p>The real culprit are rules 4a and 4b, which let a job <strong>retain its priority by relinquishing</strong> the CPU before the time slice expires.</p>
+<p>Rewrite them to be the following single rule:</p>
+<ul>
+<li>Rule 4: Once a job uses up its time allotment at a given level (regardless of how many times it has given up the CPU), its priority is reduced.</li>
+</ul>
+<h4 id="Summary">Summary</h4>
+<p>As for how to parameterize a scheduler, there are <strong>no easy answers</strong> to these questions, and thus only some <strong>experience with workloads and subsequent tuning</strong> of the scheduler will lead to a satisfactory balance.</p>
+<img src="MLFQ.png" alt="MLFQ" style="zoom:60%;" />
+<h3 id="Scheduling-Proportional-Share">Scheduling: Proportional Share</h3>
+<p>Instead of optimizing for turnaround time or response time, a scheduler might instead try to guarantee that each job obtain a certain percentage of CPU time.</p>
+<blockquote>
+<p>How to share the CPU proportionally?</p>
+</blockquote>
+<p>Not Deterministic - Lottery scheduling</p>
+<ol>
+<li>
+<p>Use of randomness</p>
+<p>It achieves this probabilistically (but not deterministically) by holding a lottery every time slice. Holding a lottery is straightforward: the scheduler must know how many total tickets there are. The scheduler then picks a winning ticket to determine which process to run.</p>
+<p>For example: Process A holds tickets 0 through 74 and process B holds tickets 75 through 99</p>
+<p>Then the scheduler choose from 0 - 99 and loads the state of the winning process.</p>
+<p>The <strong>randomness</strong> in lottery scheduling leads to <strong>a probabilistic correctness in meeting the desire proportion, but no guarantee</strong>.</p>
+</li>
+<li>
+<p>Ticket currency</p>
+<p>Currency allows a user with a set of tickets to <strong>allocate tickets among their jobs</strong> in whatever currency they would like; the system automatically converts said currency into the <strong>correct global value</strong>.</p>
+</li>
+<li>
+<p>Ticket transfer</p>
+<p>With transfers, a process can <strong>temporarily hand off its tickets</strong> to another process and it is especially useful in a client/server setting.</p>
+</li>
+<li>
+<p>Ticket inflation</p>
+<p>With inflation, a process can <strong>temporarily raise or lower the number of tickets it owns</strong>. (Apply in an environment where a group of processes trust one another)</p>
+</li>
+</ol>
+<p>But the ticket-assignment problem remains open.</p>
+<p>While randomness gets us a simple scheduler, it occasionally will not deliver the exact right proportions, especially over short time scales.</p>
+<hr>
+<p>Deterministic - Stride scheduling</p>
+<p>Each job in the system has a <strong>stride</strong>, which is <strong>inverse</strong> in proportion to the number of tickets it has. Every time a process runs, we will increment a counter for it (called its <strong>pass value</strong>) by its stride to track its global progress. Then pick the process to run that has the lowest pass value so far.</p>
+<p>pick client with min pass -&gt; run for quantum -&gt; update pass using stride -&gt; return the client to queue</p>
+<blockquote>
+<p>Disadvantage compared with lottery scheduling</p>
+</blockquote>
+<p>It owns a <strong>global state</strong>.</p>
+<p>Imagine a new job enters in the middle of our stride scheduling, <strong>what should its pass value be</strong>? If it is set to 0, it will monopolize the CPU.</p>
+<p>With lottery scheduling, there is no global state per process; we simply add a new process with whatever tickets it has, update the single global variable to track <strong>how many total tickets we have</strong>, and go from there.</p>
+<hr>
+<p>Linux Completely Fair Scheduler</p>
+<p>Goal: to fairly divide a CPU evenly among all competing processes.</p>
+<p>It does so through a simple <strong>counting-based</strong> technique known as <strong>virtual runtime</strong>. As each process runs, it <strong>accumulates vruntime</strong>. When a scheduling decision occurs, CFS will pick the process with the <strong>lowest vruntime to run next</strong>.</p>
+<blockquote>
+<p>How does the scheduler know when to stop the currently running process, and run the next one?</p>
+</blockquote>
+<p>If CFS switches too often, fairness is increased, as CFS will ensure that each process receives its share of CPU even over miniscule time windows, but at the cost of performance (too much context switching).</p>
+<p>If CFS switches less often, performance is increased (reduced context switching), but at cost of near-term fairness.</p>
+<blockquote>
+<p>CFS manage the tension above through various control parameters</p>
+</blockquote>
+<ul>
+<li>
+<p><code>sched_latency</code> (A typical value is 48ms)</p>
+<p>Determine how long one process should run before considering a switch (effectively determining its time slice but in a dynamic fashion). <strong>CFS divides this value by the number (n) of processes running on the CPU to determine the time slice for a process</strong>, and thus ensures that over this period of time, CFS will be completely fair.</p>
+<p>If there are too many processes running, it leads to too small of a time slice and thus too many context switches.</p>
+</li>
+<li>
+<p><code>min_granularity</code> (usually set to a value like 6ms)</p>
+<p>CFS will <strong>never set the time slice of a process to less than this value</strong>, ensuring that not too much time is spent in scheduling overhead. Although CFS won’t be perfectly fair over the target scheduling latency, it will be close, while still achieving high CPU efficiency.</p>
+</li>
+</ul>
+<p>CFS tracks vruntime precisely which allows a job has a time slice that is not a perfect multiple of the time interrupt interval.</p>
+<blockquote>
+<p>Weighting design (niceness)</p>
+</blockquote>
+<p>The <strong>nice</strong> level of a process. (can be set anywhere from -20 to +19 with a default of 0. Positive nice value imply lower priority and negative values imply higher priority)</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>t</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>l</mi><mi>i</mi><mi>c</mi><msub><mi>e</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>k</mi></msub></mrow><mrow><munderover><mo>∑</mo><mn>0</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub><mo>∗</mo><mi>s</mi><mi>c</mi><mi>h</mi><mi>e</mi><mi>d</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></mfrac><mspace linebreak="newline"></mspace><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>v</mi><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub><mo>+</mo><mfrac><mrow><mi>N</mi><mi>I</mi><mi>C</mi><mi>E</mi><mi mathvariant="normal">_</mi><mi>O</mi><mi mathvariant="normal">_</mi><mi>L</mi><mi>O</mi><mi>A</mi><mi>D</mi></mrow><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow></mfrac><mo>∗</mo><mi>r</mi><mi>u</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>m</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">time\_slice_k=\frac{weight_k}{\sum_{0}^{n-1}weight_i*sched\_latency}\\
+vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord mathnormal">e</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">s</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5254em;vertical-align:-1.154em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.156em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">sc</span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord mathnormal">d</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.03588em;">cy</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.154em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2638em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3833em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">h</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.7em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal" style="margin-right:0.05764em;">CE</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal">L</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">im</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>NICE_O_LOAD is a constant default weight of a process.</p>
+<blockquote>
+<p>Using Red-Black Trees</p>
+<p>To find the next job to run quickly as soon as possible</p>
+</blockquote>
+<p>CFS only keep running (or runnable) processes in this structure.</p>
+<p>Insert / delete job: O( log(n) )</p>
+<blockquote>
+<p>Dealing with I/O and Sleeping processes</p>
+</blockquote>
+<p>CFS handles them by <strong>altering the vruntime of a job when it wakes up</strong>. Specially, CFS sets the vruntime of that job to the <strong>minimum value</strong> found in the tree to avoid starvation of other processes.</p>
+<h4 id="Summary-2">Summary</h4>
+<p>No scheduler is a panacea, and fair-share schedulers have their fair share of problems.</p>
+<ol>
+<li>do not particularly mesh well with I/O</li>
+<li>ticket or priority assignment problem</li>
+</ol>
+<h3 id="Multiprocessor-Scheduling">Multiprocessor Scheduling</h3>
+<blockquote>
+<p>difference between single-CPU hardware and multi-CPU hardware</p>
+</blockquote>
+<p>The use of hardware caches and exactly how data is shared across multiple processors.</p>
+<p>Caches fast memories that <strong>hold copies of popular data</strong> that is found in the <strong>main memory</strong> of the system.</p>
+<p>Caches are based on the <strong>notion of locality</strong>.</p>
+<ul>
+<li>
+<p>Temporal locality</p>
+<p>When a piece of data is accessed, it is likely to be accessed again in the near future</p>
+</li>
+<li>
+<p>Spatial locality</p>
+<p>If a program accesses a data item at address <em>x</em>, it is likely to access data item near <em>x</em> as well.</p>
+</li>
+</ul>
+<p>Caching with multiple CPUs is much more complicated. For example, it will cause a general problem - <strong>cache coherence</strong></p>
+<blockquote>
+<p>Solution to maintain a cache coherence</p>
+</blockquote>
+<p>Basic solution provided by the hardware: by <strong>monitoring memory accesses</strong>, hardware can ensure that basically the <strong>“right thing” happens</strong> and that the view of a single shared memory is preserved.</p>
+<p>One way to do this on a bus-based system is to use an old technique known as <strong>bus snooping</strong>; each cache pays attention to memory updates by observing the bus that connects them to main memory. When a CPU then sees an update for a data item it holds in memory, it will <strong>notice the change</strong> and either <strong>invalidate</strong> (remove it from its own cache) its copy or <strong>update</strong> it (put the new value into its cache).</p>
+<blockquote>
+<p>Synchronization</p>
+</blockquote>
+<p>When accessing / updating shared data items or structures across CPUs, <strong>mutual exclusion primitives</strong> (such as <strong>locks</strong>) should likely to be used to guarantee correctness (other approaches, such as <strong>building lock-free data structures</strong>). But locking will create the problem with regards to performance especially as the number of CPU grows.</p>
+<blockquote>
+<p>Cache affinity</p>
+</blockquote>
+<p>A process, when run on a particular CPU, builds up a fair bit of state in the caches (and TLBs) of the CPU. The next time the process runs, it is often advantageous to run it <strong>on the same CPU</strong>, as it will run faster if <strong>some of its state is already present</strong> in the caches on that CPU.</p>
+<p>A multiprocessor scheduler should consider cache affinity when making its scheduling decisions, perhaps <strong>preferring to keep a process on the same CPU</strong> if all at possible.</p>
+<h4 id="Single-Queue-Scheduling">Single-Queue Scheduling</h4>
+<p>The most basic approach is to simply reuse the basic framework for single processor scheduling, by <strong>putting all jobs that need to scheduled into a single queue</strong>; we call this single-queue multiprocessor scheduling (SQMS).</p>
+<p>Advantage:</p>
+<ul>
+<li>Simplicity. Not require much work to take an existing pick policy and adapt it to work on more than one CPU.</li>
+</ul>
+<p>Disadvantage:</p>
+<ul>
+<li>
+<p>Lack of scalability. The developers have to inserted some form of locking into code which greatly reduce performance to ensure correct access to the single queue.</p>
+</li>
+<li>
+<p>Cache affinity</p>
+<p>Each CPU simply picks the next job to run from the globally shared queue, each job ends up bouncing around from CPU to CPU, thus doing exactly the opposite of what would make sense from the stand point of cache affinity.</p>
+<p>To handle this problem, most SQMS schedulers include some kind of affinity mechanism. One might provide affinity for some jobs, but move others around to balance load.</p>
+</li>
+</ul>
+<h4 id="Multi-Queue-Scheduling">Multi-Queue Scheduling</h4>
+<p>Some system opt for multiple queues, e.g., one per CPU. We call it multi-queue multiprocessor scheduling (MQMS)</p>
+<p>In MQMS, our basic scheduling framework consists of multiple scheduling queues. <strong>Each queue will likely follow a particular scheduling discipline</strong>, such as round-robin, though of any algorithm can be used.</p>
+<p>When a job enters the system, it is placed on exactly one scheduling queue, according to some heuristic. Then it is scheduled essentially independently.</p>
+<p>Advantage:</p>
+<ul>
+<li>Avoiding the problems of information sharing and synchronization found in the single-queue approach</li>
+<li>Inherently more scalable ( lock and cache contention not become a central problem; intrinsically provides cache affinity)</li>
+</ul>
+<p>Disadvantage:</p>
+<ul>
+<li><strong>load imbalance</strong></li>
+</ul>
+<blockquote>
+<p>How to deal with load imbalance</p>
+</blockquote>
+<p>By <strong>migrating</strong> a job from one CPU to another, true load balance can be achieved.</p>
+<blockquote>
+<p>How should the system decide to enact a migration</p>
+</blockquote>
+<p><strong>Work stealing</strong>. A queue that is low on jobs will occasionally peek at another queue, to see how full it is. If the target queue is more full than the source queue, the source will steal one or more jobs from the target to help balance load.</p>
+<p>However, if you look around at other queues too often, you will suffer from <strong>high overhead and have trouble scaling</strong>. If you don’t look at other queues very often, you are in danger of <strong>suffering from severe load imbalances</strong>.</p>
+<h4 id="Linux-Multiprocessor-Schedulers">Linux Multiprocessor Schedulers</h4>
+<p>Both O(1) and CFS use multiple queues, whereas BFS uses a single queue.</p>
+<p>O(1) scheduler is a priority-based scheduler (similar to the MLFQ), changing a process’s priority over time and then scheduling those with highest priority in order to meet various scheduling objectives.</p>
+<p>CFS, in contrast, is a deterministic proportional-share approach (more like stride scheduling).</p>
+<p>BFS, is also proportional-share, but based on a more complicated scheme known as Earliest Eligible Virtual Deadline First (EEVDF).</p>
+]]></content>
+      <categories>
+        <category>Notes</category>
+      </categories>
+      <tags>
+        <tag>Operating System</tag>
       </tags>
   </entry>
 </search>
