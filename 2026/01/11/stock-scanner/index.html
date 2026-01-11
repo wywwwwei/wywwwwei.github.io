@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="A small app for scanning abnormal movements of US stocks written for a friend.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Building an Automated NASDAQ Stock Scanner: From Setup to Deployment">
+<meta property="og:url" content="https://wywwwwei.github.io/2026/01/11/stock-scanner/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="A small app for scanning abnormal movements of US stocks written for a friend.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/01/11/stock-scanner/image-20260112013315265.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/01/11/stock-scanner/image-20260112013624232.png">
+<meta property="article:published_time" content="2026-01-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-11T17:53:40.165Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="TinyJoy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2026/01/11/stock-scanner/image-20260112013315265.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2026/01/11/stock-scanner/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2026/01/11/stock-scanner/","path":"2026/01/11/stock-scanner/","title":"Building an Automated NASDAQ Stock Scanner: From Setup to Deployment"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Building an Automated NASDAQ Stock Scanner: From Setup to Deployment | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Core-Functionality"><span class="nav-number">2.</span> <span class="nav-text">Core Functionality</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Technology-Stack"><span class="nav-number">3.</span> <span class="nav-text">Technology Stack</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Implementation-Details"><span class="nav-number">4.</span> <span class="nav-text">Implementation Details</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Script-Structure"><span class="nav-number">4.1.</span> <span class="nav-text">Script Structure</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GitHub-Repository-Secrets-Setup"><span class="nav-number">4.2.</span> <span class="nav-text">GitHub Repository &amp; Secrets Setup</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2026/01/11/stock-scanner/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Building an Automated NASDAQ Stock Scanner: From Setup to Deployment | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Building an Automated NASDAQ Stock Scanner: From Setup to Deployment
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-01-11 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-11T00:00:00+08:00">2026-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Application/" itemprop="url" rel="index"><span itemprop="name">Application</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h4 id="Overview">Overview</h4>
+<p>This guide outlines the complete process for creating an automated stock scanner that runs after market close, scans all NASDAQ-listed stocks, identifies those meeting selected technical criteria, and delivers results via email. The solution is implemented in Python and deployed using GitHub Actions for fully scheduled, unattended operation.</p>
+<h4 id="Core-Functionality">Core Functionality</h4>
+<p>The scanner provides the following main features:</p>
+<ol>
+<li>
+<p><strong>Symbol Acquisition</strong></p>
+<p>Retrieves the current list of NASDAQ-listed stock symbols from the official NASDAQ website</p>
+</li>
+<li>
+<p><strong>Scanning Criteria</strong> (The following indicators are for example only and can be adjusted according to the actual trading strategy)</p>
+<ul>
+<li><strong>Volume Surge</strong>: Current day dollar volume &gt; 2 x the average dollar volume of the previous 60 trading days</li>
+<li><strong>MA Golden Cross</strong>: MA5 (day) crosses above MA10, with average dollar volume over the past 10 trading days &gt; US$50 million</li>
+</ul>
+</li>
+<li>
+<p><strong>Result Presentation</strong></p>
+<p>Sorts qualifying stocks by current day dollar volume (descending) and displays results clearly in email format</p>
+</li>
+<li>
+<p><strong>Email Notification</strong></p>
+<p>Automatically sends scan results to a designated email address</p>
+</li>
+<li>
+<p><strong>Scheduled Automation</strong></p>
+<p>Hosts the script on GitHub and uses GitHub Actions for regular, hands-free execution</p>
+</li>
+</ol>
+<h4 id="Technology-Stack">Technology Stack</h4>
+<ul>
+<li>Language: Python</li>
+<li>Data manipulation: pandas, numpy</li>
+<li>HTTP requests: requests</li>
+<li>Market data: yfinance</li>
+<li>Email: smtplib</li>
+<li>CI/CD &amp; hosting: GitHub + GitHub Actions</li>
+</ul>
+<h4 id="Implementation-Details">Implementation Details</h4>
+<h5 id="Script-Structure">Script Structure</h5>
+<ol>
+<li>
+<p>Email Configuration (sensitive values should be stored in environment variables)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SMTP_SERVER = <span class="string">&quot;smtp.gmail.com&quot;</span></span><br><span class="line">SMTP_PORT = <span class="number">587</span></span><br><span class="line">SENDER_EMAIL = os.getenv(<span class="string">&#x27;EMAIL_NAME&#x27;</span>)</span><br><span class="line">SENDER_PASSWORD = os.getenv(<span class="string">&#x27;EMAIL_PASSWORD&#x27;</span>)</span><br><span class="line">RECIPIENT_EMAIL = os.getenv(<span class="string">&#x27;RECIPIENT_EMAIL&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">all</span>([SENDER_EMAIL, SENDER_PASSWORD, RECIPIENT_EMAIL]):</span><br><span class="line">    <span class="keyword">raise</span> ValueError(<span class="string">&quot;Required email environment variables are missing&quot;</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Fetch NASDAQ Symbol List</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_nasdaq_symbols</span>():</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Download and parse nasdaqlisted.txt from NASDAQ official website to obtain the current stock symbol list</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    url = <span class="string">&quot;https://www.nasdaqtrader.com/dynamic/symdir/nasdaqlisted.txt&quot;</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        response = requests.get(url)</span><br><span class="line">        response.raise_for_status()</span><br><span class="line">        df = pd.read_csv(io.StringIO(response.text), sep=<span class="string">&quot;|&quot;</span>)</span><br><span class="line">        symbols = df[<span class="string">&#x27;Symbol&#x27;</span>].dropna().tolist()</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Successfully retrieved <span class="subst">&#123;<span class="built_in">len</span>(symbols)&#125;</span> NASDAQ symbols&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> symbols</span><br><span class="line">    <span class="keyword">except</span> requests.exceptions.RequestException <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Failed to download symbol list: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line">    <span class="keyword">except</span> pd.errors.EmptyDataError:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Downloaded file is empty or has incorrect format&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Error parsing symbol list: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> []</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Data acquisition and analysis</p>
+<p>This is the core part of the script, responsible for obtaining the historical data of a single stock, calculating the moving average and trading volume, and determining whether the preset conditions are met.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_stock_data</span>(<span class="params">ticker</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Fetch historical data for the specified ticker and calculate indicators required for screening</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">import</span> yfinance <span class="keyword">as</span> yf</span><br><span class="line">    </span><br><span class="line">    stock = yf.Ticker(ticker)</span><br><span class="line">    <span class="comment"># Get at least 70 days of data to ensure enough history for MA10 and 60-day average volume</span></span><br><span class="line">    hist_data = stock.history(period=<span class="string">&quot;70d&quot;</span>) </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> hist_data.empty <span class="keyword">or</span> <span class="built_in">len</span>(hist_data) &lt; <span class="number">11</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Warning: <span class="subst">&#123;ticker&#125;</span> has insufficient historical data, skipping&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span>, <span class="literal">None</span>, <span class="literal">None</span>, <span class="literal">None</span>, <span class="literal">None</span>, <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Calculate moving averages</span></span><br><span class="line">    hist_data[<span class="string">&#x27;MA5&#x27;</span>]  = hist_data[<span class="string">&#x27;Close&#x27;</span>].rolling(window=<span class="number">5</span>).mean()</span><br><span class="line">    hist_data[<span class="string">&#x27;MA10&#x27;</span>] = hist_data[<span class="string">&#x27;Close&#x27;</span>].rolling(window=<span class="number">10</span>).mean()</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Calculate daily dollar volume (Dollar Volume = Close × Volume)</span></span><br><span class="line">    hist_data[<span class="string">&#x27;DollarVolume&#x27;</span>] = hist_data[<span class="string">&#x27;Close&#x27;</span>] * hist_data[<span class="string">&#x27;Volume&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ── Condition 1: Volume Surge ──</span></span><br><span class="line">    current_dollar_volume = hist_data[<span class="string">&#x27;DollarVolume&#x27;</span>].iloc[-<span class="number">1</span>]</span><br><span class="line">    past_60_dollar_volumes = hist_data[<span class="string">&#x27;DollarVolume&#x27;</span>].iloc[-<span class="number">61</span>:-<span class="number">1</span>]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(past_60_dollar_volumes) &lt; <span class="number">60</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Warning: <span class="subst">&#123;ticker&#125;</span> has fewer than 60 prior trading days, skipping volume surge check&quot;</span>)</span><br><span class="line">        dollar_vol_condition_met = <span class="literal">False</span></span><br><span class="line">        avg_dollar_vol_60 = <span class="literal">None</span></span><br><span class="line">        ratio = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        avg_dollar_vol_60 = past_60_dollar_volumes.mean()</span><br><span class="line">        <span class="comment"># Strict check to prevent division by zero or NaN</span></span><br><span class="line">        <span class="keyword">if</span> pd.isna(avg_dollar_vol_60) <span class="keyword">or</span> avg_dollar_vol_60 == <span class="number">0</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;Warning: <span class="subst">&#123;ticker&#125;</span> has invalid 60-day average dollar volume (<span class="subst">&#123;avg_dollar_vol_60&#125;</span>), skipping volume check&quot;</span>)</span><br><span class="line">            dollar_vol_condition_met = <span class="literal">False</span></span><br><span class="line">            ratio = <span class="literal">None</span></span><br><span class="line">            <span class="keyword">return</span> dollar_vol_condition_met, avg_dollar_vol_60, <span class="literal">None</span>, current_dollar_volume, <span class="literal">None</span>, ratio</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ratio = current_dollar_volume / avg_dollar_vol_60</span><br><span class="line">            dollar_vol_condition_met = ratio &gt; <span class="number">2</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># ── Condition 2: MA Golden Cross + High Volume ──</span></span><br><span class="line">    current_ma5  = hist_data[<span class="string">&#x27;MA5&#x27;</span>].iloc[-<span class="number">1</span>]</span><br><span class="line">    current_ma10 = hist_data[<span class="string">&#x27;MA10&#x27;</span>].iloc[-<span class="number">1</span>]</span><br><span class="line">    prev_ma5     = hist_data[<span class="string">&#x27;MA5&#x27;</span>].iloc[-<span class="number">2</span>]</span><br><span class="line">    prev_ma10    = hist_data[<span class="string">&#x27;MA10&#x27;</span>].iloc[-<span class="number">2</span>]</span><br><span class="line">    </span><br><span class="line">    ma_condition_met = (current_ma5 &gt; current_ma10) <span class="keyword">and</span> (prev_ma5 &lt;= prev_ma10)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Check 10-day average dollar volume requirement</span></span><br><span class="line">    past_10_dollar_volumes = hist_data[<span class="string">&#x27;DollarVolume&#x27;</span>].iloc[-<span class="number">11</span>:-<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(past_10_dollar_volumes) &lt; <span class="number">10</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Warning: <span class="subst">&#123;ticker&#125;</span> has fewer than 10 prior trading days, skipping MA volume condition&quot;</span>)</span><br><span class="line">        avg_dollar_vol_10 = <span class="literal">None</span></span><br><span class="line">        high_dollar_vol_condition_met = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        avg_dollar_vol_10 = past_10_dollar_volumes.mean()</span><br><span class="line">        <span class="keyword">if</span> pd.isna(avg_dollar_vol_10) <span class="keyword">or</span> avg_dollar_vol_10 == <span class="number">0</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;Warning: <span class="subst">&#123;ticker&#125;</span> has invalid 10-day average dollar volume (<span class="subst">&#123;avg_dollar_vol_10&#125;</span>), skipping&quot;</span>)</span><br><span class="line">            high_dollar_vol_condition_met = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high_dollar_vol_condition_met = avg_dollar_vol_10 &gt; <span class="number">50_000_000</span></span><br><span class="line"></span><br><span class="line">    ma_and_volume_condition_met = ma_condition_met <span class="keyword">and</span> high_dollar_vol_condition_met</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (dollar_vol_condition_met, avg_dollar_vol_60, </span><br><span class="line">            ma_and_volume_condition_met, current_dollar_volume, </span><br><span class="line">            avg_dollar_vol_10, ratio)</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Scanning and result organization</p>
+<p>Traverse the stock list, call <code>get_stock_data</code> for analysis, and collect the results that meet the conditions.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">scan_stocks</span>(<span class="params">stock_list</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Iterate through the stock list and collect symbols that meet the screening conditions</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    volume_results = []</span><br><span class="line">    ma_results = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> ticker <span class="keyword">in</span> stock_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            vol_met, avg_vol_60, ma_met, current_vol, avg_dollar_vol_10, ratio = get_stock_data(ticker)</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> vol_met <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> avg_vol_60 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> ratio <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">                volume_results.append(&#123;</span><br><span class="line">                    <span class="string">&#x27;Symbol&#x27;</span>: ticker,</span><br><span class="line">                    <span class="string">&#x27;Current Dollar Volume&#x27;</span>: <span class="string">f&quot;$<span class="subst">&#123;current_vol:,<span class="number">.2</span>f&#125;</span>&quot;</span>,</span><br><span class="line">                    <span class="string">&#x27;60-Day Avg Dollar Volume&#x27;</span>: <span class="string">f&quot;$<span class="subst">&#123;avg_vol_60:,<span class="number">.2</span>f&#125;</span>&quot;</span>,</span><br><span class="line">                    <span class="string">&#x27;Ratio (Current / 60-Day Avg)&#x27;</span>: <span class="string">f&quot;<span class="subst">&#123;ratio:<span class="number">.2</span>f&#125;</span>x&quot;</span></span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">f&quot;Found volume surge stock: <span class="subst">&#123;ticker&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> ma_met <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> avg_dollar_vol_10 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">                ma_results.append(&#123;</span><br><span class="line">                    <span class="string">&#x27;Symbol&#x27;</span>: ticker,</span><br><span class="line">                    <span class="string">&#x27;Avg Dollar Volume (10-day)&#x27;</span>: <span class="string">f&quot;$<span class="subst">&#123;avg_dollar_vol_10:,<span class="number">.2</span>f&#125;</span>&quot;</span></span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">f&quot;Found MA golden cross + high volume stock: <span class="subst">&#123;ticker&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;Error processing <span class="subst">&#123;ticker&#125;</span>: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">    <span class="comment"># Convert to DataFrame and sort by volume descending</span></span><br><span class="line">    df_volumes = pd.DataFrame(volume_results)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> df_volumes.empty:</span><br><span class="line">        df_volumes[<span class="string">&#x27;sort_key&#x27;</span>] = df_volumes[<span class="string">&#x27;Current Dollar Volume&#x27;</span>].<span class="built_in">str</span>.replace(<span class="string">r&#x27;[\$,]&#x27;</span>, <span class="string">&#x27;&#x27;</span>, regex=<span class="literal">True</span>).astype(<span class="built_in">float</span>)</span><br><span class="line">        df_volumes = df_volumes.sort_values(<span class="string">&#x27;sort_key&#x27;</span>, ascending=<span class="literal">False</span>)\</span><br><span class="line">                               .drop(<span class="string">&#x27;sort_key&#x27;</span>, axis=<span class="number">1</span>)\</span><br><span class="line">                               .reset_index(drop=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    df_mas = pd.DataFrame(ma_results)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> df_mas.empty:</span><br><span class="line">        df_mas[<span class="string">&#x27;sort_key&#x27;</span>] = df_mas[<span class="string">&#x27;Avg Dollar Volume (10-day)&#x27;</span>].<span class="built_in">str</span>.replace(<span class="string">r&#x27;[\$,]&#x27;</span>, <span class="string">&#x27;&#x27;</span>, regex=<span class="literal">True</span>).astype(<span class="built_in">float</span>)</span><br><span class="line">        df_mas = df_mas.sort_values(<span class="string">&#x27;sort_key&#x27;</span>, ascending=<span class="literal">False</span>)\</span><br><span class="line">                       .drop(<span class="string">&#x27;sort_key&#x27;</span>, axis=<span class="number">1</span>)\</span><br><span class="line">                       .reset_index(drop=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> df_volumes, df_mas</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>HTML Email Generation &amp; Sending</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">send_email</span>(<span class="params">df_volume_results, df_ma_results</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Format the scan results as HTML and send via email</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    html_content = <span class="string">f&quot;&lt;h2&gt;NASDAQ After-Hours Scan Results - <span class="subst">&#123;pd.Timestamp.now().strftime(<span class="string">&#x27;%Y-%m-%d&#x27;</span>)&#125;</span>&lt;/h2&gt;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> df_volume_results.empty:</span><br><span class="line">        html_content += <span class="string">&quot;&lt;h3&gt;1. Volume Surge Stocks&lt;/h3&gt;&lt;p&gt;No stocks found with today&#x27;s volume &gt; 2× 60-day average&lt;/p&gt;&quot;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        html_content += <span class="string">&quot;&lt;h3&gt;1. Volume Surge Stocks (sorted by current day dollar volume)&lt;/h3&gt;&quot;</span></span><br><span class="line">        html_content += df_volume_results.to_html(index=<span class="literal">False</span>, table_id=<span class="string">&quot;volume_results&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> df_ma_results.empty:</span><br><span class="line">        html_content += <span class="string">&quot;&lt;h3&gt;2. MA5 Crosses Above MA10 + 10-day Avg &gt; $50M&lt;/h3&gt;&lt;p&gt;No matching stocks today&lt;/p&gt;&quot;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        html_content += <span class="string">&quot;&lt;h3&gt;2. MA5 Crosses Above MA10 + 10-day Avg &gt; $50M (sorted by 10-day avg volume)&lt;/h3&gt;&quot;</span></span><br><span class="line">        html_content += df_ma_results.to_html(index=<span class="literal">False</span>, table_id=<span class="string">&quot;ma_results&quot;</span>)</span><br><span class="line"></span><br><span class="line">    message = MIMEMultipart(<span class="string">&quot;alternative&quot;</span>)</span><br><span class="line">    message[<span class="string">&quot;Subject&quot;</span>] = <span class="string">f&quot;NASDAQ Scan Report - <span class="subst">&#123;pd.Timestamp.now().strftime(<span class="string">&#x27;%Y-%m-%d&#x27;</span>)&#125;</span>&quot;</span></span><br><span class="line">    message[<span class="string">&quot;From&quot;</span>] = SENDER_EMAIL</span><br><span class="line">    message[<span class="string">&quot;To&quot;</span>] = RECIPIENT_EMAIL</span><br><span class="line"></span><br><span class="line">    part = MIMEText(html_content, <span class="string">&quot;html&quot;</span>)</span><br><span class="line">    message.attach(part)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">with</span> smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) <span class="keyword">as</span> server:</span><br><span class="line">            server.login(SENDER_EMAIL, SENDER_PASSWORD)</span><br><span class="line">            server.sendmail(SENDER_EMAIL, RECIPIENT_EMAIL, message.as_string())</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Email sent successfully&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Email sending failed: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Main Entry Point</p>
+<p>Connect all the steps.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Main execution entry point - coordinates the entire scanning process</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Downloading NASDAQ symbol list...&quot;</span>)</span><br><span class="line">    stock_symbols = get_nasdaq_symbols()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> stock_symbols:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Failed to obtain stock symbol list. Terminating execution.&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Starting scan of <span class="subst">&#123;<span class="built_in">len</span>(stock_symbols)&#125;</span> NASDAQ symbols...&quot;</span>)</span><br><span class="line">    results_df_volumes, results_df_mas = scan_stocks(stock_symbols)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Scan completed. Preparing and sending email report...&quot;</span>)</span><br><span class="line">    send_email(results_df_volumes, results_df_mas)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Script execution finished.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h5 id="GitHub-Repository-Secrets-Setup">GitHub Repository &amp; Secrets Setup</h5>
+<ol>
+<li>
+<p>Create Repository</p>
+<p>Upload the main script (e.g. <code>stock_scanner.py</code>) to the GitHub repository.</p>
+</li>
+<li>
+<p>Configure Repository Secrets</p>
+<p>To securely store email credentials:</p>
+<ul>
+<li>Go to repository → Settings → Secrets and variables → Actions</li>
+<li>Create an environment named e.g. <code>scan_env</code></li>
+<li>Add secrets under this environment:<code> EMAIL_NAME</code>, <code>EMAIL_PASSWORD</code>, <code>RECIPIENT_EMAIL</code></li>
+</ul>
+<img src="image-20260112013315265.png" alt="secrets-config" style="zoom:33%;" />
+</li>
+<li>
+<p>GitHub Actions Workflow</p>
+<p>Create file <code>.github/workflows/stock_scan.yml</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Run</span> <span class="string">Stock</span> <span class="string">Scanner</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">schedule:</span></span><br><span class="line">    <span class="comment"># 6:00 AM Beijing time Tue-Sat (UTC 22:00 Mon-Fri)</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">cron:</span> <span class="string">&#x27;0 22 * * 1-5&#x27;</span></span><br><span class="line">  <span class="attr">workflow_dispatch:</span>       <span class="comment"># Allow manual trigger</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">run-script:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">environment:</span> <span class="string">scan_env</span>   <span class="comment"># Use the environment you created</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">repository</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Set</span> <span class="string">up</span> <span class="string">Python</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/setup-python@v5</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">python-version:</span> <span class="string">&#x27;3.x&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">dependencies</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        python -m pip install --upgrade pip</span></span><br><span class="line"><span class="string">        pip install -r requirements.txt</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Run</span> <span class="string">Python</span> <span class="string">script</span></span><br><span class="line">      <span class="attr">env:</span></span><br><span class="line">        <span class="attr">EMAIL_PASSWORD:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.EMAIL_PASSWORD</span> <span class="string">&#125;&#125;</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line">        <span class="string">python</span> <span class="string">stock_scanner.py</span></span><br></pre></td></tr></table></figure>
+<p>And create <code>requirements.txt</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pandas</span><br><span class="line">requests</span><br><span class="line">yfinance</span><br><span class="line">numpy</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Deployment &amp; Execution</p>
+<p>Push all files (<code>stock_scanner.py</code>, .<code>github/workflows/stock_scan.yml</code>, <code>requirements.txt</code>) to GitHub.</p>
+<p>Go to the “Actions” tab in your repository — you should see the “Run Stock Scanner” workflow. It will run automatically according to the schedule, or you can trigger it manually with the “Run workflow” button.</p>
+<img src="image-20260112013624232.png" alt="run-action" style="zoom:50%;" /></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2026/01/11/stock-scanner/" title="Building an Automated NASDAQ Stock Scanner: From Setup to Deployment">https://wywwwwei.github.io/2026/01/11/stock-scanner/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/TinyJoy/" rel="tag"># TinyJoy</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/02/01/bandwidth-cost/" rel="prev" title="Optimizing Bandwidth Costs for Short Video Downloads">
+                  <i class="fa fa-angle-left"></i> Optimizing Bandwidth Costs for Short Video Downloads
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
