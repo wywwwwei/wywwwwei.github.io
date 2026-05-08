@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="A practical guide to iOS build time optimization — from Clang Modules and Swift incremental compilation to modularization">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS Build Time Optimization - From Clang Modules to Incremental Compilation">
+<meta property="og:url" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="A practical guide to iOS build time optimization — from Clang Modules and Swift incremental compilation to modularization">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-01-build-timing-summary.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-03-build-time-trend.jpg">
+<meta property="og:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-08-swift-compile-flow-2.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-08-swift-compile-flow.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-09-modularization.jpg">
+<meta property="og:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-10-before-after.png">
+<meta property="article:published_time" content="2025-04-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-08T18:39:59.202Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Optimization">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/fig-01-build-timing-summary.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2025/05/01/ios-build-optimization/","path":"2025/05/01/ios-build-optimization/","title":"iOS Build Time Optimization - From Clang Modules to Incremental Compilation"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>iOS Build Time Optimization - From Clang Modules to Incremental Compilation | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">1. Why Builds Get Slow</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">2. Measuring Build Time</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Built-in-Tools-in-Xcode"><span class="nav-number">2.0.1.</span> <span class="nav-text">2.1 Built-in Tools in Xcode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Finding-Slow-Files-and-Functions"><span class="nav-number">2.0.2.</span> <span class="nav-text">2.2 Finding Slow Files and Functions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Tracking-Build-Time-in-CI"><span class="nav-number">2.0.3.</span> <span class="nav-text">2.3 Tracking Build Time in CI</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">3. Breaking Down the Build Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Four-Stages-of-Compilation"><span class="nav-number">3.0.1.</span> <span class="nav-text">3.1 Four Stages of Compilation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Where-Does-Build-Time-Go"><span class="nav-number">3.0.2.</span> <span class="nav-text">3.2 Where Does Build Time Go?</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">4. Clang Modules Optimization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-The-Problem-with-Traditional-import"><span class="nav-number">4.0.1.</span> <span class="nav-text">4.1 The Problem with Traditional #import</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-How-Clang-Modules-Work"><span class="nav-number">4.0.2.</span> <span class="nav-text">4.2 How Clang Modules Work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Practical-Steps"><span class="nav-number">4.0.3.</span> <span class="nav-text">4.3 Practical Steps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-Common-Pitfalls"><span class="nav-number">4.0.4.</span> <span class="nav-text">4.4 Common Pitfalls</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">5. Swift Incremental Compilation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Why-Swift-Builds-Slower-Than-Objective-C"><span class="nav-number">5.0.1.</span> <span class="nav-text">5.1 Why Swift Builds Slower Than Objective-C</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-How-Incremental-Compilation-Works"><span class="nav-number">5.0.2.</span> <span class="nav-text">5.2 How Incremental Compilation Works</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-Making-Incremental-Compilation-Actually-Work"><span class="nav-number">5.0.3.</span> <span class="nav-text">5.3 Making Incremental Compilation Actually Work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-Choosing-Build-Modes"><span class="nav-number">5.0.4.</span> <span class="nav-text">5.4 Choosing Build Modes</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">6.</span> <span class="nav-text">6. Source-Level Build Optimization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-Header-Dependency-Management"><span class="nav-number">6.0.1.</span> <span class="nav-text">6.1 Header Dependency Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-Compiler-Friendly-Swift-Code"><span class="nav-number">6.0.2.</span> <span class="nav-text">6.2 Compiler-Friendly Swift Code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-Debug-Configuration-Speedups"><span class="nav-number">6.0.3.</span> <span class="nav-text">6.3 Debug Configuration Speedups</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">7.</span> <span class="nav-text">7. Project Structure Optimization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-Modularization"><span class="nav-number">7.0.1.</span> <span class="nav-text">7.1 Modularization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-Eliminate-%E2%80%9CGod-Modules%E2%80%9D"><span class="nav-number">7.0.2.</span> <span class="nav-text">7.2 Eliminate “God Modules”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-Dependency-Direction-Control"><span class="nav-number">7.0.3.</span> <span class="nav-text">7.3 Dependency Direction Control</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">8.</span> <span class="nav-text">8. Link Phase Optimization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-Why-Linking-Is-Slow"><span class="nav-number">8.0.1.</span> <span class="nav-text">8.1 Why Linking Is Slow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-Optimization-Techniques"><span class="nav-number">8.0.2.</span> <span class="nav-text">8.2 Optimization Techniques</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">9.</span> <span class="nav-text">9. CI Pipeline Optimization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-Build-Caching-ccache-sccache"><span class="nav-number">9.0.1.</span> <span class="nav-text">9.1 Build Caching (ccache &#x2F; sccache)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-2-Split-Build-Tasks"><span class="nav-number">9.0.2.</span> <span class="nav-text">9.2 Split Build Tasks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-3-Build-Caching-and-Remote-Build"><span class="nav-number">9.0.3.</span> <span class="nav-text">9.3 Build Caching and Remote Build</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">10.</span> <span class="nav-text">10. Tools and Observability Summary</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">11.</span> <span class="nav-text">11. Real-World Case Study</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#11-1-Baseline"><span class="nav-number">11.0.1.</span> <span class="nav-text">11.1 Baseline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-2-Optimization-Steps"><span class="nav-number">11.0.2.</span> <span class="nav-text">11.2 Optimization Steps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-3-Key-Metrics"><span class="nav-number">11.0.3.</span> <span class="nav-text">11.3 Key Metrics</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">12.</span> <span class="nav-text">12. Best Practices Checklist</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">13.</span> <span class="nav-text">13. Conclusion</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">14.</span> <span class="nav-text">14. References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="iOS Build Time Optimization - From Clang Modules to Incremental Compilation | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS Build Time Optimization - From Clang Modules to Incremental Compilation
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-05-01 00:00:00" itemprop="dateCreated datePublished" datetime="2025-05-01T00:00:00+08:00">2025-05-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Application/" itemprop="url" rel="index"><span itemprop="name">Application</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>9 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>In large iOS projects, a clean build can easily take 10–20 minutes. A single bad commit can block the entire team in CI.</p>
+<p>This article walks through build system fundamentals and practical optimization techniques, with a real goal: reduce clean build time from 12 minutes to under 3 minutes, and incremental builds to under 40 seconds.</p>
+<hr>
+<h1>1. Why Builds Get Slow</h1>
+<ul>
+<li>Slow builds in large iOS projects are rarely caused by a single issue. It’s usually a combination of factors:
+<ul>
+<li><strong>Large codebase</strong>: hundreds of thousands of lines, thousands of files</li>
+<li><strong>Complex dependencies</strong>: deeply nested headers; a change in a common header can trigger widespread recompilation</li>
+<li><strong>Mixed languages</strong>: Objective-C and Swift bridging, different compiler behaviors</li>
+<li><strong>Linking overhead</strong>: large numbers of static libraries and symbols</li>
+</ul>
+</li>
+</ul>
+<p>Before doing any optimization, there’s one critical step: <strong>Measure</strong>.</p>
+<hr>
+<h1>2. Measuring Build Time</h1>
+<p>Optimizing without data is guesswork. Start by establishing a baseline.</p>
+<h3 id="2-1-Built-in-Tools-in-Xcode">2.1 Built-in Tools in Xcode</h3>
+<p>The quickest way is Xcode’s Build Timing Summary:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Menu Bar → Product → Perform Action → Build With Timing Summary</span><br></pre></td></tr></table></figure>
+<p>Or via CLI:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">xcodebuild -workspace MyApp.xcworkspace \</span><br><span class="line">           -scheme MyApp \</span><br><span class="line">           -configuration Debug \</span><br><span class="line">           -destination <span class="string">&#x27;platform=iOS Simulator,name=iPhone 16&#x27;</span> \</span><br><span class="line">           clean build \</span><br><span class="line">           OTHER_SWIFT_FLAGS=<span class="string">&quot;-Xfrontend -debug-time-function-bodies&quot;</span> \</span><br><span class="line">           -showBuildTimingSummary 2&gt;&amp;1 | <span class="built_in">tee</span> build_log.txt</span><br></pre></td></tr></table></figure>
+<p>The output is shown approximately as follows, which allows you to quickly locate the most time-consuming compilation stage.</p>
+<blockquote>
+<p>The diagram is only a small demo for demonstration purposes</p>
+</blockquote>
+<img src="fig-01-build-timing-summary.png" alt="Build Timing Summary Example" style="zoom: 50%;" />
+<h3 id="2-2-Finding-Slow-Files-and-Functions">2.2 Finding Slow Files and Functions</h3>
+<p>Swift compiler flags provide fine-grained diagnostics:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Print compilation time for each function</span></span><br><span class="line">-Xfrontend -debug-time-function-bodies</span><br><span class="line"></span><br><span class="line"><span class="comment"># Print type-checking time for each expression</span></span><br><span class="line">-Xfrontend -debug-time-expression-type-checking</span><br></pre></td></tr></table></figure>
+<p>Sort the output to get the 20 slowest functions:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Extract and show the top 20 slowest items</span></span><br><span class="line">grep -E <span class="string">&quot;^[0-9.]+ms&quot;</span> build_log.txt | <span class="built_in">sort</span> -t<span class="string">&#x27;m&#x27;</span> -k1 -rn | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>If a Swift function takes over 100ms to type-check, it’s usually worth simplifying.</p>
+</blockquote>
+<h3 id="2-3-Tracking-Build-Time-in-CI">2.3 Tracking Build Time in CI</h3>
+<p>In a team setting, it’s a good idea to include build time as a metric in your CI pipeline:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Record build time in CI scripts</span></span><br><span class="line">START_TIME=$(<span class="built_in">date</span> +%s)</span><br><span class="line">xcodebuild ... build</span><br><span class="line">END_TIME=$(<span class="built_in">date</span> +%s)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Build time: <span class="subst">$((END_TIME - START_TIME)</span>) seconds&quot;</span> &gt;&gt; build_stats.csv</span><br></pre></td></tr></table></figure>
+<p>Over time, you can visualize this data to track trends in build performance.</p>
+<p>Before optimization:</p>
+<img src="fig-03-build-time-trend.jpg" alt="Build time trend" style="zoom: 33%;" />
+<hr>
+<h1>3. Breaking Down the Build Pipeline</h1>
+<p>Before optimizing, understand what the compiler actually does.</p>
+<h3 id="3-1-Four-Stages-of-Compilation">3.1 Four Stages of Compilation</h3>
+<p>Both Objective-C and Swift compilation can be abstracted into the following stages:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Source (.m / .swift)</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐</span><br><span class="line">│ Preprocess   │───▶│   Compile    │───▶│   Assemble   │───▶│     Link     │</span><br><span class="line">└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘</span><br><span class="line">                                              │                     │</span><br><span class="line">                                              ▼                     ▼</span><br><span class="line">                                           .o files          Executable</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Objective-C</strong> is handled by the Clang compiler</li>
+<li><strong>Swift</strong> is handled by the Swift Compiler (which includes an internal SIL optimization pass)</li>
+<li>Both converge at the <strong>Link</strong> stage</li>
+</ul>
+<h3 id="3-2-Where-Does-Build-Time-Go">3.2 Where Does Build Time Go?</h3>
+<p>Based on real-world project experience, build time is roughly distributed as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Share</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Header Parsing</td>
+<td>~40%</td>
+<td>Recursive header expansion; redundant parsing is the biggest cost</td>
+</tr>
+<tr>
+<td>Code Generation (Compile)</td>
+<td>~30%</td>
+<td>Includes Swift type checking, SIL optimization, etc.</td>
+</tr>
+<tr>
+<td>Linking</td>
+<td>~20%</td>
+<td>Especially noticeable in large projects</td>
+</tr>
+<tr>
+<td>Other</td>
+<td>~10%</td>
+<td>Resource processing, copying, etc.</td>
+</tr>
+</tbody>
+</table>
+<p>The core takeaway:</p>
+<blockquote>
+<p><strong>Redundant parsing + dependency explosion = slow builds</strong></p>
+</blockquote>
+<p>This is exactly what Clang Modules and incremental compilation are designed to solve.</p>
+<hr>
+<h1>4. Clang Modules Optimization</h1>
+<h3 id="4-1-The-Problem-with-Traditional-import">4.1 The Problem with Traditional #import</h3>
+<p>In the traditional approach, every time the compiler encounters an <code>#import</code>, it recursively expands the header file:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">A.m</span><br><span class="line"> └── #import &quot;A.h&quot;</span><br><span class="line">      └── #import &quot;B.h&quot;</span><br><span class="line">           └── #import &quot;C.h&quot;</span><br><span class="line">                └── #import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">                     └── ... (hundreds of headers)</span><br></pre></td></tr></table></figure>
+<p>If <code>Foundation.h</code> is expanded 50 times in a single compilation unit, the compiler parses the exact same content 50 times.</p>
+<h3 id="4-2-How-Clang-Modules-Work">4.2 How Clang Modules Work</h3>
+<p>Clang Modules introduce a new mechanism: <strong>compiling modules into binary cache files (.pcm)</strong>.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">First build:</span><br><span class="line">  Foundation.framework → compiled → Foundation.pcm (cached)</span><br><span class="line"></span><br><span class="line">Subsequent builds:</span><br><span class="line">  @import Foundation → load Foundation.pcm directly (skip parsing)</span><br></pre></td></tr></table></figure>
+<p>Key features:</p>
+<ul>
+<li><strong>Parsed only once</strong> — subsequent builds load the precompiled module cache</li>
+<li><strong>Semantic-level imports</strong> — no longer relies on textual substitution</li>
+<li>Automatic dependency management between modules</li>
+</ul>
+<h3 id="4-3-Practical-Steps">4.3 Practical Steps</h3>
+<p><strong>Enable Modules</strong>: Confirm the following settings in Xcode:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Build Settings → Enable Modules (C and Objective-C) = YES</span><br><span class="line">Build Settings → Link Frameworks Automatically = YES</span><br></pre></td></tr></table></figure>
+<p><strong>Use @import instead of #import</strong>:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Traditional</span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Modules style</span></span><br><span class="line"><span class="keyword">@import</span> <span class="built_in">UIKit</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>Reduce Umbrella Header Size</strong>: Many third-party libraries have umbrella headers that import all headers at once, causing unnecessary dependency bloat. Import only the modules you actually use.</p>
+<h3 id="4-4-Common-Pitfalls">4.4 Common Pitfalls</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Symptom</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Macro pollution</td>
+<td>Macros defined in module headers cause modules to fail</td>
+<td>Move macro definitions to non-module headers</td>
+</tr>
+<tr>
+<td>Private header exposure</td>
+<td>Private modules declared in <code>.modulemap</code> are not properly isolated</td>
+<td>Strictly separate Public / Private headers</td>
+</tr>
+<tr>
+<td>Unstable Module Cache</td>
+<td>Cache path conflicts in CI environments</td>
+<td>Set a dedicated <code>MODULE_CACHE_DIR</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1>5. Swift Incremental Compilation</h1>
+<h3 id="5-1-Why-Swift-Builds-Slower-Than-Objective-C">5.1 Why Swift Builds Slower Than Objective-C</h3>
+<p>The Swift compiler adds several extra stages compared to Clang:</p>
+<img src="fig-08-swift-compile-flow-2.png" alt="swift compile flow" style="zoom:40%;" />
+<img src="fig-08-swift-compile-flow.png" alt="swift compile flow" style="zoom:70%;" />
+<ul>
+<li><strong>Sema (Semantic Analysis)</strong>: type inference, protocol conformance checking — complex generics cause time to spike</li>
+<li><strong>SIL Optimization</strong>: Swift Intermediate Language optimization — in Whole Module Optimization mode, all files are analyzed together</li>
+<li><strong>IR Generation + LLVM</strong>: shares the backend with ObjC, but has more upfront overhead</li>
+</ul>
+<h3 id="5-2-How-Incremental-Compilation-Works">5.2 How Incremental Compilation Works</h3>
+<p>Swift’s incremental compilation is based on a <strong>file dependency graph</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Modify FileA.swift</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">Analyze FileA&#x27;s dependency graph</span><br><span class="line">    │</span><br><span class="line">    ├── Files directly depending on FileA → recompile</span><br><span class="line">    │       └── Files indirectly depending → recompile</span><br><span class="line">    └── All other files → use cache, skip</span><br></pre></td></tr></table></figure>
+<p>The Swift compiler maintains a <code>.swiftdeps</code> file in the build directory, recording each source file’s dependencies. When a file is modified, only the files in the dependency chain are recompiled.</p>
+<p><strong>But incremental compilation breaks easily</strong> — modifying a widely-referenced public protocol or type can cause nearly every file to be recompiled.</p>
+<h3 id="5-3-Making-Incremental-Compilation-Actually-Work">5.3 Making Incremental Compilation Actually Work</h3>
+<p><strong>Control dependency scope</strong>:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bad: modifying LoginUser causes all files referencing it to recompile</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">LoginUser</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">var</span> avatar: <span class="type">URL</span></span><br><span class="line">    <span class="keyword">var</span> level: <span class="type">Int</span></span><br><span class="line">    <span class="comment">// ... 20 more fields</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Better: split by usage, reduce coupling surface</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">UserProfile</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">var</span> avatar: <span class="type">URL</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">UserLevel</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> level: <span class="type">Int</span></span><br><span class="line">    <span class="keyword">var</span> badges: [<span class="type">Badge</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Avoid behaviors that break incremental compilation</strong>:</p>
+<ul>
+<li>Modifying a public <code>protocol</code> definition → all conformers recompile</li>
+<li>Modifying the public API of a heavily-imported module → entire module cascades</li>
+<li>Defining too many <code>extension</code>s in one file → excessive dependency fan-out</li>
+</ul>
+<p><strong>Splitting modules</strong> is the ultimate approach: decompose a single target into multiple frameworks / SPM modules, with clear interfaces between them. Modifying one module won’t trigger recompilation of others.</p>
+<h3 id="5-4-Choosing-Build-Modes">5.4 Choosing Build Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Recommended Setting</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debug</td>
+<td>Incremental Compilation</td>
+<td>Fast iteration; only recompile what changed</td>
+</tr>
+<tr>
+<td>Debug</td>
+<td>Whole Module Optimization = NO</td>
+<td>Disable global optimization to speed up builds</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>Whole Module Optimization = YES</td>
+<td>Trade build time for runtime performance</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>Optimization Level = <code>-O</code></td>
+<td>Enable LLVM optimizations</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1>6. Source-Level Build Optimization</h1>
+<h3 id="6-1-Header-Dependency-Management">6.1 Header Dependency Management</h3>
+<p><strong>Use Forward Declarations</strong>:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bad: #import introduces unnecessary compile-time dependency</span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;UserModel.h&quot;</span></span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ChatViewController</span> : <span class="title">UIViewController</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) UserModel *user;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Good: forward declaration, don&#x27;t import UserModel.h in the header</span></span><br><span class="line"><span class="class"><span class="keyword">@class</span> <span class="title">UserModel</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ChatViewController</span> : <span class="title">UIViewController</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) UserModel *user;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="comment">// #import &quot;UserModel.h&quot; goes in the .m file</span></span><br></pre></td></tr></table></figure>
+<p><strong>Reduce #import Depth</strong>: The number of <code>#import</code> directives in a header directly determines that file’s compilation cost. Periodically audit header include graphs and clean up unnecessary dependencies.</p>
+<h3 id="6-2-Compiler-Friendly-Swift-Code">6.2 Compiler-Friendly Swift Code</h3>
+<p><strong>Control Type Inference Complexity</strong>:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bad: complex chained calls — the compiler must infer each layer&#x27;s type</span></span><br><span class="line"><span class="keyword">let</span> result <span class="operator">=</span> items.filter &#123; <span class="variable">$0</span>.isValid &#125;</span><br><span class="line">                  .map &#123; <span class="variable">$0</span>.name &#125;</span><br><span class="line">                  .sorted()</span><br><span class="line">                  .joined(separator: <span class="string">&quot;, &quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Good: explicit type annotations reduce compiler burden</span></span><br><span class="line"><span class="keyword">let</span> filtered: [<span class="type">Item</span>] <span class="operator">=</span> items.filter &#123; <span class="variable">$0</span>.isValid &#125;</span><br><span class="line"><span class="keyword">let</span> names: [<span class="type">String</span>] <span class="operator">=</span> filtered.map(\.name)</span><br><span class="line"><span class="keyword">let</span> sorted: [<span class="type">String</span>] <span class="operator">=</span> names.sorted()</span><br><span class="line"><span class="keyword">let</span> result: <span class="type">String</span> <span class="operator">=</span> sorted.joined(separator: <span class="string">&quot;, &quot;</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>Watch Out for Compile-Time Bombs</strong>: Overly long <code>switch</code> statements, deeply nested closures, and enums with many associated values can all cause type-checking time to spike.</p>
+<h3 id="6-3-Debug-Configuration-Speedups">6.3 Debug Configuration Speedups</h3>
+<p>In Debug mode, several settings can significantly reduce build time:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># Only build the active architecture (enabled by default — confirm it&#x27;s not turned off)</span><br><span class="line">Build Active Architecture Only = YES</span><br><span class="line"></span><br><span class="line"># Disable dSYM generation in Debug</span><br><span class="line">Debug Information Format = DWARF (not DWARF with dSYM File)</span><br><span class="line"></span><br><span class="line"># Disable Bitcode (no need to worry if already deprecated)</span><br><span class="line">Enable Bitcode = NO</span><br></pre></td></tr></table></figure>
+<hr>
+<h1>7. Project Structure Optimization</h1>
+<p>This is the most effective — but also the most costly — optimization approach.</p>
+<h3 id="7-1-Modularization">7.1 Modularization</h3>
+<p>Split a monolithic project into independent modules:</p>
+<img src="fig-09-modularization.jpg" alt="Modular architecture diagram" style="zoom:50%;" />
+<p>Key benefits:</p>
+<ul>
+<li><strong>Reduced compile dependencies</strong>: modifying Feature Chat only recompiles the Chat module, without affecting Feed</li>
+<li><strong>Higher incremental build hit rate</strong>: module boundaries are compilation boundaries</li>
+<li><strong>Parallel compilation</strong>: independent modules can be compiled in parallel</li>
+</ul>
+<h3 id="7-2-Eliminate-“God-Modules”">7.2 Eliminate “God Modules”</h3>
+<p>Check whether your project has a “God Module” — typically a <code>Common</code> or <code>Utils</code> module that is depended on by a huge number of files. Every modification triggers widespread recompilation.</p>
+<p>Solution:</p>
+<ul>
+<li>Split into smaller modules by responsibility (<code>UIUtils</code>, <code>NetworkUtils</code>, <code>Foundation+</code>, etc.)</li>
+<li>Avoid placing business types in shared modules</li>
+</ul>
+<h3 id="7-3-Dependency-Direction-Control">7.3 Dependency Direction Control</h3>
+<p>Keep module dependencies unidirectional and avoid circular dependencies:</p>
+<p>Correct: App → Feature → Core → Infrastructure</p>
+<p>Wrong: Feature A ↔ Feature B (circular dependency)</p>
+<p>Circular dependencies not only break architectural clarity, they also prevent the compiler from building the two modules in parallel.</p>
+<hr>
+<h1>8. Link Phase Optimization</h1>
+<h3 id="8-1-Why-Linking-Is-Slow">8.1 Why Linking Is Slow</h3>
+<p>The core task of the linking phase is <strong>symbol resolution</strong>: resolving symbol references in each <code>.o</code> file to actual addresses and merging everything into a single executable.</p>
+<p>In large projects, linking can account for over 20% of total build time, due to:</p>
+<ul>
+<li>A large number of static libraries (<code>.a</code> files) that need to be merged</li>
+<li>Massive symbol tables</li>
+<li>C++ template instantiation generating many weak symbols</li>
+</ul>
+<h3 id="8-2-Optimization-Techniques">8.2 Optimization Techniques</h3>
+<p><strong>Dynamic vs Static Libraries — the Trade-off</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Build Time</th>
+<th>Launch Time</th>
+<th>Binary Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Static</td>
+<td>Slow (merged at link time)</td>
+<td>Fast</td>
+<td>Supports Dead Code Stripping</td>
+</tr>
+<tr>
+<td>Dynamic</td>
+<td>Fast (compiled and linked independently)</td>
+<td>Slow (loaded at runtime)</td>
+<td>Cannot be stripped</td>
+</tr>
+</tbody>
+</table>
+<p>For fast iteration during development, consider switching some large modules to dynamic library integration to reduce link time.</p>
+<p><strong>Enable Dead Code Stripping</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Build Settings → Dead Code Stripping = YES</span><br></pre></td></tr></table></figure>
+<p>This tells the linker to remove unreferenced code, reducing both final binary size and link workload.</p>
+<p><strong>Reduce the Number of Object Files</strong>: Merging overly small source files (having one file per class for a 20-line class is over-splitting) can reduce the number of inputs to the linker.</p>
+<hr>
+<h1>9. CI Pipeline Optimization</h1>
+<p>CI environments differ fundamentally from local development: <strong>there is no cache</strong>. This means every build is close to a full clean build.</p>
+<h3 id="9-1-Build-Caching-ccache-sccache">9.1 Build Caching (ccache / sccache)</h3>
+<p>ccache can cache compilation artifacts — when source files haven’t changed, the cache is used directly:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Install</span></span><br><span class="line">brew install ccache</span><br><span class="line"></span><br><span class="line"><span class="comment"># Configure in Xcode</span></span><br><span class="line">Build Settings → CC = /usr/local/bin/ccache</span><br><span class="line">Build Settings → CXX = /usr/local/bin/ccache</span><br></pre></td></tr></table></figure>
+<p>Caching strategy in CI:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># .gitlab-ci.yml example</span></span><br><span class="line"><span class="attr">cache:</span></span><br><span class="line">  <span class="attr">key:</span> <span class="string">ccache-$&#123;CI_COMMIT_REF_SLUG&#125;</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">.ccache/</span></span><br></pre></td></tr></table></figure>
+<h3 id="9-2-Split-Build-Tasks">9.2 Split Build Tasks</h3>
+<p>Split the CI pipeline into multiple stages that run in parallel:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Pipeline</span><br><span class="line">├── Build</span><br><span class="line">├── Unit Test</span><br><span class="line">├── Lint</span><br><span class="line">└── Archive</span><br></pre></td></tr></table></figure>
+<p>Build and test can run in parallel: compile a Debug build for testing while simultaneously compiling a Release build for distribution.</p>
+<h3 id="9-3-Build-Caching-and-Remote-Build">9.3 Build Caching and Remote Build</h3>
+<p>Further exploration directions:</p>
+<ul>
+<li><strong>Bazel</strong>: Google’s open-source build system, supports Remote Cache and Remote Build Execution — ideal for very large projects</li>
+<li><strong>Buck2</strong>: Meta’s open-source build system, implemented in Rust, excellent performance</li>
+</ul>
+<p>These tools have a high adoption cost and are best suited for teams with dedicated build system maintainers.</p>
+<hr>
+<h1>10. Tools and Observability Summary</h1>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Recommended Scenario</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build Timing Summary</td>
+<td>View time spent in each build phase</td>
+<td>Quick daily diagnosis</td>
+</tr>
+<tr>
+<td><code>-debug-time-function-bodies</code></td>
+<td>Find the slowest Swift functions</td>
+<td>Swift build optimization</td>
+</tr>
+<tr>
+<td><code>-debug-time-expression-type-checking</code></td>
+<td>Find the slowest expressions</td>
+<td>Generics / closure optimization</td>
+</tr>
+<tr>
+<td>BuildTimeAnalyzer (Xcode plugin)</td>
+<td>Visualize build times</td>
+<td>Graphical analysis</td>
+</tr>
+<tr>
+<td><code>xcpretty</code></td>
+<td>Format xcodebuild output</td>
+<td>CI log readability</td>
+</tr>
+<tr>
+<td><code>objc_dep.py</code> / <code>swift-dependencies</code></td>
+<td>Analyze module dependency graph</td>
+<td>Architecture governance</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1>11. Real-World Case Study</h1>
+<h3 id="11-1-Baseline">11.1 Baseline</h3>
+<p>A large iOS project (~500K lines of mixed Objective-C + Swift code). Build times before optimization:</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clean build</td>
+<td>12 min</td>
+</tr>
+<tr>
+<td>Incremental build (single file change)</td>
+<td>3~5 min</td>
+</tr>
+<tr>
+<td>CI clean build</td>
+<td>18 min</td>
+</tr>
+</tbody>
+</table>
+<h3 id="11-2-Optimization-Steps">11.2 Optimization Steps</h3>
+<p>Three rounds of optimization:</p>
+<p><strong>Round 1: Low-cost fixes (1 week)</strong></p>
+<ul>
+<li>Verified and enabled Clang Modules configuration</li>
+<li>Disabled dSYM generation in Debug</li>
+<li>Cleaned up 10+ unnecessary <code>#import</code> statements</li>
+<li>Result: clean → 10 min, incremental → 2 min</li>
+</ul>
+<p><strong>Round 2: Swift build optimization (2 weeks)</strong></p>
+<ul>
+<li>Used <code>-debug-time-function-bodies</code> to identify the Top 20 slowest functions</li>
+<li>Refactored 3 functions with overly complex type inference</li>
+<li>Fixed 2 public type changes that were breaking incremental compilation</li>
+<li>Result: clean → 8 min, incremental → 1 min</li>
+</ul>
+<p><strong>Round 3: Modularization (4 weeks)</strong></p>
+<ul>
+<li>Split the monolithic project into 20+ sub-modules (SPM packages)</li>
+<li>Established module dependency rules, prohibiting circular dependencies</li>
+<li>Result: clean → 4 min, incremental → 30~40 s</li>
+</ul>
+<img src="fig-10-before-after.png" alt="Before and after comparison" style="zoom: 50%;" />
+<h3 id="11-3-Key-Metrics">11.3 Key Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clean build</td>
+<td>12 min</td>
+<td>4 min</td>
+<td><strong>67%</strong></td>
+</tr>
+<tr>
+<td>Incremental build</td>
+<td>3~5 min</td>
+<td>30~40 s</td>
+<td><strong>80%+</strong></td>
+</tr>
+<tr>
+<td>CI build</td>
+<td>18 min</td>
+<td>7 min</td>
+<td><strong>61%</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1>12. Best Practices Checklist</h1>
+<ul>
+<li>
+<p>Enable Clang Modules, use <code>@import</code> instead of <code>#import</code></p>
+</li>
+<li>
+<p>Use forward declarations instead of header imports; limit <code>#import</code> count in <code>.h</code> files</p>
+</li>
+<li>
+<p>Disable dSYM in Debug; confirm “Build Active Architecture Only” is enabled</p>
+</li>
+<li>
+<p>Periodically scan for slowest functions with <code>-debug-time-function-bodies</code></p>
+</li>
+<li>
+<p>Avoid overly deep type inference and nested closures in Swift</p>
+</li>
+<li>
+<p>Keep module dependencies unidirectional; prohibit circular dependencies</p>
+</li>
+<li>
+<p>Regularly audit “God Modules” and split them into single-responsibility sub-modules</p>
+</li>
+<li>
+<p>Introduce build caching in CI (ccache / sccache)</p>
+</li>
+<li>
+<p>Include build time as a CI monitoring metric with alert thresholds</p>
+</li>
+</ul>
+<hr>
+<h1>13. Conclusion</h1>
+<p>Build optimization is not a one-time task — it’s an ongoing engineering practice that requires continuous maintenance. As codebases grow, without a mindset for build time governance, projects will inevitably get slower over time.</p>
+<p>The core approach can be summarized in three principles:</p>
+<ul>
+<li><strong>Measure first, then optimize</strong> — optimization without data is guesswork</li>
+<li><strong>Reduce redundant work</strong> — whether it’s module caching, incremental compilation, or ccache, the essence is making the compiler do less repeated work</li>
+<li><strong>Control dependency scope</strong> — the narrower the dependencies, the smaller the blast radius of changes, and the faster the builds</li>
+</ul>
+<p>I hope this article provides a systematic reference framework for your build optimization efforts. If you have better practices or experiences, I’d love to hear about them.</p>
+<hr>
+<h1>14. References</h1>
+<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/Modules.html">Modules — Clang 23.0.0</a></p>
+<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/PCHInternals.html">Precompiled Header and Modules Internals — Clang 23.0.0</a></p>
+<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/CommandGuide/clang.html">clang - the Clang C, C++, and Objective-C compiler — Clang 23.0.0</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/videos/play/wwdc2018/408/">Building Faster in Xcode - WWDC18 - Videos - Apple Developer</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/xcode/improving-the-speed-of-incremental-builds">Improving the speed of incremental builds | Apple Developer Documentation</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000043863817">ios - 通过 SIL 看 Swift 的方法派发 - 网易云音乐技术团队 - SegmentFault 思否</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/xcode/build-settings-reference">Build settings reference | Apple Developer Documentation</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2025/05/01/ios-build-optimization/" title="iOS Build Time Optimization - From Clang Modules to Incremental Compilation">https://wywwwwei.github.io/2025/05/01/ios-build-optimization/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Optimization/" rel="tag"># Optimization</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/02/01/bandwidth-cost/" rel="prev" title="Optimizing Bandwidth Costs for Short Video Downloads">
+                  <i class="fa fa-angle-left"></i> Optimizing Bandwidth Costs for Short Video Downloads
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/01/11/stock-scanner/" rel="next" title="Building an Automated NASDAQ Stock Scanner: From Setup to Deployment">
+                  Building an Automated NASDAQ Stock Scanner: From Setup to Deployment <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
