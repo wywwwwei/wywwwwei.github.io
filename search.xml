@@ -107,115 +107,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Player First Open Time Optimizition</title>
-    <url>/2024/10/01/VideoStartUp/</url>
-    <content><![CDATA[<p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
-<h2 id="Definition-of-First-Open-Time">Definition of First Open Time</h2>
-<p>First open time is the duration from when the user presses the “play” button (or triggers media playback) to the moment the first audio or video frame is successfully decoded and presented. It typically includes the following steps:</p>
-<ol>
-<li><strong>Request Initialization</strong>: Setting up the network request for the media resource.</li>
-<li><strong>Media Resource Loading</strong>: Downloading the initial segments of the media file.</li>
-<li><strong>Demuxing and Parsing</strong>: Extracting audio and video streams from the media container.</li>
-<li><strong>Codec Initialization</strong>: Setting up audio and video decoders.</li>
-<li><strong>Buffering</strong>: Pre-loading enough data to ensure smooth playback.</li>
-<li><strong>Rendering</strong>: Displaying the first frame or playing the first audio sample.</li>
-</ol>
-<h2 id="Step-by-Step-Breakdown-and-Optimization">Step-by-Step Breakdown and Optimization</h2>
-<h3 id="1-Request-Initialization">1. Request Initialization</h3>
-<h4 id="Process-Overview">Process Overview</h4>
-<ul>
-<li>Establishing the connection to the media server.</li>
-<li>Resolving DNS, negotiating SSL/TLS (if applicable), and sending the HTTP(S) request.</li>
-</ul>
-<h4 id="Optimization">Optimization</h4>
-<ul>
-<li><strong>DNS Pre-fetching</strong>: Resolve domain names in advance to reduce lookup time.</li>
-<li><strong>Persistent Connections</strong>: Use HTTP/2 or keep-alive connections to eliminate the need to re-establish TCP connections.</li>
-<li><strong>Edge Caching</strong>: Deploy CDN (Content Delivery Network) servers close to the user to reduce latency.</li>
-<li><strong>Reduce Redirects</strong>: Ensure direct access to the media URL to avoid unnecessary HTTP redirections.</li>
-</ul>
-<h3 id="2-Media-Resource-Loading">2. Media Resource Loading</h3>
-<h4 id="Process-Overview-2">Process Overview</h4>
-<ul>
-<li>Retrieving the initial media segments (e.g., initialization segments, first GOP for video).</li>
-</ul>
-<h4 id="Optimization-2">Optimization</h4>
-<ul>
-<li>
-<p><strong>Smaller Initialization Segments</strong>: Minimize the size of the first chunk of data required for playback.</p>
-</li>
-<li>
-<p><strong>Adaptive Bitrate (ABR)</strong>: Start playback with a lower bitrate to reduce the initial data load.</p>
-</li>
-<li>
-<p><strong>Parallel Requests</strong>: Fetch audio and video segments simultaneously to save time.</p>
-</li>
-<li>
-<p><strong>Preloading</strong>: Predict and prefetch media segments based on user behavior or autoplay scenarios.</p>
-</li>
-</ul>
-<h3 id="3-Demuxing-and-Parsing">3. Demuxing and Parsing</h3>
-<h4 id="Process-Overview-3">Process Overview</h4>
-<ul>
-<li>Splitting the media container into audio and video streams.</li>
-<li>Parsing metadata (e.g., timestamps, codec information).</li>
-</ul>
-<h4 id="Optimization-3">Optimization</h4>
-<ul>
-<li><strong>Efficient Parsers</strong>: Use highly optimized demuxing libraries to reduce processing time.</li>
-<li><strong>Streamlined Containers</strong>: Favor lightweight media containers like MP4 or WebM with minimal overhead. Placing the ‘moov’ atom at the start of the MP4 file (instead of the default location at the end) allows the player to access this critical metadata immediately, without having to download the entire file first.</li>
-<li><strong>Lazy Parsing</strong>: Parse only essential metadata needed for playback, deferring deeper parsing for later.</li>
-</ul>
-<h3 id="4-Codec-Initialization">4. Codec Initialization</h3>
-<h4 id="Process-Overview-4">Process Overview</h4>
-<ul>
-<li>Setting up decoders for audio and video based on the codec information (e.g., H.264, AAC).</li>
-</ul>
-<h4 id="Optimization-4">Optimization</h4>
-<ul>
-<li><strong>Hardware Acceleration</strong>: Leverage GPU or hardware decoders for faster codec initialization.</li>
-<li><strong>Pre-initialized Decoders</strong>: Keep decoders ready for commonly used codecs to avoid setup delays.</li>
-<li><strong>Codec Negotiation</strong>: Ensure client and server agree on the optimal codec during the handshake phase.</li>
-</ul>
-<h3 id="5-Buffering">5. Buffering</h3>
-<h4 id="Process-Overview-5">Process Overview</h4>
-<ul>
-<li>Filling the playback buffer with enough data to start playback while avoiding interruptions.</li>
-</ul>
-<h4 id="Optimization-5">Optimization</h4>
-<ul>
-<li><strong>Dynamic Buffering Thresholds</strong>: Start playback with minimal buffering for faster startup and dynamically adjust thresholds during playback.</li>
-<li><strong>Predictive Buffering</strong>: Use machine learning to predict network conditions and pre-buffer accordingly.</li>
-<li><strong>Low-Latency Protocols</strong>: Implement protocols like HTTP/3 or QUIC to reduce latency during data transfer.</li>
-</ul>
-<h3 id="6-Rendering">6. Rendering</h3>
-<h4 id="Process-Overview-6">Process Overview</h4>
-<ul>
-<li>Decoding and rendering the first frame of video or playing the first audio sample.</li>
-</ul>
-<h4 id="Optimization-6">Optimization</h4>
-<ul>
-<li><strong>Skip Unnecessary Frames</strong>: Drop non-essential frames (e.g., B-frames) during startup to prioritize the first I-frame.</li>
-<li><strong>Frame Preprocessing</strong>: Pre-decode and cache the first frame during media loading.</li>
-<li><strong>Audio-First Start</strong>: If video decoding takes longer, start with audio playback to give the illusion of faster startup.</li>
-</ul>
-<h2 id="Additional-Best-Practices">Additional Best Practices</h2>
-<h4 id="Device-Specific-Optimizations">Device-Specific Optimizations</h4>
-<p>Optimize for popular devices and browsers by identifying bottlenecks in specific platforms.</p>
-<h4 id="Graceful-Degradation">Graceful Degradation</h4>
-<p>Provide fallback mechanisms (e.g., lower resolution or audio-only playback) for users on slow networks.</p>
-<h2 id="Conclusion">Conclusion</h2>
-<p>Optimizing first open time is a multi-faceted challenge that requires improvements at every step of the media playback pipeline. By implementing the techniques outlined above, developers can significantly reduce startup delays, leading to a smoother and more engaging user experience.</p>
-<p>Reducing first open time isn’t just about technical enhancements—it’s about providing a seamless experience that keeps users coming back. With continuous monitoring and iteration, these optimizations can have a lasting impact on user satisfaction and retention.</p>
-]]></content>
-      <categories>
-        <category>Application</category>
-      </categories>
-      <tags>
-        <tag>Multimedia</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Image Processing - Image Enhancement &amp; Restoration</title>
     <url>/2024/05/03/image-processing-2/</url>
     <content><![CDATA[<h3 id="Image-Enhancement">Image Enhancement</h3>
@@ -4219,6 +4110,330 @@ vruntime_i=vruntime_i+\frac{NICE\_O\_LOAD}{weight_i}∗runtime_i
       </categories>
       <tags>
         <tag>TinyJoy</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App</title>
+    <url>/2026/08/10/ios-memory-management/</url>
+    <content><![CDATA[<p>In a modern iOS app, Swift, Rust, C++, and Kotlin may all run at once—each with a fundamentally different memory management mechanism. Memory problems in mixed-language architectures are often not about any one language being written poorly; they stem from the boundary design between languages going wrong. This article takes an operating system’s perspective to examine the essential differences between these memory models, how multiple runtimes coexist within a single process, and the real-world memory side effects—and coping strategies—in a mixed-language architecture.</p>
+<hr>
+<h3 id="1-Essential-Memory-Management-Comparison-Across-Five-Languages">1. Essential Memory Management Comparison Across Five Languages</h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Core Mechanism</th>
+<th>Runtime Involvement</th>
+<th>Safety Guarantee</th>
+<th>Typical Overhead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C++</strong></td>
+<td>Manual management + RAII + smart pointers</td>
+<td>Virtually none</td>
+<td>Weak (convention-based)</td>
+<td>Very low (controllable)</td>
+</tr>
+<tr>
+<td><strong>Objective-C</strong></td>
+<td>ARC (reference counting)</td>
+<td>Lightweight runtime</td>
+<td>Moderate</td>
+<td>Moderate (atomic operations)</td>
+</tr>
+<tr>
+<td><strong>Swift</strong></td>
+<td>ARC + value-type copying</td>
+<td>Lightweight runtime</td>
+<td>Relatively strong</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td><strong>Kotlin</strong> (JVM)</td>
+<td>Garbage collection (GC)</td>
+<td>Full JVM/ART</td>
+<td>Strong</td>
+<td>Higher (potential pauses)</td>
+</tr>
+<tr>
+<td><strong>Kotlin/Native</strong></td>
+<td>Own GC</td>
+<td>Own runtime</td>
+<td>Strong</td>
+<td>Moderately high</td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td>Ownership + borrow checking</td>
+<td>Virtually none</td>
+<td>Extremely strong (compile-time)</td>
+<td>Very low (zero-cost)</td>
+</tr>
+</tbody>
+</table>
+<p>You can think of this table as three camps. <strong>C++ / Rust</strong> push work to compile time or explicit programmer code, with the runtime barely involved in deciding whether an object is alive. <strong>Swift / Objective-C</strong> rely on the compiler to automatically insert retain/release, with the runtime providing only lightweight support (atomic reference counting, zeroing weak references, Autorelease Pool, etc.). <strong>GC-based languages like Kotlin (JVM)</strong> require a full runtime to manage the heap and perform collection.</p>
+<p>There’s a detail here that’s easy to overlook: Swift’s value types (struct, enum) are stack-allocated by default, and only heap-allocated via copy-on-write when sharing is needed. Many developers coming from Objective-C habitually assume everything lives on the heap, but Swift’s design in this regard is actually closer to C++ semantics.</p>
+<blockquote>
+<p><strong>Where does ARC’s <code>retain/release</code> cost actually come from?</strong></p>
+<p>Swift/Objective-C reference counting is <strong>atomic</strong> by default—every retain/release is an <code>atomic increment/decrement</code>, which triggers CPU cache-line synchronization in multithreaded environments. When large numbers of small objects are created and destroyed on hot paths, this overhead can accumulate to a measurable degree. This is where Rust’s zero-runtime-overhead ownership model has an advantage in extreme performance scenarios.</p>
+</blockquote>
+<hr>
+<h3 id="2-How-These-Languages-Are-Used-on-iOS">2. How These Languages Are Used on iOS</h3>
+<ul>
+<li><strong>C++ / Objective-C / Swift</strong>: Native support; can be directly mixed in compilation.</li>
+<li><strong>Kotlin</strong>: Compiled into a framework via Kotlin Multiplatform (KMP) for interoperation with Swift.</li>
+<li><strong>Rust</strong>: Compiled as a static library with <strong>UniFFI</strong>-generated bindings—a very mature approach. Mozilla components and numerous commercial SDKs use this in production.</li>
+</ul>
+<p>UniFFI’s core value: the APIs you call in Swift look nearly native, but the actual computation runs in compiled Rust machine code. However, “looks native” doesn’t mean “free”—data needs to be converted at the boundary. Numeric and boolean types are passed directly, with negligible overhead; strings are passed via a UTF-8 pointer plus length, also fine; but if you pass a deeply nested struct, UniFFI will serialize it into a byte buffer, and that temporary allocation is absolutely visible in Instruments on hot paths. Rust types exported as Objects maintain their lifecycle across the boundary via handles plus reference counting—if this part of the design isn’t handled well, I’ll get to that later.</p>
+<hr>
+<h3 id="3-What-Does-the-Operating-System-Actually-Manage">3. What Does the Operating System Actually Manage</h3>
+<p>With so many runtimes squeezed into one process, wouldn’t the OS help coordinate them? Not at all. iOS’s XNU kernel is responsible only for:</p>
+<ol>
+<li>Providing each process with an independent virtual address space</li>
+<li>Providing physical memory pages on demand (page faults)</li>
+<li>Memory permission protection</li>
+<li>Compression and Jetsam (process killing) under memory pressure</li>
+<li>Unconditionally reclaiming all memory when a process exits</li>
+</ol>
+<p>No matter how many languages and runtimes an app contains, they are just <strong>one process</strong> in the eyes of the OS. All code shares the same address space and ultimately requests memory from the kernel via the system allocator. Language-level reference counting, ownership checking, and garbage collection are all <strong>intra-process</strong> concerns.</p>
+<hr>
+<h3 id="4-What-Exactly-Is-a-Language-“Runtime”">4. What Exactly Is a Language “Runtime”</h3>
+<p>If I had to summarize in one sentence: true garbage collection almost inevitably requires a runtime, pure reference counting can be made very lightweight, and compile-time ownership can reduce runtime overhead to near zero. But that’s too abstract—there are a few noteworthy specifics for each language:</p>
+<ul>
+<li><strong>Kotlin/Native</strong> has no JVM but has its own native runtime and heap. Since Kotlin 1.7.7 it uses a <strong>concurrent mark-sweep</strong> GC, and in most scenarios manual <code>autoreleasepool</code> calls are no longer needed during Swift interoperation (though explicit use is still recommended in extremely memory-sensitive scenarios).</li>
+<li><strong>Swift / Objective-C</strong> have no traditional large runtime + GC; the runtime only provides lightweight support such as atomic operations, weak reference tables, and Autorelease Pools.</li>
+<li><strong>C++ / Rust</strong> have virtually no language-level memory runtime. C++'s new/delete ultimately go to the system allocator, and smart pointers are standard library behavior; Rust’s ownership and borrowing are fully checked at compile time, and Rc/Arc are merely library implementations.</li>
+</ul>
+<hr>
+<h3 id="5-How-Do-Multiple-Runtimes-Coexist-in-the-Same-Process">5. How Do Multiple Runtimes Coexist in the Same Process</h3>
+<p>They share the address space and OS resources, but <strong>each manages its own objects and heap</strong>, interacting through well-defined boundaries. The typical structure looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Same process</span><br><span class="line">├── Swift / Objective-C runtime (ARC)</span><br><span class="line">├── Kotlin/Native runtime (own GC)</span><br><span class="line">├── Rust code (virtually no runtime)</span><br><span class="line">├── C++ code (manual / smart pointers)</span><br><span class="line">└── Possibly other embedded runtimes</span><br></pre></td></tr></table></figure>
+<p>The coexistence is held together by several mechanisms: each runtime typically only recognizes objects it allocated—Runtime A’s GC doesn’t scan Runtime B’s heap, which is logical isolation. Data transfer often requires copying or conversion; object references are held indirectly via handles or proxy objects, and a core job of the code generated by UniFFI and KMP is maintaining these cross-model lifecycle protocols. Each runtime may have its own GC threads or background tasks, but they are ordinary user-space threads, uniformly scheduled by the OS.</p>
+<p>The real risks are concentrated at the boundaries: mishandled circular references cause leaks, one side releasing while the other still uses causes crashes, and disagreements about whether “the object is still alive” also cause problems.</p>
+<hr>
+<h3 id="6-Side-Effects-of-Mixed-Memory-Models-and-How-to-Cope">6. Side Effects of Mixed Memory Models and How to Cope</h3>
+<h4 id="Kotlin-Multiplatform-Kotlin-Native-Main-Side-Effects">Kotlin Multiplatform (Kotlin/Native): Main Side Effects</h4>
+<p><strong>Periodically elevated memory footprint</strong> is the most obvious problem. GC reclaims lazily—objects are not freed immediately after becoming unreachable, but wait for the next GC cycle. High-frequency allocation produces a sawtooth memory pattern; short spikes may trigger Jetsam (especially in Extensions, background execution, and on low-end devices).</p>
+<p><strong>Coordination issues with Swift ARC</strong> are the most common source of problems. The two sides disagree on whether “the object is still alive”—Swift looks at reference counts, Kotlin/Native looks at GC reachability. Improper handling of bridging objects, closure captures, singletons, and global state easily causes cross-boundary leaks (a common symptom: Android is fine, but iOS memory keeps climbing).</p>
+<p>There are also several milder but still real issues: GC threads consume extra CPU—modern implementations have improved significantly, but brief pauses may still occur; framework size and the runtime itself contribute additional baseline memory overhead; and debugging difficulty increases—Instruments displays Kotlin objects less intuitively than pure Swift, and leak sources may be in the Kotlin heap, the bridging layer, or the Swift side, requiring back-and-forth between tools.</p>
+<h4 id="Rust-UniFFI-Main-Side-Effects">Rust + UniFFI: Main Side Effects</h4>
+<p>Rust has no GC, so the problems are much milder than KMP—centered on <strong>boundary design</strong> and <strong>temporary allocations</strong>.</p>
+<p>Cross-boundary data conversion overhead is negligible in most scenarios, but frequently transferring large objects on hot paths can produce measurable spikes in temporary allocations and copies. Batching typically mitigates this kind of problem effectively.</p>
+<p>Rust types exported as Objects maintain their lifecycle across the boundary via handles plus reference counting; poor design can cause leaks or delayed release. Debugging cost is also worth noting—call stacks span Rust and Swift, making investigation more complex than purely native code.</p>
+<h4 id="Issues-Requiring-Special-Attention">Issues Requiring Special Attention</h4>
+<p><strong>When to use <code>@autoreleasepool</code></strong>: Swift’s ARC does not automatically release autorelease objects (e.g., some objects returned by Objective-C APIs). In cross-language loops, temporary objects may accumulate until the RunLoop iteration ends. Early versions of Kotlin/Native were especially dependent on manual management. The actual usage is straightforward:</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="comment">// When calling code in a loop that may produce autorelease objects</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span><span class="operator">..&lt;</span><span class="number">10000</span> &#123;</span><br><span class="line">    autoreleasepool &#123;</span><br><span class="line">        <span class="keyword">let</span> data <span class="operator">=</span> someObjCAPI.createTemporaryData(i)</span><br><span class="line">        process(data)</span><br><span class="line">    &#125; <span class="comment">// data is released here, not at the end of the entire loop</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Rust FFI memory ownership</strong>: When Rust exports data via FFI, ownership responsibility must be explicitly agreed upon. If the Swift side uses <code>free()</code> to directly release memory allocated by Rust, undefined behavior results—the two allocators may differ, and this kind of issue often manifests as crashing on some devices but not others, making it extremely difficult to diagnose. The common pattern is for Rust to export a dedicated deallocation function:</p>
+<figure class="highlight rust"><table><tr><td class="code"><pre><span class="line"><span class="meta">#[no_mangle]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">unsafe</span> <span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="keyword">fn</span> <span class="title function_">free_string</span>(ptr: *<span class="keyword">mut</span> c_char) &#123;</span><br><span class="line">    <span class="keyword">if</span> !ptr.<span class="title function_ invoke__">is_null</span>() &#123;</span><br><span class="line">        <span class="title function_ invoke__">drop</span>(CString::<span class="title function_ invoke__">from_raw</span>(ptr)); <span class="comment">// Released by Rust&#x27;s allocator</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Swift calls it via <code>defer</code> to return ownership:</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> cStr <span class="operator">=</span> rust_create_string()</span><br><span class="line"><span class="keyword">defer</span> &#123; rust_free_string(cStr) &#125; <span class="comment">// Must call Rust&#x27;s deallocation function</span></span><br><span class="line"><span class="keyword">let</span> swiftString <span class="operator">=</span> <span class="type">String</span>(cString: cStr<span class="operator">!</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>Cross-runtime concurrent access</strong>: When a Swift object is captured by a Kotlin/Native or Rust closure executing on another thread, it bypasses ARC’s thread-safety assumptions. Kotlin/Native’s GC, when scanning the object graph, will crash if it finds that an externally referenced Swift object has already been released. Practical advice: prefer passing value types or immutable data; if reference types must be passed, ensure lifecycle is explicitly managed by one side, with the other holding only weak references or handles.</p>
+<h4 id="Coping-Strategies">Coping Strategies</h4>
+<p>The most important architectural principle is <strong>reducing dangerous interactions</strong>. Have shared code work with “data” rather than complex “object graphs”; prefer simple types, DTOs, and byte arrays. Control cross-boundary call frequency; batch multiple small calls into bulk operations. Clarify ownership at the API design stage: who creates, who holds, who releases—don’t let both sides feel responsible for managing the lifecycle.</p>
+<p>For Kotlin/Native, several approaches that have proven effective in practice: use autoreleasepool appropriately to manage temporary objects; proactively break unnecessary references (weak references or explicit nil-setting) to avoid globals/singles holding large context-related objects long-term; use Instruments to compare memory footprint between pure native and KMP-integrated builds; and for extremely memory-sensitive scenarios (Extensions, background tasks), carefully evaluate whether KMP is appropriate.</p>
+<p>For Rust + UniFFI, favor value passing and simple structures in interfaces; reduce long-term holding of large Objects. Batching is preferable to fine-grained frequent calls.</p>
+<p>For monitoring, establish a memory footprint baseline: compare peak and steady-state memory for the same operation across pure Swift, KMP-integrated, and Rust-integrated builds. Watch for sustained memory growth after long-running sessions, background transitions, and repeated page entries. Run dedicated tests on low-end devices and memory-constrained scenarios—many problems only surface on an iPhone SE or under memory pressure.</p>
+<p><strong>Instruments memory debugging toolkit</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Allocations</strong></td>
+<td>Track all heap allocations, by type/call stack</td>
+<td>Locate which code is allocating heavily</td>
+</tr>
+<tr>
+<td><strong>Leaks</strong></td>
+<td>Detect leaks from circular references</td>
+<td>Swift/ObjC reference counting leaks</td>
+</tr>
+<tr>
+<td><strong>VM Tracker</strong></td>
+<td>View virtual memory usage (mmap, heap, stack, GPU, etc.)</td>
+<td>Distinguish memory usage of each language runtime</td>
+</tr>
+<tr>
+<td><strong>Memory Graph</strong></td>
+<td>Runtime object graph snapshot, viewable reference relationships</td>
+<td>Investigate circular references and unexpected retains</td>
+</tr>
+<tr>
+<td><strong>Memory Pressure</strong></td>
+<td>Simulate system memory pressure, observe app response</td>
+<td>Verify Extension/background memory behavior</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>For Kotlin/Native’s heap, Instruments can only see the total Kotlin runtime usage and cannot break it down to individual Kotlin objects. You need to use Kotlin-side memory dump tools or diagnostic interfaces provided by the KMP framework.</p>
+</blockquote>
+<p><strong>Decision reference</strong></p>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Memory Side-Effect Risk</th>
+<th>Better Suited For</th>
+<th>Less Suited For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>KMP</strong></td>
+<td>Higher (GC footprint, boundary leaks, baseline)</td>
+<td>Business logic sharing, highly consistent two-platform logic</td>
+<td>Extremely memory-sensitive, high real-time requirements, Extensions</td>
+</tr>
+<tr>
+<td><strong>Rust + UniFFI</strong></td>
+<td>Medium-low (mainly temporary allocations and boundary design)</td>
+<td>High-performance cores, encryption, parsing, algorithms</td>
+<td>Deep sharing of complex object graphs with Swift, frequent large-object transfer on hot paths</td>
+</tr>
+<tr>
+<td><strong>Pure native</strong></td>
+<td>Lowest</td>
+<td>UI, system integration, memory-sensitive paths</td>
+<td>High cost of multi-platform redundant implementation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="Conclusion">Conclusion</h3>
+<p>When sinking heavy logic into Rust or C++, prioritize performance-critical modules with clear boundaries; avoid frequently transferring complex large objects on hot paths. When using UniFFI or KMP, treat the bridging layer as a “translator between different memory models”—the quality of that translator directly determines whether two languages can coexist peacefully. When debugging memory issues, remember that Instruments shows the entire process’s usage; often the Leaks tool won’t catch the problem (e.g., leaks on the Kotlin heap), and you need to combine it with Kotlin-side dump tools.</p>
+<p>The most important thing is to account for memory model differences at the architecture design stage, not as a post-launch fix.</p>
+<p>At its core, memory management in a mixed-language architecture comes down to one simple question: <strong>who manages the life and death of objects, and who merely provides pages?</strong> Get that question straight, and you’ll avoid most of the pitfalls.</p>
+<hr>
+<h3 id="Reference-Link">Reference Link</h3>
+<p><a href="https://mozilla.github.io/uniffi-rs/latest/internals/lifting_and_lowering.html">Lifting, Lowering and Serialization - The UniFFI user guide</a></p>
+<p><a href="https://stadiamaps.com/blog/ferrostar-building-a-cross-platform-navigation-sdk-in-rust-part-2/">Ferrostar: Building a Cross-Platform Navigation SDK in Rust (Part 2 - iOS Packaging)</a></p>
+<p><a href="https://www.macinternals.app/en/blog/memory-pressure-on-macos">Memory pressure on macOS: compressor, jetsam, and the working set</a></p>
+<p><a href="https://kotlinlang.org/docs/native-memory-manager.html">Kotlin/Native memory management﻿ - Kotlin docs</a></p>
+<p><a href="https://kotlinlang.org/docs/native-arc-integration.html">Integration with Swift/Objective-C ARC - Kotlin docs</a></p>
+]]></content>
+      <categories>
+        <category>Concepts</category>
+      </categories>
+      <tags>
+        <tag>Operating System</tag>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Player First Open Time Optimizition</title>
+    <url>/2024/10/01/video-start-up/</url>
+    <content><![CDATA[<p><strong>First Open Time</strong> is a critical metric in the user experience of a media player. It refers to the time it takes from the user initiating playback to the first frame of the video or audio being rendered on the screen or played through the speakers. Reducing this time is essential for improving user satisfaction, especially in competitive environments like streaming platforms where speed is a key differentiator.</p>
+<h2 id="Definition-of-First-Open-Time">Definition of First Open Time</h2>
+<p>First open time is the duration from when the user presses the “play” button (or triggers media playback) to the moment the first audio or video frame is successfully decoded and presented. It typically includes the following steps:</p>
+<ol>
+<li><strong>Request Initialization</strong>: Setting up the network request for the media resource.</li>
+<li><strong>Media Resource Loading</strong>: Downloading the initial segments of the media file.</li>
+<li><strong>Demuxing and Parsing</strong>: Extracting audio and video streams from the media container.</li>
+<li><strong>Codec Initialization</strong>: Setting up audio and video decoders.</li>
+<li><strong>Buffering</strong>: Pre-loading enough data to ensure smooth playback.</li>
+<li><strong>Rendering</strong>: Displaying the first frame or playing the first audio sample.</li>
+</ol>
+<h2 id="Step-by-Step-Breakdown-and-Optimization">Step-by-Step Breakdown and Optimization</h2>
+<h3 id="1-Request-Initialization">1. Request Initialization</h3>
+<h4 id="Process-Overview">Process Overview</h4>
+<ul>
+<li>Establishing the connection to the media server.</li>
+<li>Resolving DNS, negotiating SSL/TLS (if applicable), and sending the HTTP(S) request.</li>
+</ul>
+<h4 id="Optimization">Optimization</h4>
+<ul>
+<li><strong>DNS Pre-fetching</strong>: Resolve domain names in advance to reduce lookup time.</li>
+<li><strong>Persistent Connections</strong>: Use HTTP/2 or keep-alive connections to eliminate the need to re-establish TCP connections.</li>
+<li><strong>Edge Caching</strong>: Deploy CDN (Content Delivery Network) servers close to the user to reduce latency.</li>
+<li><strong>Reduce Redirects</strong>: Ensure direct access to the media URL to avoid unnecessary HTTP redirections.</li>
+</ul>
+<h3 id="2-Media-Resource-Loading">2. Media Resource Loading</h3>
+<h4 id="Process-Overview-2">Process Overview</h4>
+<ul>
+<li>Retrieving the initial media segments (e.g., initialization segments, first GOP for video).</li>
+</ul>
+<h4 id="Optimization-2">Optimization</h4>
+<ul>
+<li>
+<p><strong>Smaller Initialization Segments</strong>: Minimize the size of the first chunk of data required for playback.</p>
+</li>
+<li>
+<p><strong>Adaptive Bitrate (ABR)</strong>: Start playback with a lower bitrate to reduce the initial data load.</p>
+</li>
+<li>
+<p><strong>Parallel Requests</strong>: Fetch audio and video segments simultaneously to save time.</p>
+</li>
+<li>
+<p><strong>Preloading</strong>: Predict and prefetch media segments based on user behavior or autoplay scenarios.</p>
+</li>
+</ul>
+<h3 id="3-Demuxing-and-Parsing">3. Demuxing and Parsing</h3>
+<h4 id="Process-Overview-3">Process Overview</h4>
+<ul>
+<li>Splitting the media container into audio and video streams.</li>
+<li>Parsing metadata (e.g., timestamps, codec information).</li>
+</ul>
+<h4 id="Optimization-3">Optimization</h4>
+<ul>
+<li><strong>Efficient Parsers</strong>: Use highly optimized demuxing libraries to reduce processing time.</li>
+<li><strong>Streamlined Containers</strong>: Favor lightweight media containers like MP4 or WebM with minimal overhead. Placing the ‘moov’ atom at the start of the MP4 file (instead of the default location at the end) allows the player to access this critical metadata immediately, without having to download the entire file first.</li>
+<li><strong>Lazy Parsing</strong>: Parse only essential metadata needed for playback, deferring deeper parsing for later.</li>
+</ul>
+<h3 id="4-Codec-Initialization">4. Codec Initialization</h3>
+<h4 id="Process-Overview-4">Process Overview</h4>
+<ul>
+<li>Setting up decoders for audio and video based on the codec information (e.g., H.264, AAC).</li>
+</ul>
+<h4 id="Optimization-4">Optimization</h4>
+<ul>
+<li><strong>Hardware Acceleration</strong>: Leverage GPU or hardware decoders for faster codec initialization.</li>
+<li><strong>Pre-initialized Decoders</strong>: Keep decoders ready for commonly used codecs to avoid setup delays.</li>
+<li><strong>Codec Negotiation</strong>: Ensure client and server agree on the optimal codec during the handshake phase.</li>
+</ul>
+<h3 id="5-Buffering">5. Buffering</h3>
+<h4 id="Process-Overview-5">Process Overview</h4>
+<ul>
+<li>Filling the playback buffer with enough data to start playback while avoiding interruptions.</li>
+</ul>
+<h4 id="Optimization-5">Optimization</h4>
+<ul>
+<li><strong>Dynamic Buffering Thresholds</strong>: Start playback with minimal buffering for faster startup and dynamically adjust thresholds during playback.</li>
+<li><strong>Predictive Buffering</strong>: Use machine learning to predict network conditions and pre-buffer accordingly.</li>
+<li><strong>Low-Latency Protocols</strong>: Implement protocols like HTTP/3 or QUIC to reduce latency during data transfer.</li>
+</ul>
+<h3 id="6-Rendering">6. Rendering</h3>
+<h4 id="Process-Overview-6">Process Overview</h4>
+<ul>
+<li>Decoding and rendering the first frame of video or playing the first audio sample.</li>
+</ul>
+<h4 id="Optimization-6">Optimization</h4>
+<ul>
+<li><strong>Skip Unnecessary Frames</strong>: Drop non-essential frames (e.g., B-frames) during startup to prioritize the first I-frame.</li>
+<li><strong>Frame Preprocessing</strong>: Pre-decode and cache the first frame during media loading.</li>
+<li><strong>Audio-First Start</strong>: If video decoding takes longer, start with audio playback to give the illusion of faster startup.</li>
+</ul>
+<h2 id="Additional-Best-Practices">Additional Best Practices</h2>
+<h4 id="Device-Specific-Optimizations">Device-Specific Optimizations</h4>
+<p>Optimize for popular devices and browsers by identifying bottlenecks in specific platforms.</p>
+<h4 id="Graceful-Degradation">Graceful Degradation</h4>
+<p>Provide fallback mechanisms (e.g., lower resolution or audio-only playback) for users on slow networks.</p>
+<h2 id="Conclusion">Conclusion</h2>
+<p>Optimizing first open time is a multi-faceted challenge that requires improvements at every step of the media playback pipeline. By implementing the techniques outlined above, developers can significantly reduce startup delays, leading to a smoother and more engaging user experience.</p>
+<p>Reducing first open time isn’t just about technical enhancements—it’s about providing a seamless experience that keeps users coming back. With continuous monitoring and iteration, these optimizations can have a lasting impact on user satisfaction and retention.</p>
+]]></content>
+      <categories>
+        <category>Application</category>
+      </categories>
+      <tags>
+        <tag>Multimedia</tag>
       </tags>
   </entry>
 </search>

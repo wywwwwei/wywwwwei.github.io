@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="A practical guide to how Swift ARC, Kotlin&#x2F;Native GC, Rust ownership, and C++ coexist in a single iOS process—covering where the real memory pitfalls lie at the boundaries between these runtimes and h">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App">
+<meta property="og:url" content="https://wywwwwei.github.io/2026/08/10/ios-memory-management/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="A practical guide to how Swift ARC, Kotlin&#x2F;Native GC, Rust ownership, and C++ coexist in a single iOS process—covering where the real memory pitfalls lie at the boundaries between these runtimes and h">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-08-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-09T17:26:26.598Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Operating System">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2026/08/10/ios-memory-management/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2026/08/10/ios-memory-management/","path":"2026/08/10/ios-memory-management/","title":"Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Essential-Memory-Management-Comparison-Across-Five-Languages"><span class="nav-number">1.</span> <span class="nav-text">1. Essential Memory Management Comparison Across Five Languages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-How-These-Languages-Are-Used-on-iOS"><span class="nav-number">2.</span> <span class="nav-text">2. How These Languages Are Used on iOS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-What-Does-the-Operating-System-Actually-Manage"><span class="nav-number">3.</span> <span class="nav-text">3. What Does the Operating System Actually Manage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-What-Exactly-Is-a-Language-%E2%80%9CRuntime%E2%80%9D"><span class="nav-number">4.</span> <span class="nav-text">4. What Exactly Is a Language “Runtime”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-How-Do-Multiple-Runtimes-Coexist-in-the-Same-Process"><span class="nav-number">5.</span> <span class="nav-text">5. How Do Multiple Runtimes Coexist in the Same Process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Side-Effects-of-Mixed-Memory-Models-and-How-to-Cope"><span class="nav-number">6.</span> <span class="nav-text">6. Side Effects of Mixed Memory Models and How to Cope</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Kotlin-Multiplatform-Kotlin-Native-Main-Side-Effects"><span class="nav-number">6.1.</span> <span class="nav-text">Kotlin Multiplatform (Kotlin&#x2F;Native): Main Side Effects</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Rust-UniFFI-Main-Side-Effects"><span class="nav-number">6.2.</span> <span class="nav-text">Rust + UniFFI: Main Side Effects</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Issues-Requiring-Special-Attention"><span class="nav-number">6.3.</span> <span class="nav-text">Issues Requiring Special Attention</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Coping-Strategies"><span class="nav-number">6.4.</span> <span class="nav-text">Coping Strategies</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Conclusion"><span class="nav-number">7.</span> <span class="nav-text">Conclusion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference-Link"><span class="nav-number">8.</span> <span class="nav-text">Reference Link</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2026/08/10/ios-memory-management/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-08-10 00:00:00" itemprop="dateCreated datePublished" datetime="2026-08-10T00:00:00+08:00">2026-08-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Concepts/" itemprop="url" rel="index"><span itemprop="name">Concepts</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>8 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>In a modern iOS app, Swift, Rust, C++, and Kotlin may all run at once—each with a fundamentally different memory management mechanism. Memory problems in mixed-language architectures are often not about any one language being written poorly; they stem from the boundary design between languages going wrong. This article takes an operating system’s perspective to examine the essential differences between these memory models, how multiple runtimes coexist within a single process, and the real-world memory side effects—and coping strategies—in a mixed-language architecture.</p>
+<hr>
+<h3 id="1-Essential-Memory-Management-Comparison-Across-Five-Languages">1. Essential Memory Management Comparison Across Five Languages</h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Core Mechanism</th>
+<th>Runtime Involvement</th>
+<th>Safety Guarantee</th>
+<th>Typical Overhead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C++</strong></td>
+<td>Manual management + RAII + smart pointers</td>
+<td>Virtually none</td>
+<td>Weak (convention-based)</td>
+<td>Very low (controllable)</td>
+</tr>
+<tr>
+<td><strong>Objective-C</strong></td>
+<td>ARC (reference counting)</td>
+<td>Lightweight runtime</td>
+<td>Moderate</td>
+<td>Moderate (atomic operations)</td>
+</tr>
+<tr>
+<td><strong>Swift</strong></td>
+<td>ARC + value-type copying</td>
+<td>Lightweight runtime</td>
+<td>Relatively strong</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td><strong>Kotlin</strong> (JVM)</td>
+<td>Garbage collection (GC)</td>
+<td>Full JVM/ART</td>
+<td>Strong</td>
+<td>Higher (potential pauses)</td>
+</tr>
+<tr>
+<td><strong>Kotlin/Native</strong></td>
+<td>Own GC</td>
+<td>Own runtime</td>
+<td>Strong</td>
+<td>Moderately high</td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td>Ownership + borrow checking</td>
+<td>Virtually none</td>
+<td>Extremely strong (compile-time)</td>
+<td>Very low (zero-cost)</td>
+</tr>
+</tbody>
+</table>
+<p>You can think of this table as three camps. <strong>C++ / Rust</strong> push work to compile time or explicit programmer code, with the runtime barely involved in deciding whether an object is alive. <strong>Swift / Objective-C</strong> rely on the compiler to automatically insert retain/release, with the runtime providing only lightweight support (atomic reference counting, zeroing weak references, Autorelease Pool, etc.). <strong>GC-based languages like Kotlin (JVM)</strong> require a full runtime to manage the heap and perform collection.</p>
+<p>There’s a detail here that’s easy to overlook: Swift’s value types (struct, enum) are stack-allocated by default, and only heap-allocated via copy-on-write when sharing is needed. Many developers coming from Objective-C habitually assume everything lives on the heap, but Swift’s design in this regard is actually closer to C++ semantics.</p>
+<blockquote>
+<p><strong>Where does ARC’s <code>retain/release</code> cost actually come from?</strong></p>
+<p>Swift/Objective-C reference counting is <strong>atomic</strong> by default—every retain/release is an <code>atomic increment/decrement</code>, which triggers CPU cache-line synchronization in multithreaded environments. When large numbers of small objects are created and destroyed on hot paths, this overhead can accumulate to a measurable degree. This is where Rust’s zero-runtime-overhead ownership model has an advantage in extreme performance scenarios.</p>
+</blockquote>
+<hr>
+<h3 id="2-How-These-Languages-Are-Used-on-iOS">2. How These Languages Are Used on iOS</h3>
+<ul>
+<li><strong>C++ / Objective-C / Swift</strong>: Native support; can be directly mixed in compilation.</li>
+<li><strong>Kotlin</strong>: Compiled into a framework via Kotlin Multiplatform (KMP) for interoperation with Swift.</li>
+<li><strong>Rust</strong>: Compiled as a static library with <strong>UniFFI</strong>-generated bindings—a very mature approach. Mozilla components and numerous commercial SDKs use this in production.</li>
+</ul>
+<p>UniFFI’s core value: the APIs you call in Swift look nearly native, but the actual computation runs in compiled Rust machine code. However, “looks native” doesn’t mean “free”—data needs to be converted at the boundary. Numeric and boolean types are passed directly, with negligible overhead; strings are passed via a UTF-8 pointer plus length, also fine; but if you pass a deeply nested struct, UniFFI will serialize it into a byte buffer, and that temporary allocation is absolutely visible in Instruments on hot paths. Rust types exported as Objects maintain their lifecycle across the boundary via handles plus reference counting—if this part of the design isn’t handled well, I’ll get to that later.</p>
+<hr>
+<h3 id="3-What-Does-the-Operating-System-Actually-Manage">3. What Does the Operating System Actually Manage</h3>
+<p>With so many runtimes squeezed into one process, wouldn’t the OS help coordinate them? Not at all. iOS’s XNU kernel is responsible only for:</p>
+<ol>
+<li>Providing each process with an independent virtual address space</li>
+<li>Providing physical memory pages on demand (page faults)</li>
+<li>Memory permission protection</li>
+<li>Compression and Jetsam (process killing) under memory pressure</li>
+<li>Unconditionally reclaiming all memory when a process exits</li>
+</ol>
+<p>No matter how many languages and runtimes an app contains, they are just <strong>one process</strong> in the eyes of the OS. All code shares the same address space and ultimately requests memory from the kernel via the system allocator. Language-level reference counting, ownership checking, and garbage collection are all <strong>intra-process</strong> concerns.</p>
+<hr>
+<h3 id="4-What-Exactly-Is-a-Language-“Runtime”">4. What Exactly Is a Language “Runtime”</h3>
+<p>If I had to summarize in one sentence: true garbage collection almost inevitably requires a runtime, pure reference counting can be made very lightweight, and compile-time ownership can reduce runtime overhead to near zero. But that’s too abstract—there are a few noteworthy specifics for each language:</p>
+<ul>
+<li><strong>Kotlin/Native</strong> has no JVM but has its own native runtime and heap. Since Kotlin 1.7.7 it uses a <strong>concurrent mark-sweep</strong> GC, and in most scenarios manual <code>autoreleasepool</code> calls are no longer needed during Swift interoperation (though explicit use is still recommended in extremely memory-sensitive scenarios).</li>
+<li><strong>Swift / Objective-C</strong> have no traditional large runtime + GC; the runtime only provides lightweight support such as atomic operations, weak reference tables, and Autorelease Pools.</li>
+<li><strong>C++ / Rust</strong> have virtually no language-level memory runtime. C++'s new/delete ultimately go to the system allocator, and smart pointers are standard library behavior; Rust’s ownership and borrowing are fully checked at compile time, and Rc/Arc are merely library implementations.</li>
+</ul>
+<hr>
+<h3 id="5-How-Do-Multiple-Runtimes-Coexist-in-the-Same-Process">5. How Do Multiple Runtimes Coexist in the Same Process</h3>
+<p>They share the address space and OS resources, but <strong>each manages its own objects and heap</strong>, interacting through well-defined boundaries. The typical structure looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Same process</span><br><span class="line">├── Swift / Objective-C runtime (ARC)</span><br><span class="line">├── Kotlin/Native runtime (own GC)</span><br><span class="line">├── Rust code (virtually no runtime)</span><br><span class="line">├── C++ code (manual / smart pointers)</span><br><span class="line">└── Possibly other embedded runtimes</span><br></pre></td></tr></table></figure>
+<p>The coexistence is held together by several mechanisms: each runtime typically only recognizes objects it allocated—Runtime A’s GC doesn’t scan Runtime B’s heap, which is logical isolation. Data transfer often requires copying or conversion; object references are held indirectly via handles or proxy objects, and a core job of the code generated by UniFFI and KMP is maintaining these cross-model lifecycle protocols. Each runtime may have its own GC threads or background tasks, but they are ordinary user-space threads, uniformly scheduled by the OS.</p>
+<p>The real risks are concentrated at the boundaries: mishandled circular references cause leaks, one side releasing while the other still uses causes crashes, and disagreements about whether “the object is still alive” also cause problems.</p>
+<hr>
+<h3 id="6-Side-Effects-of-Mixed-Memory-Models-and-How-to-Cope">6. Side Effects of Mixed Memory Models and How to Cope</h3>
+<h4 id="Kotlin-Multiplatform-Kotlin-Native-Main-Side-Effects">Kotlin Multiplatform (Kotlin/Native): Main Side Effects</h4>
+<p><strong>Periodically elevated memory footprint</strong> is the most obvious problem. GC reclaims lazily—objects are not freed immediately after becoming unreachable, but wait for the next GC cycle. High-frequency allocation produces a sawtooth memory pattern; short spikes may trigger Jetsam (especially in Extensions, background execution, and on low-end devices).</p>
+<p><strong>Coordination issues with Swift ARC</strong> are the most common source of problems. The two sides disagree on whether “the object is still alive”—Swift looks at reference counts, Kotlin/Native looks at GC reachability. Improper handling of bridging objects, closure captures, singletons, and global state easily causes cross-boundary leaks (a common symptom: Android is fine, but iOS memory keeps climbing).</p>
+<p>There are also several milder but still real issues: GC threads consume extra CPU—modern implementations have improved significantly, but brief pauses may still occur; framework size and the runtime itself contribute additional baseline memory overhead; and debugging difficulty increases—Instruments displays Kotlin objects less intuitively than pure Swift, and leak sources may be in the Kotlin heap, the bridging layer, or the Swift side, requiring back-and-forth between tools.</p>
+<h4 id="Rust-UniFFI-Main-Side-Effects">Rust + UniFFI: Main Side Effects</h4>
+<p>Rust has no GC, so the problems are much milder than KMP—centered on <strong>boundary design</strong> and <strong>temporary allocations</strong>.</p>
+<p>Cross-boundary data conversion overhead is negligible in most scenarios, but frequently transferring large objects on hot paths can produce measurable spikes in temporary allocations and copies. Batching typically mitigates this kind of problem effectively.</p>
+<p>Rust types exported as Objects maintain their lifecycle across the boundary via handles plus reference counting; poor design can cause leaks or delayed release. Debugging cost is also worth noting—call stacks span Rust and Swift, making investigation more complex than purely native code.</p>
+<h4 id="Issues-Requiring-Special-Attention">Issues Requiring Special Attention</h4>
+<p><strong>When to use <code>@autoreleasepool</code></strong>: Swift’s ARC does not automatically release autorelease objects (e.g., some objects returned by Objective-C APIs). In cross-language loops, temporary objects may accumulate until the RunLoop iteration ends. Early versions of Kotlin/Native were especially dependent on manual management. The actual usage is straightforward:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// When calling code in a loop that may produce autorelease objects</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span><span class="operator">..&lt;</span><span class="number">10000</span> &#123;</span><br><span class="line">    autoreleasepool &#123;</span><br><span class="line">        <span class="keyword">let</span> data <span class="operator">=</span> someObjCAPI.createTemporaryData(i)</span><br><span class="line">        process(data)</span><br><span class="line">    &#125; <span class="comment">// data is released here, not at the end of the entire loop</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Rust FFI memory ownership</strong>: When Rust exports data via FFI, ownership responsibility must be explicitly agreed upon. If the Swift side uses <code>free()</code> to directly release memory allocated by Rust, undefined behavior results—the two allocators may differ, and this kind of issue often manifests as crashing on some devices but not others, making it extremely difficult to diagnose. The common pattern is for Rust to export a dedicated deallocation function:</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[no_mangle]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">unsafe</span> <span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="keyword">fn</span> <span class="title function_">free_string</span>(ptr: *<span class="keyword">mut</span> c_char) &#123;</span><br><span class="line">    <span class="keyword">if</span> !ptr.<span class="title function_ invoke__">is_null</span>() &#123;</span><br><span class="line">        <span class="title function_ invoke__">drop</span>(CString::<span class="title function_ invoke__">from_raw</span>(ptr)); <span class="comment">// Released by Rust&#x27;s allocator</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Swift calls it via <code>defer</code> to return ownership:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> cStr <span class="operator">=</span> rust_create_string()</span><br><span class="line"><span class="keyword">defer</span> &#123; rust_free_string(cStr) &#125; <span class="comment">// Must call Rust&#x27;s deallocation function</span></span><br><span class="line"><span class="keyword">let</span> swiftString <span class="operator">=</span> <span class="type">String</span>(cString: cStr<span class="operator">!</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>Cross-runtime concurrent access</strong>: When a Swift object is captured by a Kotlin/Native or Rust closure executing on another thread, it bypasses ARC’s thread-safety assumptions. Kotlin/Native’s GC, when scanning the object graph, will crash if it finds that an externally referenced Swift object has already been released. Practical advice: prefer passing value types or immutable data; if reference types must be passed, ensure lifecycle is explicitly managed by one side, with the other holding only weak references or handles.</p>
+<h4 id="Coping-Strategies">Coping Strategies</h4>
+<p>The most important architectural principle is <strong>reducing dangerous interactions</strong>. Have shared code work with “data” rather than complex “object graphs”; prefer simple types, DTOs, and byte arrays. Control cross-boundary call frequency; batch multiple small calls into bulk operations. Clarify ownership at the API design stage: who creates, who holds, who releases—don’t let both sides feel responsible for managing the lifecycle.</p>
+<p>For Kotlin/Native, several approaches that have proven effective in practice: use autoreleasepool appropriately to manage temporary objects; proactively break unnecessary references (weak references or explicit nil-setting) to avoid globals/singles holding large context-related objects long-term; use Instruments to compare memory footprint between pure native and KMP-integrated builds; and for extremely memory-sensitive scenarios (Extensions, background tasks), carefully evaluate whether KMP is appropriate.</p>
+<p>For Rust + UniFFI, favor value passing and simple structures in interfaces; reduce long-term holding of large Objects. Batching is preferable to fine-grained frequent calls.</p>
+<p>For monitoring, establish a memory footprint baseline: compare peak and steady-state memory for the same operation across pure Swift, KMP-integrated, and Rust-integrated builds. Watch for sustained memory growth after long-running sessions, background transitions, and repeated page entries. Run dedicated tests on low-end devices and memory-constrained scenarios—many problems only surface on an iPhone SE or under memory pressure.</p>
+<p><strong>Instruments memory debugging toolkit</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Allocations</strong></td>
+<td>Track all heap allocations, by type/call stack</td>
+<td>Locate which code is allocating heavily</td>
+</tr>
+<tr>
+<td><strong>Leaks</strong></td>
+<td>Detect leaks from circular references</td>
+<td>Swift/ObjC reference counting leaks</td>
+</tr>
+<tr>
+<td><strong>VM Tracker</strong></td>
+<td>View virtual memory usage (mmap, heap, stack, GPU, etc.)</td>
+<td>Distinguish memory usage of each language runtime</td>
+</tr>
+<tr>
+<td><strong>Memory Graph</strong></td>
+<td>Runtime object graph snapshot, viewable reference relationships</td>
+<td>Investigate circular references and unexpected retains</td>
+</tr>
+<tr>
+<td><strong>Memory Pressure</strong></td>
+<td>Simulate system memory pressure, observe app response</td>
+<td>Verify Extension/background memory behavior</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>For Kotlin/Native’s heap, Instruments can only see the total Kotlin runtime usage and cannot break it down to individual Kotlin objects. You need to use Kotlin-side memory dump tools or diagnostic interfaces provided by the KMP framework.</p>
+</blockquote>
+<p><strong>Decision reference</strong></p>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Memory Side-Effect Risk</th>
+<th>Better Suited For</th>
+<th>Less Suited For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>KMP</strong></td>
+<td>Higher (GC footprint, boundary leaks, baseline)</td>
+<td>Business logic sharing, highly consistent two-platform logic</td>
+<td>Extremely memory-sensitive, high real-time requirements, Extensions</td>
+</tr>
+<tr>
+<td><strong>Rust + UniFFI</strong></td>
+<td>Medium-low (mainly temporary allocations and boundary design)</td>
+<td>High-performance cores, encryption, parsing, algorithms</td>
+<td>Deep sharing of complex object graphs with Swift, frequent large-object transfer on hot paths</td>
+</tr>
+<tr>
+<td><strong>Pure native</strong></td>
+<td>Lowest</td>
+<td>UI, system integration, memory-sensitive paths</td>
+<td>High cost of multi-platform redundant implementation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="Conclusion">Conclusion</h3>
+<p>When sinking heavy logic into Rust or C++, prioritize performance-critical modules with clear boundaries; avoid frequently transferring complex large objects on hot paths. When using UniFFI or KMP, treat the bridging layer as a “translator between different memory models”—the quality of that translator directly determines whether two languages can coexist peacefully. When debugging memory issues, remember that Instruments shows the entire process’s usage; often the Leaks tool won’t catch the problem (e.g., leaks on the Kotlin heap), and you need to combine it with Kotlin-side dump tools.</p>
+<p>The most important thing is to account for memory model differences at the architecture design stage, not as a post-launch fix.</p>
+<p>At its core, memory management in a mixed-language architecture comes down to one simple question: <strong>who manages the life and death of objects, and who merely provides pages?</strong> Get that question straight, and you’ll avoid most of the pitfalls.</p>
+<hr>
+<h3 id="Reference-Link">Reference Link</h3>
+<p><a target="_blank" rel="noopener" href="https://mozilla.github.io/uniffi-rs/latest/internals/lifting_and_lowering.html">Lifting, Lowering and Serialization - The UniFFI user guide</a></p>
+<p><a target="_blank" rel="noopener" href="https://stadiamaps.com/blog/ferrostar-building-a-cross-platform-navigation-sdk-in-rust-part-2/">Ferrostar: Building a Cross-Platform Navigation SDK in Rust (Part 2 - iOS Packaging)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.macinternals.app/en/blog/memory-pressure-on-macos">Memory pressure on macOS: compressor, jetsam, and the working set</a></p>
+<p><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/native-memory-manager.html">Kotlin/Native memory management﻿ - Kotlin docs</a></p>
+<p><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/native-arc-integration.html">Integration with Swift/Objective-C ARC - Kotlin docs</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2026/08/10/ios-memory-management/" title="Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App">https://wywwwwei.github.io/2026/08/10/ios-memory-management/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Operating-System/" rel="tag"># Operating System</a>
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/01/11/stock-scanner/" rel="prev" title="Building an Automated NASDAQ Stock Scanner: From Setup to Deployment">
+                  <i class="fa fa-angle-left"></i> Building an Automated NASDAQ Stock Scanner: From Setup to Deployment
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
