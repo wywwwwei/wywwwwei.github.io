@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wywwwwei.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"right","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="An in-depth, engineering-first dissection of WebRTC internals and multi-party video conferencing architecture—unpacking signaling, SDP negotiation, ICE NAT traversal, RTP&#x2F;RTCP telemetry, and weak-netw">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Core WebRTC Mechanisms and Practical Video Conferencing Analysis">
+<meta property="og:url" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/index.html">
+<meta property="og:site_name" content="Wu Yongwei&#39;s Blog">
+<meta property="og:description" content="An in-depth, engineering-first dissection of WebRTC internals and multi-party video conferencing architecture—unpacking signaling, SDP negotiation, ICE NAT traversal, RTP&#x2F;RTCP telemetry, and weak-netw">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/mesh-topology.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/sfu-topology.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/2da67f85001329d0599da49d419461ef28e89931.svg">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/2026-09-22-03-05-14-image.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/rtp-rtcp-protocols.png">
+<meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/2026-09-22-03-12-27-image.png">
+<meta property="article:published_time" content="2026-08-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-21T20:03:01.977Z">
+<meta property="article:author" content="Wu Yongwei">
+<meta property="article:tag" content="Multimedia">
+<meta property="article:tag" content="WebRTC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/mesh-topology.png">
+
+
+<link rel="canonical" href="https://wywwwwei.github.io/2026/09/01/webrtc-intro/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://wywwwwei.github.io/2026/09/01/webrtc-intro/","path":"2026/09/01/webrtc-intro/","title":"Core WebRTC Mechanisms and Practical Video Conferencing Analysis"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Core WebRTC Mechanisms and Practical Video Conferencing Analysis | Wu Yongwei's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Wu Yongwei's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Multi-Party-Video-Conferencing-Business-Context-and-Core-Contradictions"><span class="nav-number">1.</span> <span class="nav-text">1. Multi-Party Video Conferencing: Business Context and Core Contradictions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Why-Pure-P2P-Inevitably-Fails-in-Multi-Party-Conferencing"><span class="nav-number">1.1.</span> <span class="nav-text">Why Pure P2P Inevitably Fails in Multi-Party Conferencing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Connection-Establishment"><span class="nav-number">2.</span> <span class="nav-text">2. Connection Establishment</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Why-a-Signaling-Service-is-Essential-as-the-First-Step"><span class="nav-number">2.1.</span> <span class="nav-text">1. Why a Signaling Service is Essential as the First Step</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Lack-of-Autonomous-Discovery"><span class="nav-number">2.1.1.</span> <span class="nav-text">(1) Lack of Autonomous Discovery</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-The-Role-of-Signaling-An-Out-of-Band-Control-Channel"><span class="nav-number">2.1.2.</span> <span class="nav-text">(2) The Role of Signaling: An Out-of-Band Control Channel</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Media-Capability-Negotiation-Session-Description-Protocol-SDP"><span class="nav-number">2.2.</span> <span class="nav-text">2. Media Capability Negotiation: Session Description Protocol (SDP)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-SDP-Structure-and-Semantics"><span class="nav-number">2.2.1.</span> <span class="nav-text">(1) SDP Structure and Semantics</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Offer-Answer-Negotiation-and-Capability-Intersection-Pruning"><span class="nav-number">2.2.2.</span> <span class="nav-text">(2) Offer&#x2F;Answer Negotiation and Capability Intersection Pruning</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Physical-Routing-Dilemma-RFC-1918-Private-Addressing-and-Firewall-Blocking"><span class="nav-number">2.3.</span> <span class="nav-text">3. Physical Routing Dilemma: RFC 1918 Private Addressing and Firewall Blocking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-NAT-Traversal-Architecture-In-Depth-Comparison-of-STUN-TURN-and-ICE"><span class="nav-number">2.4.</span> <span class="nav-text">4. NAT Traversal Architecture: In-Depth Comparison of STUN, TURN, and ICE</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-STUN-Discovering-Server-Reflexive-srflx-Addresses"><span class="nav-number">2.4.1.</span> <span class="nav-text">(1) STUN: Discovering Server Reflexive (srflx) Addresses</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-TURN-Guaranteed-Fallback-via-Media-Relaying"><span class="nav-number">2.4.2.</span> <span class="nav-text">(2) TURN: Guaranteed Fallback via Media Relaying</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-ICE-Unified-Path-Decision-and-Connectivity-Checking"><span class="nav-number">2.4.3.</span> <span class="nav-text">(3) ICE: Unified Path Decision and Connectivity Checking</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Coordinated-Pipeline-Trickle-ICE-Incremental-Candidate-Mechanism"><span class="nav-number">2.5.</span> <span class="nav-text">5. Coordinated Pipeline: Trickle ICE Incremental Candidate Mechanism</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Media-Transmission-and-Security-Substrate"><span class="nav-number">3.</span> <span class="nav-text">3. Media Transmission and Security Substrate</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-What-Problems-Do-RTP-and-RTCP-Solve-Respectively"><span class="nav-number">3.1.</span> <span class="nav-text">1. What Problems Do RTP and RTCP Solve Respectively?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-RTP-Header-Design-Solving-Sequence-and-Timing"><span class="nav-number">3.1.1.</span> <span class="nav-text">(1) RTP Header Design: Solving Sequence and Timing</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-RTCP-Feedback-Mechanisms-Constructing-Closed-Loop-Control"><span class="nav-number">3.1.2.</span> <span class="nav-text">(2) RTCP Feedback Mechanisms: Constructing Closed-Loop Control</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Why-is-DTLS-SRTP-the-Security-Cornerstone-of-WebRTC"><span class="nav-number">3.2.</span> <span class="nav-text">2. Why is DTLS-SRTP the Security Cornerstone of WebRTC?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Why-Not-Transmit-Audio-Video-Directly-over-DTLS-Records"><span class="nav-number">3.2.1.</span> <span class="nav-text">Why Not Transmit Audio&#x2F;Video Directly over DTLS Records?</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-QoS-and-Dynamic-Adaptation-Strategies-in-Weak-Network-Conditions"><span class="nav-number">4.</span> <span class="nav-text">4. QoS and Dynamic Adaptation Strategies in Weak Network Conditions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-How-Do-RTT-Packet-Loss-and-Jitter-Degrade-Meeting-Experience"><span class="nav-number">4.1.</span> <span class="nav-text">1. How Do RTT, Packet Loss, and Jitter Degrade Meeting Experience?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Core-Countermeasures-Analyzed"><span class="nav-number">4.2.</span> <span class="nav-text">2. Core Countermeasures Analyzed</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Adaptive-JitterBuffer"><span class="nav-number">4.2.1.</span> <span class="nav-text">(1) Adaptive JitterBuffer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Negative-Acknowledgment-NACK"><span class="nav-number">4.2.2.</span> <span class="nav-text">(2) Negative Acknowledgment (NACK)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Keyframe-Fast-Recovery-PLI-and-FIR"><span class="nav-number">4.2.3.</span> <span class="nav-text">(3) Keyframe Fast Recovery: PLI and FIR</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Application-Layer-Adaptive-Strategies-in-Video-Conferencing"><span class="nav-number">4.3.</span> <span class="nav-text">3. Application-Layer Adaptive Strategies in Video Conferencing</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Degradation-Preference-degradationPreference"><span class="nav-number">4.3.1.</span> <span class="nav-text">(1) Degradation Preference (degradationPreference)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Multi-Stream-Distribution-Simulcast-and-SVC"><span class="nav-number">4.3.2.</span> <span class="nav-text">(2) Multi-Stream Distribution: Simulcast and SVC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Practical-Implementation-and-Traffic-Inspection"><span class="nav-number">5.</span> <span class="nav-text">5. Practical Implementation and Traffic Inspection</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Industrial-Grade-Browser-Inspection-chrome-webrtc-internals"><span class="nav-number">5.1.</span> <span class="nav-text">Industrial-Grade Browser Inspection: chrome:&#x2F;&#x2F;webrtc-internals</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-End-to-End-Lifecycle-Sequence-Diagram"><span class="nav-number">6.</span> <span class="nav-text">6. End-to-End Lifecycle Sequence Diagram</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Conclusion"><span class="nav-number">6.1.</span> <span class="nav-text">Conclusion</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference-Link"><span class="nav-number">7.</span> <span class="nav-text">Reference Link</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu Yongwei"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Wu Yongwei</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wywwwwei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wywwwwei" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wyw1191448318@hotmail.com" title="E-Mail → mailto:wyw1191448318@hotmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wywwwwei.github.io/2026/09/01/webrtc-intro/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Wu Yongwei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Core WebRTC Mechanisms and Practical Video Conferencing Analysis | Wu Yongwei's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Core WebRTC Mechanisms and Practical Video Conferencing Analysis
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-09-01 00:00:00" itemprop="dateCreated datePublished" datetime="2026-09-01T00:00:00+08:00">2026-09-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Concepts/" itemprop="url" rel="index"><span itemprop="name">Concepts</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>4.2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>15 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>[!NOTE]<br>
+<strong>Companion Open-Source Project &amp; Demo</strong>: <a target="_blank" rel="noopener" href="https://github.com/wywwwwei/MeetingDemo">MeetingDemo/README_EN.md at main · wywwwwei/MeetingDemo</a><br>
+This article is accompanied by a full-stack, observable video conferencing lab—featuring live SDP/ICE candidate inspection, RTCP QoS telemetry, Simulcast multi-streaming, and PLI keyframe recovery.</p>
+</blockquote>
+<h2 id="1-Multi-Party-Video-Conferencing-Business-Context-and-Core-Contradictions">1. Multi-Party Video Conferencing: Business Context and Core Contradictions</h2>
+<p>In multi-party collaborative video conferencing systems such as Zoom, Microsoft Teams, and Tencent Meeting, user requirements center around three core pillars: <strong>ultra-low end-to-end latency (typically sub-400ms)</strong>, <strong>instant video rendering upon joining (first-frame fast rendering)</strong>, and <strong>continuous fluency and clarity across complex, heterogeneous networks</strong>.</p>
+<p>Unlike video-on-demand (VOD) or standard live streaming—which rely on client-side deep buffers spanning several seconds or even tens of seconds to absorb network jitter—real-time communication (RTC) is characterized by <strong>high concurrency and tight interactivity</strong>. Meeting participants engage in spontaneous speech, cross-talk, code reviews, and slide presentations. Introducing even a few seconds of buffer latency causes frequent speech collisions and awkward pauses. Therefore, RTC transmission strictly forbids deep buffering.</p>
+<p>When participants connect from corporate enterprise intranets, residential Wi-Fi, and fluctuating cellular networks, the conferencing system must tightly coordinate across the transmission, transport, and codec layers. However, when architecting such a system, engineers must first resolve a fundamental topological dilemma:</p>
+<h3 id="Why-Pure-P2P-Inevitably-Fails-in-Multi-Party-Conferencing">Why Pure P2P Inevitably Fails in Multi-Party Conferencing</h3>
+<p>Many newcomers to WebRTC assume that “if two browsers acquire each other’s IP addresses, they can transmit UDP packets directly like in a local area network (LAN).” In real-world enterprise operations, this naive P2P model collides with insurmountable barriers at both the <strong>network layer</strong> and the <strong>architectural layer</strong>:</p>
+<ol>
+<li>
+<p><strong>Network-Layer Roadblocks (Private Subnets and Symmetric NATs)</strong>:<br>
+The vast majority of end-user devices reside behind residential routers (NAT44/NAT64) or corporate stateful firewalls, assigned private RFC 1918 IPs (e.g., <code>192.168.x.x</code>). Private IPs are globally non-routable over the public internet. Furthermore, corporate firewalls drop any inbound external UDP packets not preceded by an outbound session initiated from inside the LAN. Under strict <strong>Symmetric NATs</strong>, external port mappings drift dynamically with each new destination IP, rendering conventional hole-punching mechanisms completely ineffective.</p>
+</li>
+<li>
+<p><strong>Architectural-Layer Roadblocks (Full Mesh Bandwidth and CPU Explosion)</strong>:<br>
+Even if a 2-party direct P2P call succeeds, scaling a meeting to three or more participants using a full-mesh topology causes client-side resource consumption to explode at an <strong><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(N^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> scale</strong>:</p>
+</li>
+</ol>
+<div align="center">
+  <img src="mesh-topology.png" alt="Mesh Topology" width="380" style="max-width: 48%; height: auto; margin: 4px;" />
+  <img src="sfu-topology.png" alt="SFU Topology" width="380" style="max-width: 48%; height: auto; margin: 4px;" />
+</div>
+<ul>
+<li><strong>Uplink Bandwidth Exhaustion</strong>: In a Full Mesh network, each participant must encode and upload their HD video stream <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">N-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> times (once to every peer). In a 6-person call, an individual participant’s uplink must sustain 5 outgoing HD video streams (at least 7.5–10 Mbps), rapidly saturating residential and cellular uplink caps.</li>
+<li><strong>CPU Encoding Saturation</strong>: Concurrently executing multiple independent hardware or software video encoders causes mobile devices and lightweight laptops to overheat, thermal throttle, and drop frames precipitously.</li>
+</ul>
+<blockquote>
+<p><strong>Key Architectural Conclusions</strong>:</p>
+<ol>
+<li>Traversing private network boundaries requires <strong>ICE / STUN / TURN</strong> for systematic path discovery and relay fallback.</li>
+<li>Large-scale multi-party conferencing must abandon client-to-client Full Mesh P2P in favor of an <strong>SFU (Selective Forwarding Unit)</strong> star topology—where each client pushes a single stream to a public SFU media server, which selectively routes and fans out streams to downstream peers with minimal processing overhead.</li>
+</ol>
+</blockquote>
+<hr>
+<h2 id="2-Connection-Establishment">2. Connection Establishment</h2>
+<p>Before designing multi-party SFU topologies, a system must first master the fundamental atomic capability: <strong>how can two mutually unaware clients, isolated behind disparate firewalls, establish a secure, low-latency, bidirectional UDP media channel?</strong></p>
+<p>Because endpoints lack public IP visibility and cannot be resolved directly, WebRTC establishes connectivity through following progression:</p>
+<div align="center">
+  <img src="2da67f85001329d0599da49d419461ef28e89931.svg" alt="WebRTC Connection Progression" width="800" style="max-width: 100%; height: auto;" />
+</div>
+<hr>
+<h3 id="1-Why-a-Signaling-Service-is-Essential-as-the-First-Step">1. Why a Signaling Service is Essential as the First Step</h3>
+<p>Before two endpoints can initiate a real-time call, they face total network isolation:</p>
+<h4 id="1-Lack-of-Autonomous-Discovery">(1) Lack of Autonomous Discovery</h4>
+<ul>
+<li><strong>No Fixed Public Addressing</strong>: End-user devices are assigned dynamic private IPs and do not operate continuous listening sockets on public well-known ports (such as <code>80</code> or <code>443</code>).</li>
+<li><strong>Complete Isolation</strong>: Located in separate private subnets, neither client knows the other exists, let alone their IP addresses or listening ports.</li>
+</ul>
+<h4 id="2-The-Role-of-Signaling-An-Out-of-Band-Control-Channel">(2) The Role of Signaling: An Out-of-Band Control Channel</h4>
+<p>To break this isolation, clients must connect to a mutually accessible third-party rendezvous server: the <strong>Signaling Server (typically implemented over WebSocket or HTTP/2)</strong>:</p>
+<ul>
+<li><strong>Control Plane</strong>: The signaling server maintains room states (e.g., <code>join-room</code>, <code>peer-left</code>), and relays SDP session descriptions and ICE candidate information. This stage involves only lightweight JSON/text metadata exchanges.</li>
+<li><strong>Data Plane</strong>: Once the underlying media channel is established, raw audio/video payloads travel directly peer-to-peer (or client-to-SFU) via UDP/SRTP. <strong>Media traffic never traverses the signaling server</strong>, preventing it from becoming a CPU or network throughput bottleneck.</li>
+</ul>
+<div align="center">
+  <img src="2026-09-22-03-05-14-image.png" alt="Control Plane vs. Data Plane" width="800" style="max-width: 100%; height: auto;" />
+</div>
+<blockquote>
+<p><strong>Design Rationale: Why Did W3C/IETF Leave Signaling Unstandardized?</strong><br>
+Control metadata requires only reliable delivery. Applications can leverage WebSockets, SIP, MQTT, HTTP long-polling, or custom enterprise RPCs. By deliberately decoupling the signaling layer from the media engine, the specification grants application developers complete architectural freedom.</p>
+</blockquote>
+<hr>
+<h3 id="2-Media-Capability-Negotiation-Session-Description-Protocol-SDP">2. Media Capability Negotiation: Session Description Protocol (SDP)</h3>
+<p>Once signaling is active, endpoints must agree on codecs, resolutions, and cryptographic keys before transmitting any media. This negotiation is governed by <strong>SDP (Session Description Protocol, RFC 4566)</strong>.</p>
+<h4 id="1-SDP-Structure-and-Semantics">(1) SDP Structure and Semantics</h4>
+<p>SDP is a compact, plain-text format organized hierarchically into global session-level attributes followed by media-level stream sections:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[Session-Level Metadata]</span><br><span class="line">v=0                                  --&gt; SDP protocol version</span><br><span class="line">o=- 42189421 2 IN IP4 127.0.0.1      --&gt; Session owner identifier and version</span><br><span class="line">s=-                                  --&gt; Session name</span><br><span class="line">t=0 0                                --&gt; Session start/stop timestamps</span><br><span class="line">a=group:BUNDLE 0 1                   --&gt; BUNDLE: Multiplex audio and video over a single UDP 5-tuple</span><br><span class="line">a=fingerprint:sha-256 A4:12:...      --&gt; DTLS certificate hash fingerprint (anti-tampering anchor)</span><br><span class="line"></span><br><span class="line">[Media-Level Metadata: Audio Track (mid: 0)]</span><br><span class="line">m=audio 9 UDP/TLS/RTP/SAVPF 111      --&gt; Media type (audio), transport profile (SAVPF), payload type (111)</span><br><span class="line">c=IN IP4 0.0.0.0                     --&gt; Connection network address placeholder</span><br><span class="line">a=mid:0                              --&gt; Media stream identification tag</span><br><span class="line">a=rtpmap:111 opus/48000/2            --&gt; Maps payload type 111 to Opus, 48kHz, stereo</span><br><span class="line">a=sendrecv                           --&gt; Directionality: Bidirectional (sendonly / recvonly / inactive)</span><br><span class="line"></span><br><span class="line">[Media-Level Metadata: Video Track (mid: 1)]</span><br><span class="line">m=video 9 UDP/TLS/RTP/SAVPF 96 97    --&gt; Media type (video), payload types 96 (VP8), 97 (H264)</span><br><span class="line">a=mid:1</span><br><span class="line">a=rtpmap:96 VP8/90000                --&gt; Maps payload type 96 to VP8 at 90kHz clock rate</span><br><span class="line">a=rtcp-fb:96 nack                    --&gt; Declares support for NACK packet loss retransmission</span><br><span class="line">a=rtcp-fb:96 nack pli                --&gt; Declares support for Picture Loss Indication (keyframe refresh)</span><br><span class="line">a=rtcp-fb:96 goog-remb / transport-cc --&gt; Declares support for congestion control feedback</span><br></pre></td></tr></table></figure>
+<h4 id="2-Offer-Answer-Negotiation-and-Capability-Intersection-Pruning">(2) Offer/Answer Negotiation and Capability Intersection Pruning</h4>
+<p>Endpoints converge on parameters through the <strong>Offer/Answer interaction model</strong>:</p>
+<ol>
+<li><strong>Offerer</strong>: Calls <code>createOffer()</code> to generate an Offer SDP containing all locally supported codecs, profiles, transport attributes, and certificate fingerprints.</li>
+<li><strong>Answerer</strong>: Receives the Offer, evaluates it against its local capabilities, computes the <strong>intersection</strong>, and calls <code>createAnswer()</code> to return an Answer SDP.</li>
+<li><strong>Capability Pruning</strong>: Any codec or feature not mutually supported is discarded or assigned port <code>0</code>. Both peers adopt this agreed-upon intersection as their encoding, packetization, and encryption standard.</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. Offerer generates an Offer and stores it locally</span></span><br><span class="line"><span class="keyword">const</span> offer = <span class="keyword">await</span> pc.<span class="title function_">createOffer</span>();</span><br><span class="line"><span class="keyword">await</span> pc.<span class="title function_">setLocalDescription</span>(offer);</span><br><span class="line">signaling.<span class="title function_">send</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;offer&#x27;</span>, targetPeerId, <span class="attr">sdp</span>: offer &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. Answerer sets RemoteDescription and generates an Answer</span></span><br><span class="line"><span class="keyword">await</span> pc.<span class="title function_">setRemoteDescription</span>(<span class="keyword">new</span> <span class="title class_">RTCSessionDescription</span>(remoteOffer));</span><br><span class="line"><span class="keyword">const</span> answer = <span class="keyword">await</span> pc.<span class="title function_">createAnswer</span>();</span><br><span class="line"><span class="keyword">await</span> pc.<span class="title function_">setLocalDescription</span>(answer);</span><br><span class="line">signaling.<span class="title function_">send</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;answer&#x27;</span>, targetPeerId, <span class="attr">sdp</span>: answer &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. Offerer applies Answer to finalize negotiation</span></span><br><span class="line"><span class="keyword">await</span> pc.<span class="title function_">setRemoteDescription</span>(<span class="keyword">new</span> <span class="title class_">RTCSessionDescription</span>(remoteAnswer));</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="3-Physical-Routing-Dilemma-RFC-1918-Private-Addressing-and-Firewall-Blocking">3. Physical Routing Dilemma: RFC 1918 Private Addressing and Firewall Blocking</h3>
+<p>Even after converging on SDP parameters, physical packet routing faces immediate obstacles:</p>
+<ul>
+<li><strong>Private IP Space (RFC 1918)</strong>: Local physical adapters report private addresses such as <code>192.168.x.x</code> or <code>10.x.x.x</code>. These addresses are valid only within local subnets and cannot be routed across public transit backbones.</li>
+<li><strong>Firewall “Default Deny Inbound” Policy</strong>: Residential NAT gateways and corporate stateful firewalls drop all inbound unsolicited UDP packets unless an internal host has previously initiated an outbound session to that specific external IP/port tuple.</li>
+</ul>
+<p>Consequently, peers cannot connect simply by exchanging their local network adapter IPs.</p>
+<hr>
+<h3 id="4-NAT-Traversal-Architecture-In-Depth-Comparison-of-STUN-TURN-and-ICE">4. NAT Traversal Architecture: In-Depth Comparison of STUN, TURN, and ICE</h3>
+<p>To overcome NAT and firewall barriers, WebRTC integrates standard IETF protocols:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Specification</th>
+<th style="text-align:left">Entity Type</th>
+<th style="text-align:left">Architectural Responsibility</th>
+<th style="text-align:left">Resource Overhead and Latency Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>STUN (RFC 5389)</strong></td>
+<td style="text-align:left">Public Server</td>
+<td style="text-align:left">Enables clients to discover their public-facing <strong>mapped IP and port</strong> (<code>srflx</code> candidate).</td>
+<td style="text-align:left">Negligible (involves only lightweight UDP Binding request/response probes).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TURN (RFC 5766)</strong></td>
+<td style="text-align:left">Public Media Relay Server</td>
+<td style="text-align:left">When direct hole-punching fails, acts as a cloud relay, <strong>forwarding all media traffic</strong> (<code>relay</code> candidate).</td>
+<td style="text-align:left">High (incurs ongoing bandwidth costs and introduces relay routing hops).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ICE (RFC 8445)</strong></td>
+<td style="text-align:left"><strong>Path Decision Framework</strong> (Algorithm)</td>
+<td style="text-align:left">Collects all candidate paths, exchanges them via signaling, pairs them, and executes connectivity checks to select the optimal path.</td>
+<td style="text-align:left">Runs locally within client RTC stacks; computational cost is negligible.</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    autonumber</span><br><span class="line">    participant A as Client A (Private Subnet)</span><br><span class="line">    participant STUN as Public STUN Server</span><br><span class="line">    participant TURN as Public TURN Relay Server</span><br><span class="line">    participant B as Client B (Private Subnet)</span><br><span class="line"></span><br><span class="line">    Note over A: 1. Enumerate adapters -&gt; Generate Host Candidate</span><br><span class="line">    A-&gt;&gt;STUN: 2. STUN Binding Request (UDP probe packet)</span><br><span class="line">    STUN--&gt;&gt;A: 3. STUN Binding Response (Returns public mapped IP:Port)</span><br><span class="line">    Note over A: Generates srflx Candidate (Server Reflexive)</span><br><span class="line">    A-&gt;&gt;TURN: 4. Allocate Request (Requests public relay allocation)</span><br><span class="line">    TURN--&gt;&gt;A: 5. Allocate Response (Allocates relay IP:Port)</span><br><span class="line">    Note over A: Generates relay Candidate</span><br><span class="line"></span><br><span class="line">    A-&gt;&gt;B: 6. Exchange Candidate Pool via Signaling Channel</span><br><span class="line">    Note over A,B: 7. ICE Connectivity Checks (STUN Binding Pings prioritized)</span><br><span class="line">    rect rgb(240, 248, 255)</span><br><span class="line">    Note over A,B: 8. Path Nomination (Nominate highest-priority viable pair: Host &gt; srflx &gt; relay)</span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+<h4 id="1-STUN-Discovering-Server-Reflexive-srflx-Addresses">(1) STUN: Discovering Server Reflexive (<code>srflx</code>) Addresses</h4>
+<p>An internal host transmits a UDP Binding Request to a public STUN server. The STUN server inspects the source UDP header and echoes the detected public IP and port back inside the <code>XOR-MAPPED-ADDRESS</code> attribute.</p>
+<ul>
+<li>The client learns its public NAT gateway footprint (the <code>srflx</code> candidate).</li>
+<li><strong>Technical Limitation</strong>: When operating behind <strong>Symmetric NAT</strong>, the router assigns a unique, randomized port for each distinct destination IP. The port discovered via the STUN server does not match the port opened when attempting to send packets to peer B. Consequently, incoming hole-punching packets are rejected by the firewall.</li>
+</ul>
+<h4 id="2-TURN-Guaranteed-Fallback-via-Media-Relaying">(2) TURN: Guaranteed Fallback via Media Relaying</h4>
+<p>When Symmetric NAT or enterprise firewalls preclude direct hole-punching, TURN serves as the ultimate fallback:</p>
+<ul>
+<li>The client requests an allocation on a public TURN server (<code>relay</code> candidate).</li>
+<li>Both endpoints transmit their encrypted media payloads directly to the TURN server, which forwards them to the remote peer.</li>
+<li><strong>Engineering Trade-Off</strong>: Provides 100% connectivity assurance at the expense of server bandwidth consumption and added network latency.</li>
+</ul>
+<h4 id="3-ICE-Unified-Path-Decision-and-Connectivity-Checking">(3) ICE: Unified Path Decision and Connectivity Checking</h4>
+<p><strong>ICE is an algorithmic framework, not a server</strong>. It orchestrates connectivity through three stages:</p>
+<ol>
+<li><strong>Candidate Harvesting</strong>:
+<ul>
+<li><strong>Host Candidate</strong>: Local network adapter IP (ideal for LAN calls, sub-2ms latency, zero cloud transit cost).</li>
+<li><strong>srflx Candidate</strong>: Publicly mapped reflection discovered via STUN (for direct calls across standard Cone NATs).</li>
+<li><strong>relay Candidate</strong>: Relayed transport address allocated on a TURN server (fallback for symmetric NATs).</li>
+</ul>
+</li>
+<li><strong>Candidate Exchange</strong>: Candidates are serialized and transmitted to the remote peer via the signaling channel.</li>
+<li><strong>Connectivity Checks and Path Nomination</strong>:<br>
+Local and remote candidates are cross-paired into candidate pairs and sorted by priority (<code>Host &gt; srflx &gt; relay</code>). The ICE agent issues STUN Binding Ping requests over each pair. The highest-priority pair that successfully responds is nominated as the active communication path (Nominated Pair).</li>
+</ol>
+<hr>
+<h3 id="5-Coordinated-Pipeline-Trickle-ICE-Incremental-Candidate-Mechanism">5. Coordinated Pipeline: Trickle ICE Incremental Candidate Mechanism</h3>
+<p>In production deployments, candidate discovery must balance setup latency with path optimality:</p>
+<ul>
+<li><strong>Vanilla ICE (Legacy)</strong>: Gathers all local, STUN, and TURN candidates before packaging them into a single monolithic SDP. Because public STUN and TURN resolutions depend on round-trip delays, this causes noticeable 2–3 second white-screen delays before call initiation.</li>
+<li><strong>Trickle ICE (RFC 8838)</strong>: The modern standard based on asynchronous, pipelined gathering:
+<ol>
+<li><code>createOffer</code> / <code>createAnswer</code> generates an initial SDP containing only media parameters and DTLS fingerprints. This is transmitted over signaling immediately to lock in codec compatibility.</li>
+<li>Concurrently, the ICE agent queries local adapters, STUN, and TURN in the background. As each candidate surfaces, an <code>icecandidate</code> event fires.</li>
+<li>Clients trickle individual candidates to their peer over signaling in real time; the remote endpoint injects them on the fly via <code>addIceCandidate()</code>.</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. Initialize RTCPeerConnection with STUN/TURN configurations</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>(&#123;</span><br><span class="line">  <span class="attr">iceServers</span>: [</span><br><span class="line">    &#123; <span class="attr">urls</span>: <span class="string">&#x27;stun:stun.l.google.com:19302&#x27;</span> &#125;,</span><br><span class="line">    <span class="comment">// In production, configure TURN servers with valid credentials</span></span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. Trickle ICE: Stream candidates incrementally as they are harvested</span></span><br><span class="line">pc.<span class="property">onicecandidate</span> = <span class="function">(<span class="params">event</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (event.<span class="property">candidate</span>) &#123;</span><br><span class="line">    signaling.<span class="title function_">send</span>(&#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;ice-candidate&#x27;</span>,</span><br><span class="line">      <span class="attr">targetPeerId</span>: remotePeerId,</span><br><span class="line">      <span class="attr">candidate</span>: event.<span class="property">candidate</span></span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. Receiver applies incoming candidates immediately to probe connectivity</span></span><br><span class="line"><span class="comment">// Best Practice: Must be added after setRemoteDescription; buffer candidates if received early</span></span><br><span class="line"><span class="keyword">await</span> pc.<span class="title function_">addIceCandidate</span>(<span class="keyword">new</span> <span class="title class_">RTCIceCandidate</span>(remoteCandidate));</span><br></pre></td></tr></table></figure>
+<p>Through Trickle ICE, codec negotiation and network path probing execute entirely in parallel, compressing call setup time to <strong>200–400ms</strong> and ensuring rapid video rendering.</p>
+<p>Once path nomination concludes, endpoints possess a verified bidirectional UDP transport. Audio/video streams can now be packetized, monitored, and encrypted over this link.</p>
+<hr>
+<h2 id="3-Media-Transmission-and-Security-Substrate">3. Media Transmission and Security Substrate</h2>
+<p>Once UDP transport paths are established, media packetization and quality feedback are governed by the <strong>RTP/RTCP protocol suite</strong>, secured end-to-end by <strong>DTLS-SRTP</strong>.</p>
+<h3 id="1-What-Problems-Do-RTP-and-RTCP-Solve-Respectively">1. What Problems Do RTP and RTCP Solve Respectively?</h3>
+<div align="center">
+  <img src="rtp-rtcp-protocols.png" alt="RTP & RTCP Protocols: Real-Time Media Explained" width="750" style="max-width: 100%; height: auto;" />
+</div>
+<h4 id="1-RTP-Header-Design-Solving-Sequence-and-Timing">(1) RTP Header Design: Solving Sequence and Timing</h4>
+<ul>
+<li><strong>Sequence Number (16-bit)</strong>: Increments by 1 with each transmitted packet. Receivers inspect sequence continuity to identify <strong>packet loss</strong>, <strong>reordering</strong>, and <strong>duplicates</strong>.</li>
+<li><strong>Timestamp (32-bit)</strong>: Advances according to the media sampling clock (90kHz for video, 48kHz for audio). Reflects relative sampling instants to ensure smooth frame rendering and jitter computation.</li>
+<li><strong>SSRC (Synchronization Source, 32-bit)</strong>: A globally unique identifier distinguishing individual media tracks. A participant’s camera, microphone, and screen share each transmit under distinct SSRCs.</li>
+<li><strong>Marker Bit (1-bit)</strong>: In video streams, when an encoded frame spans multiple RTP packets, the <strong>Marker bit is set to 1 on the final packet</strong>, signaling frame boundaries to the jitter buffer.</li>
+</ul>
+<h4 id="2-RTCP-Feedback-Mechanisms-Constructing-Closed-Loop-Control">(2) RTCP Feedback Mechanisms: Constructing Closed-Loop Control</h4>
+<p>Because UDP is inherently unacknowledged, RTCP packets establish a telemetry feedback loop:</p>
+<ul>
+<li><strong>Sender Reports (SR) and Lip Sync (AV Sync)</strong>: Audio and video sampling clocks run independently at different frequencies with random initial offsets. Senders periodically dispatch SR packets correlating absolute <strong>64-bit NTP timestamps</strong> with corresponding <strong>RTP timestamps</strong>. Receivers align incoming audio and video streams along this unified physical timeline, eliminating lip-sync drift.</li>
+<li><strong>Receiver Reports (RR) and Accurate RTT Derivation</strong>: Receivers transmit RR packets reporting observed loss and jitter. Senders evaluate the local arrival time against report fields <code>LSR</code> (Last SR timestamp) and <code>DLSR</code> (Delay Since Last SR) to compute round-trip time:<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>RTT</mtext><mo>=</mo><msub><mi>T</mi><mtext>current</mtext></msub><mo>−</mo><mtext>LSR</mtext><mo>−</mo><mtext>DLSR</mtext></mrow><annotation encoding="application/x-tex">\text{RTT} = T_{\text{current}} - \text{LSR} - \text{DLSR}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">RTT</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">current</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">LSR</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">DLSR</span></span></span></span></span></span></p>
+</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Extract RTCP QoS telemetry using the standard W3C getStats() API</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">sampleRtcMetrics</span>(<span class="params"><span class="attr">pc</span>: <span class="title class_">RTCPeerConnection</span>, <span class="attr">prevBytes</span>: <span class="built_in">number</span>, <span class="attr">deltaMs</span>: <span class="built_in">number</span></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> stats = <span class="keyword">await</span> pc.<span class="title function_">getStats</span>();</span><br><span class="line">  <span class="keyword">const</span> metrics = &#123; <span class="attr">rttMs</span>: <span class="number">0</span>, <span class="attr">jitterMs</span>: <span class="number">0</span>, <span class="attr">fractionLostRate</span>: <span class="number">0</span>, <span class="attr">bitrateKbps</span>: <span class="number">0</span>, <span class="attr">fps</span>: <span class="number">0</span> &#125;;</span><br><span class="line"></span><br><span class="line">  stats.<span class="title function_">forEach</span>(<span class="function"><span class="params">report</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 1. True round-trip time over the selected candidate pair</span></span><br><span class="line">    <span class="keyword">if</span> (report.<span class="property">type</span> === <span class="string">&#x27;candidate-pair&#x27;</span> &amp;&amp; (report.<span class="property">selected</span> || report.<span class="property">state</span> === <span class="string">&#x27;succeeded&#x27;</span>)) &#123;</span><br><span class="line">      metrics.<span class="property">rttMs</span> = <span class="title class_">Math</span>.<span class="title function_">round</span>((report.<span class="property">currentRoundTripTime</span> || <span class="number">0</span>) * <span class="number">1000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 2. Jitter and fractional loss from Remote Inbound RTP reports (RTCP RR)</span></span><br><span class="line">    <span class="keyword">if</span> (report.<span class="property">type</span> === <span class="string">&#x27;remote-inbound-rtp&#x27;</span> &amp;&amp; report.<span class="property">kind</span> === <span class="string">&#x27;video&#x27;</span>) &#123;</span><br><span class="line">      metrics.<span class="property">jitterMs</span> = <span class="title class_">Math</span>.<span class="title function_">round</span>((report.<span class="property">jitter</span> || <span class="number">0</span>) * <span class="number">1000</span>);</span><br><span class="line">      metrics.<span class="property">fractionLostRate</span> = <span class="title class_">Math</span>.<span class="title function_">round</span>((report.<span class="property">fractionLost</span> || <span class="number">0</span>) * <span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 3. Instantaneous encoding bitrate and frame rate</span></span><br><span class="line">    <span class="keyword">if</span> (report.<span class="property">type</span> === <span class="string">&#x27;outbound-rtp&#x27;</span> &amp;&amp; report.<span class="property">kind</span> === <span class="string">&#x27;video&#x27;</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> deltaBytes = report.<span class="property">bytesSent</span> - prevBytes;</span><br><span class="line">      metrics.<span class="property">bitrateKbps</span> = <span class="title class_">Math</span>.<span class="title function_">round</span>((deltaBytes * <span class="number">8</span>) / deltaMs);</span><br><span class="line">      metrics.<span class="property">fps</span> = report.<span class="property">framesPerSecond</span> || <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> metrics;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="2-Why-is-DTLS-SRTP-the-Security-Cornerstone-of-WebRTC">2. Why is DTLS-SRTP the Security Cornerstone of WebRTC?</h3>
+<p>The WebRTC specification mandates that <strong>all media streams must be encrypted end-to-end; unencrypted plain-text transmission is strictly disallowed</strong>. This is implemented via <strong>DTLS-SRTP (RFC 5764)</strong>.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant A as Client A</span><br><span class="line">    participant S as Signaling</span><br><span class="line">    participant B as Client B</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 1 — Fingerprint Exchange</span><br><span class="line">    A-&gt;&gt;S: SDP + SHA-256 Certificate Fingerprint</span><br><span class="line">    S-&gt;&gt;B: SDP + Certificate Fingerprint</span><br><span class="line">    Note over A,B: Fingerprint binds the expected DTLS certificate</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 2 — DTLS Handshake</span><br><span class="line">    A&lt;&lt;-&gt;&gt;B: DTLS Handshake over ICE / UDP</span><br><span class="line">    Note over A,B: Key negotiation + UDP retransmission</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 3 — Key Material Derivation</span><br><span class="line">    A-&gt;&gt;A: Derive SRTP / SRTCP key material</span><br><span class="line">    B-&gt;&gt;B: Derive SRTP / SRTCP key material</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 4 — Media Encryption</span><br><span class="line">    A-&gt;&gt;A: RTP Packet → SRTP Protection</span><br><span class="line">    A-&gt;&gt;B: Encrypted SRTP Packet over UDP</span><br><span class="line">    B-&gt;&gt;B: SRTP Decryption → RTP Packet</span><br></pre></td></tr></table></figure>
+<h4 id="Why-Not-Transmit-Audio-Video-Directly-over-DTLS-Records">Why Not Transmit Audio/Video Directly over DTLS Records?</h4>
+<ul>
+<li><strong>Excessive Protocol Overhead</strong>: DTLS record framing introduces heavy per-packet overhead and strict sequence validation unnecessary for loss-tolerant real-time media.</li>
+<li><strong>Hybrid Architecture</strong>: DTLS executes <strong>only once during initial connection setup</strong> to perform asymmetric authentication and negotiate symmetric keying material. High-throughput media frames are then protected by lightweight <strong>SRTP (Secure RTP)</strong> leveraging hardware AES-NI instructions, achieving strong cryptographic security with negligible CPU overhead.</li>
+</ul>
+<hr>
+<h2 id="4-QoS-and-Dynamic-Adaptation-Strategies-in-Weak-Network-Conditions">4. QoS and Dynamic Adaptation Strategies in Weak Network Conditions</h2>
+<p>Public UDP transmission is inherently vulnerable to Wi-Fi channel contention, cellular handovers, and bufferbloat, resulting in packet loss and jitter.</p>
+<h3 id="1-How-Do-RTT-Packet-Loss-and-Jitter-Degrade-Meeting-Experience">1. How Do RTT, Packet Loss, and Jitter Degrade Meeting Experience?</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Network Anomaly</th>
+<th style="text-align:left">Direct Impact on User Experience</th>
+<th style="text-align:left">Architectural Countermeasures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Elevated RTT</strong> (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>400</mn><mtext>ms</mtext></mrow><annotation encoding="application/x-tex">&gt;400\text{ms}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">400</span><span class="mord text"><span class="mord">ms</span></span></span></span></span>)</td>
+<td style="text-align:left"><strong>Conversational cross-talk and awkward pauses</strong>. Speakers interrupt each other due to delayed audio feedback.</td>
+<td style="text-align:left">Suppress deep retransmissions; deploy proactive Forward Error Correction (FEC); minimize jitter buffer depth.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Jitter</strong></td>
+<td style="text-align:left"><strong>Robotic, staggered, or distorted audio</strong> caused by irregular inter-arrival intervals.</td>
+<td style="text-align:left"><strong>Adaptive JitterBuffer</strong>: Dynamically estimates delay variance to release frames at steady intervals to decoders.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Packet Loss</strong></td>
+<td style="text-align:left"><strong>Blocky video artifacts, green screens, audio dropouts</strong> due to missing reference frames.</td>
+<td style="text-align:left">1. <strong>NACK</strong>: Selective negative acknowledgment retransmissions.<br>2. <strong>PLI/FIR</strong>: Fast keyframe generation to break decoding dependency corruption.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Bandwidth Collapse</strong></td>
+<td style="text-align:left">Bottleneck routers overflow, inducing cascading loss and video stalls.</td>
+<td style="text-align:left"><strong>TCC + Pacer</strong>: Queue-delay-sensitive bandwidth estimation and smoothed packet pacing; coupled with <strong>Degradation Preferences</strong>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="2-Core-Countermeasures-Analyzed">2. Core Countermeasures Analyzed</h3>
+<h4 id="1-Adaptive-JitterBuffer">(1) Adaptive JitterBuffer</h4>
+<p>Incoming RTP packets are queued and sorted by timestamp before being dispatched to decoders. Under stable network conditions, the buffer contracts to reduce end-to-end latency; during jitter spikes, it dynamically expands, sacrificing tens of milliseconds of latency to prevent playback stalls.</p>
+<h4 id="2-Negative-Acknowledgment-NACK">(2) Negative Acknowledgment (NACK)</h4>
+<p>When a receiver observes gaps in incoming RTP sequence numbers, it requests retransmission from the sender.</p>
+<ul>
+<li><strong>Operational Boundary</strong>: Highly effective in metro networks where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>RTT</mtext><mo>&lt;</mo><mn>50</mn><mtext>ms</mtext></mrow><annotation encoding="application/x-tex">\text{RTT} &lt; 50\text{ms}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord text"><span class="mord">RTT</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">50</span><span class="mord text"><span class="mord">ms</span></span></span></span></span>. In transoceanic links (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>RTT</mtext><mo>&gt;</mo><mn>250</mn><mtext>ms</mtext></mrow><annotation encoding="application/x-tex">\text{RTT} &gt; 250\text{ms}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord text"><span class="mord">RTT</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">250</span><span class="mord text"><span class="mord">ms</span></span></span></span></span>), waiting for retransmissions breaches frame playback deadlines. In such scenarios, systems suppress NACKs and rely instead on proactive FEC redundancy.</li>
+</ul>
+<h4 id="3-Keyframe-Fast-Recovery-PLI-and-FIR">(3) Keyframe Fast Recovery: PLI and FIR</h4>
+<p>Video codecs rely on inter-frame compression (P-frames referencing prior I- or P-frames). When reference frames are irrevocably lost, downstream frames cannot be decoded, causing video corruption.</p>
+<ul>
+<li><strong>PLI (Picture Loss Indication)</strong>: Alerts the sender to partial reference loss, requesting a keyframe at the encoder’s earliest convenience.</li>
+<li><strong>FIR (Full Intra Request)</strong>: Unconditionally commands the sender’s encoder to <strong>immediately produce a full IDR keyframe</strong>. Widely utilized for <strong>active speaker switching</strong> and <strong>fast first-frame rendering upon joining</strong>.</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Receiver: Request an immediate keyframe refresh over signaling upon detecting corruption</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">requestKeyFrame</span>(<span class="params"><span class="attr">signaling</span>: <span class="title class_">WebSocket</span>, <span class="attr">targetPeerId</span>: <span class="built_in">string</span></span>) &#123;</span><br><span class="line">  signaling.<span class="title function_">send</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123;</span><br><span class="line">    <span class="attr">type</span>: <span class="string">&#x27;request-keyframe&#x27;</span>,</span><br><span class="line">    targetPeerId,</span><br><span class="line">    <span class="attr">reason</span>: <span class="string">&#x27;PLI: Reference frame loss or fast room join&#x27;</span></span><br><span class="line">  &#125;));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Sender: Trigger encoder keyframe generation upon receiving PLI</span></span><br><span class="line"><span class="keyword">if</span> (videoSender &amp;&amp; <span class="title function_">typeof</span> (videoSender <span class="keyword">as</span> <span class="built_in">any</span>).<span class="property">generateKeyFrame</span> === <span class="string">&#x27;function&#x27;</span>) &#123;</span><br><span class="line">  (videoSender <span class="keyword">as</span> <span class="built_in">any</span>).<span class="title function_">generateKeyFrame</span>(); <span class="comment">// Supported natively in modern browsers</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="3-Application-Layer-Adaptive-Strategies-in-Video-Conferencing">3. Application-Layer Adaptive Strategies in Video Conferencing</h3>
+<h4 id="1-Degradation-Preference-degradationPreference">(1) Degradation Preference (<code>degradationPreference</code>)</h4>
+<p>WebRTC exposes application-layer prioritization to intelligently manage encoding trade-offs under bandwidth constraints:</p>
+<ul>
+<li><strong><code>maintain-resolution</code></strong>:
+<ul>
+<li><strong>Use Case</strong>: Desktop screen sharing, slide presentations, document review, and code walkthroughs.</li>
+<li><strong>Strategy</strong>: Fine text and diagrams must remain crisp. Under bandwidth crunches, the encoder aggressively reduces frame rate (e.g., from 30fps down to 5fps) while <strong>strictly preserving 1080p resolution</strong>.</li>
+</ul>
+</li>
+<li><strong><code>maintain-framerate</code></strong>:
+<ul>
+<li><strong>Use Case</strong>: Headshot camera streams, speaker facial expressions, and gesture interaction.</li>
+<li><strong>Strategy</strong>: Smooth motion and lip synchronization are paramount. Under bandwidth crunches, the encoder downscales resolution (e.g., from 720p to 360p) to preserve a fluid 24–30fps.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Dynamically adjust sender degradation preference</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">setDegradationPreference</span>(<span class="params"></span></span><br><span class="line"><span class="params">  <span class="attr">sender</span>: <span class="title class_">RTCRtpSender</span>,</span></span><br><span class="line"><span class="params">  <span class="attr">preference</span>: <span class="string">&#x27;maintain-resolution&#x27;</span> | <span class="string">&#x27;maintain-framerate&#x27;</span> | <span class="string">&#x27;balanced&#x27;</span></span></span><br><span class="line"><span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> params = sender.<span class="title function_">getParameters</span>();</span><br><span class="line">  params.<span class="property">degradationPreference</span> = preference;</span><br><span class="line">  <span class="keyword">await</span> sender.<span class="title function_">setParameters</span>(params);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-Multi-Stream-Distribution-Simulcast-and-SVC">(2) Multi-Stream Distribution: Simulcast and SVC</h4>
+<p>In multi-party meetings, participants operate with heterogeneous downlink bandwidths. Broadcasters cannot degrade stream quality for all participants simply because one peer suffers a poor connection.</p>
+<ul>
+<li><strong>Simulcast</strong>: The sender’s device concurrently encodes 2–3 streams of varying resolutions and bitrates from the same camera source (e.g., High 1080p@2Mbps, Mid 360p@500Kbps, Low 180p@150Kbps), tagging each with distinct SSRCs before uploading to an SFU.</li>
+<li><strong>SFU Dynamic Routing</strong>: The SFU routes the 180p stream to thumbnail gallery views and the 1080p stream to the active speaker’s spotlight view. If a participant’s link deteriorates, the SFU seamlessly down-switches them to the 360p layer without disrupting the sender or other peers.</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Configure 3-layer Simulcast encodings when adding video tracks</span></span><br><span class="line"><span class="keyword">const</span> transceiver = pc.<span class="title function_">addTransceiver</span>(videoTrack, &#123;</span><br><span class="line">  <span class="attr">direction</span>: <span class="string">&#x27;sendrecv&#x27;</span>,</span><br><span class="line">  <span class="attr">sendEncodings</span>: [</span><br><span class="line">    &#123; <span class="attr">rid</span>: <span class="string">&#x27;f&#x27;</span>, <span class="attr">maxBitrate</span>: <span class="number">1500000</span>, <span class="attr">maxFramerate</span>: <span class="number">30</span> &#125;,        <span class="comment">// Full: 1080p/720p</span></span><br><span class="line">    &#123; <span class="attr">rid</span>: <span class="string">&#x27;h&#x27;</span>, <span class="attr">maxBitrate</span>: <span class="number">500000</span>, <span class="attr">scaleResolutionDownBy</span>: <span class="number">2.0</span> &#125;, <span class="comment">// Half: 360p</span></span><br><span class="line">    &#123; <span class="attr">rid</span>: <span class="string">&#x27;q&#x27;</span>, <span class="attr">maxBitrate</span>: <span class="number">150000</span>, <span class="attr">scaleResolutionDownBy</span>: <span class="number">4.0</span> &#125;  <span class="comment">// Quarter: 180p</span></span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="5-Practical-Implementation-and-Traffic-Inspection">5. Practical Implementation and Traffic Inspection</h2>
+<p>This repository includes a fully operational, observable video conferencing demo:</p>
+<div align="center">
+  <img src="2026-09-22-03-12-27-image.png" alt="Multi-Party Video Conference Demo" width="800" style="max-width: 100%; height: auto;" />
+</div>
+<h3 id="Industrial-Grade-Browser-Inspection-chrome-webrtc-internals">Industrial-Grade Browser Inspection: <code>chrome://webrtc-internals</code></h3>
+<p>When evaluating this demo, open <code>chrome://webrtc-internals</code> in a separate browser tab—the indispensable diagnostic suite for WebRTC engineers:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[Diagnostic Tree]</span><br><span class="line">├─ Stats Graphs for RTCIceCandidatePair</span><br><span class="line">│  └─ [currentRoundTripTime]  --&gt; Tracks true millisecond-level RTT derived from RTCP telemetry</span><br><span class="line">├─ Stats Graphs for outbound-rtp (video)</span><br><span class="line">│  ├─ [bytesSent]            --&gt; Quantifies throughput changes under congestion control</span><br><span class="line">│  ├─ [framesPerSecond]      --&gt; Validates frame rate throttling under maintain-resolution</span><br><span class="line">│  └─ [keyFramesEncoded]     --&gt; Observes instant keyframe spikes when triggering PLI</span><br><span class="line">└─ Data Path (ICE / DTLS)</span><br><span class="line">   └─ Selected Candidate Pair: host &lt;--&gt; srflx (Verifies active path typology)</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="6-End-to-End-Lifecycle-Sequence-Diagram">6. End-to-End Lifecycle Sequence Diagram</h2>
+<p>The following sequence diagram consolidates the complete lifecycle of a call—from initial signaling to video rendering:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    autonumber</span><br><span class="line">    actor Alice as Participant Alice</span><br><span class="line">    participant WS as WebSocket Signaling</span><br><span class="line">    actor Bob as Participant Bob</span><br><span class="line">    participant STUN as STUN/TURN Server</span><br><span class="line">    participant Dec as JitterBuffer &amp; Decoder</span><br><span class="line"></span><br><span class="line">    rect rgb(245, 247, 250)</span><br><span class="line">    Note over Alice,Bob: Stage 1: Room Join &amp; Peer Discovery (Signaling)</span><br><span class="line">    Alice-&gt;&gt;WS: join-room &#123; roomId: 888 &#125;</span><br><span class="line">    Bob-&gt;&gt;WS: join-room &#123; roomId: 888 &#125;</span><br><span class="line">    WS--&gt;&gt;Bob: existing-peers: [Alice]</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(255, 250, 240)</span><br><span class="line">    Note over Alice,Bob: Stage 2: Media Capability Negotiation (SDP)</span><br><span class="line">    Bob-&gt;&gt;Bob: createOffer() -&gt; Store LocalDescription</span><br><span class="line">    Bob-&gt;&gt;WS: Send Offer (VP8/Opus, DTLS fingerprint)</span><br><span class="line">    WS-&gt;&gt;Alice: Forward Offer</span><br><span class="line">    Alice-&gt;&gt;Alice: Store RemoteDescription -&gt; createAnswer()</span><br><span class="line">    Alice-&gt;&gt;WS: Send Answer (Capability intersection)</span><br><span class="line">    WS-&gt;&gt;Bob: Forward Answer</span><br><span class="line">    Bob-&gt;&gt;Bob: Store RemoteDescription</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(240, 255, 240)</span><br><span class="line">    Note over Alice,Bob: Stage 3: NAT Traversal &amp; Hole Punching (ICE)</span><br><span class="line">    par Candidate Discovery</span><br><span class="line">        Alice-&gt;&gt;STUN: Discover public mapped address</span><br><span class="line">        Bob-&gt;&gt;STUN: Discover public mapped address</span><br><span class="line">    end</span><br><span class="line">    Alice-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)</span><br><span class="line">    Bob-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)</span><br><span class="line">    Alice&lt;&lt;-&gt;&gt;Bob: STUN Binding Ping/Pong connectivity checks</span><br><span class="line">    Note over Alice,Bob: Nominate highest-priority viable pair</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(255, 245, 245)</span><br><span class="line">    Note over Alice,Bob: Stage 4: Cryptographic Handshake (DTLS-SRTP)</span><br><span class="line">    Alice&lt;&lt;-&gt;&gt;Bob: Execute DTLS handshake over UDP transport</span><br><span class="line">    Note over Alice,Bob: Verify SDP fingerprints, derive symmetric SRTP keys</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(245, 245, 255)</span><br><span class="line">    Note over Alice,Bob: Stage 5: Media Flow, QoS Feedback &amp; Rendering</span><br><span class="line">    loop Encrypted Media Transfer (SRTP)</span><br><span class="line">        Bob-&gt;&gt;Alice: Transmit RTP packets (SeqNum, Timestamp, Marker)</span><br><span class="line">        Alice-&gt;&gt;Dec: Ingest into JitterBuffer (Absorbs jitter &amp; reorders)</span><br><span class="line">        Dec-&gt;&gt;Alice: Assemble frames -&gt; Decode -&gt; Render to canvas/video</span><br><span class="line">    end</span><br><span class="line">    loop Telemetry Feedback Loop (RTCP)</span><br><span class="line">        Bob-&gt;&gt;Alice: Send RTCP SR (Synchronize physical NTP and RTP clocks)</span><br><span class="line">        Alice-&gt;&gt;Bob: Return RTCP RR (Report RTT, packet loss, and jitter)</span><br><span class="line">        opt Reference Frame Loss Detected</span><br><span class="line">            Alice-&gt;&gt;Bob: Send RTCP PLI/FIR (Request immediate keyframe refresh)</span><br><span class="line">        end</span><br><span class="line">    end</span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Conclusion">Conclusion</h3>
+<p>The essence of WebRTC lies not merely in calling browser APIs, but in the tight, closed-loop coordination across <strong>network discovery (ICE), applied cryptography (DTLS-SRTP), real-time flow control (RTP/RTCP), and adaptive recovery (JitterBuffer/TCC/PLI)</strong>. We hope this comprehensive analysis—spanning business realities, protocol mechanics, and traffic inspection—provides you with a robust mental model for diagnosing latency, eliminating media stalls, and architecting resilient enterprise video systems.</p>
+<h2 id="Reference-Link">Reference Link</h2>
+<p><a target="_blank" rel="noopener" href="https://webrtc.org/getting-started/overview">Getting started with WebRTC</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.webrtc-developers.com/anatomy-of-a-webrtc-connection/?utm_source=chatgpt.com">Anatomy of a WebRTC Connection | WebRTC for Developers</a></p>
+<p><a target="_blank" rel="noopener" href="https://alokknight.com/blog/system-design-webrtc">WebRTC in System Design: Signaling, NAT Traversal, STUN/TURN &amp; SFU (Visualized)</a></p>
+<p><a target="_blank" rel="noopener" href="https://real-time-media-architecture.com/webrtc-protocol-stack-signaling-servers/">Webrtc Protocol Stack Signaling Servers</a></p>
+<p><a target="_blank" rel="noopener" href="https://webrtc.ventures/2025/02/a-quick-tour-of-webrtc-internals-a-powerful-webrtc-debugging-tool/">https://webrtc.ventures/2025/02/a-quick-tour-of-webrtc-internals-a-powerful-webrtc-debugging-tool/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Wu Yongwei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://wywwwwei.github.io/2026/09/01/webrtc-intro/" title="Core WebRTC Mechanisms and Practical Video Conferencing Analysis">https://wywwwwei.github.io/2026/09/01/webrtc-intro/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Multimedia/" rel="tag"># Multimedia</a>
+              <a href="/tags/WebRTC/" rel="tag"># WebRTC</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/08/10/ios-memory-management/" rel="prev" title="Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App">
+                  <i class="fa fa-angle-left"></i> Crossing the Memory Model Boundary: How Multiple Languages Coexist in a Single iOS App
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu Yongwei</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+
+</body>
+</html>
