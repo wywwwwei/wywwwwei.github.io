@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/rtp-rtcp-protocols.png">
 <meta property="og:image" content="https://wywwwwei.github.io/2026/09/01/webrtc-intro/2026-09-22-03-12-27-image.png">
 <meta property="article:published_time" content="2026-08-31T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-09-21T20:13:02.824Z">
+<meta property="article:modified_time" content="2026-09-27T09:36:09.419Z">
 <meta property="article:author" content="Wu Yongwei">
 <meta property="article:tag" content="Multimedia">
 <meta property="article:tag" content="WebRTC">
@@ -495,7 +495,8 @@ Local and remote candidates are cross-paired into candidate pairs and sorted by 
     Note over A,B: Fingerprint binds the expected DTLS certificate
 
     Note over A,B: Step 2 — DTLS Handshake
-    A&lt;&lt;-&gt;&gt;B: DTLS Handshake over ICE / UDP
+    A-&gt;&gt;B: DTLS Handshake (ClientHello)
+    B--&gt;&gt;A: DTLS Handshake (ServerHello &amp; Finished)
     Note over A,B: Key negotiation + UDP retransmission
 
     Note over A,B: Step 3 — Key Material Derivation
@@ -634,13 +635,15 @@ Local and remote candidates are cross-paired into candidate pairs and sorted by 
     end
     Alice-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)
     Bob-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)
-    Alice&lt;&lt;-&gt;&gt;Bob: STUN Binding Ping/Pong connectivity checks
+    Alice-&gt;&gt;Bob: STUN Binding Request (Ping)
+    Bob--&gt;&gt;Alice: STUN Binding Response (Pong)
     Note over Alice,Bob: Nominate highest-priority viable pair
     end
 
     rect rgb(255, 245, 245)
     Note over Alice,Bob: Stage 4: Cryptographic Handshake (DTLS-SRTP)
-    Alice&lt;&lt;-&gt;&gt;Bob: Execute DTLS handshake over UDP transport
+    Alice-&gt;&gt;Bob: Execute DTLS handshake (ClientHello)
+    Bob--&gt;&gt;Alice: Complete DTLS handshake (ServerHello &amp; Finished)
     Note over Alice,Bob: Verify SDP fingerprints, derive symmetric SRTP keys
     end
 
