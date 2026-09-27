@@ -1,7 +1,7 @@
 /* global NexT, CONFIG, mermaid */
 
 document.addEventListener('page:loaded', () => {
-  const mermaidElements = document.querySelectorAll('pre > .mermaid');
+  const mermaidElements = document.querySelectorAll('pre > .mermaid, pre > .language-mermaid');
   if (mermaidElements.length) {
     NexT.utils.getScript(CONFIG.mermaid.js, {
       condition: window.mermaid

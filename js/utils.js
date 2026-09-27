@@ -92,7 +92,7 @@ NexT.utils = {
     }
     figure.forEach(element => {
       // Skip pre > .mermaid for folding and copy button
-      if (element.querySelector('.mermaid')) return;
+      if (element.querySelector('.mermaid, .language-mermaid')) return;
       if (!inited) {
         let span = element.querySelectorAll('.code .line span');
         if (span.length === 0) {

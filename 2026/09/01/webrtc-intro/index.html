@@ -395,7 +395,26 @@ Control metadata requires only reliable delivery. Applications can leverage WebS
 </tr>
 </tbody>
 </table>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    autonumber</span><br><span class="line">    participant A as Client A (Private Subnet)</span><br><span class="line">    participant STUN as Public STUN Server</span><br><span class="line">    participant TURN as Public TURN Relay Server</span><br><span class="line">    participant B as Client B (Private Subnet)</span><br><span class="line"></span><br><span class="line">    Note over A: 1. Enumerate adapters -&gt; Generate Host Candidate</span><br><span class="line">    A-&gt;&gt;STUN: 2. STUN Binding Request (UDP probe packet)</span><br><span class="line">    STUN--&gt;&gt;A: 3. STUN Binding Response (Returns public mapped IP:Port)</span><br><span class="line">    Note over A: Generates srflx Candidate (Server Reflexive)</span><br><span class="line">    A-&gt;&gt;TURN: 4. Allocate Request (Requests public relay allocation)</span><br><span class="line">    TURN--&gt;&gt;A: 5. Allocate Response (Allocates relay IP:Port)</span><br><span class="line">    Note over A: Generates relay Candidate</span><br><span class="line"></span><br><span class="line">    A-&gt;&gt;B: 6. Exchange Candidate Pool via Signaling Channel</span><br><span class="line">    Note over A,B: 7. ICE Connectivity Checks (STUN Binding Pings prioritized)</span><br><span class="line">    rect rgb(240, 248, 255)</span><br><span class="line">    Note over A,B: 8. Path Nomination (Nominate highest-priority viable pair: Host &gt; srflx &gt; relay)</span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+<pre><code class="highlight mermaid">sequenceDiagram
+    autonumber
+    participant A as Client A (Private Subnet)
+    participant STUN as Public STUN Server
+    participant TURN as Public TURN Relay Server
+    participant B as Client B (Private Subnet)
+
+    Note over A: 1. Enumerate adapters -&gt; Generate Host Candidate
+    A-&gt;&gt;STUN: 2. STUN Binding Request (UDP probe packet)
+    STUN--&gt;&gt;A: 3. STUN Binding Response (Returns public mapped IP:Port)
+    Note over A: Generates srflx Candidate (Server Reflexive)
+    A-&gt;&gt;TURN: 4. Allocate Request (Requests public relay allocation)
+    TURN--&gt;&gt;A: 5. Allocate Response (Allocates relay IP:Port)
+    Note over A: Generates relay Candidate
+
+    A-&gt;&gt;B: 6. Exchange Candidate Pool via Signaling Channel
+    Note over A,B: 7. ICE Connectivity Checks (STUN Binding Pings prioritized)
+    rect rgb(240, 248, 255)
+    Note over A,B: 8. Path Nomination (Nominate highest-priority viable pair: Host &gt; srflx &gt; relay)
+    end</code></pre>
 <h4 id="1-STUN-Discovering-Server-Reflexive-srflx-Addresses">(1) STUN: Discovering Server Reflexive (<code>srflx</code>) Addresses</h4>
 <p>An internal host transmits a UDP Binding Request to a public STUN server. The STUN server inspects the source UDP header and echoes the detected public IP and port back inside the <code>XOR-MAPPED-ADDRESS</code> attribute.</p>
 <ul>
@@ -465,7 +484,28 @@ Local and remote candidates are cross-paired into candidate pairs and sorted by 
 <hr>
 <h3 id="2-Why-is-DTLS-SRTP-the-Security-Cornerstone-of-WebRTC">2. Why is DTLS-SRTP the Security Cornerstone of WebRTC?</h3>
 <p>The WebRTC specification mandates that <strong>all media streams must be encrypted end-to-end; unencrypted plain-text transmission is strictly disallowed</strong>. This is implemented via <strong>DTLS-SRTP (RFC 5764)</strong>.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant A as Client A</span><br><span class="line">    participant S as Signaling</span><br><span class="line">    participant B as Client B</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 1 — Fingerprint Exchange</span><br><span class="line">    A-&gt;&gt;S: SDP + SHA-256 Certificate Fingerprint</span><br><span class="line">    S-&gt;&gt;B: SDP + Certificate Fingerprint</span><br><span class="line">    Note over A,B: Fingerprint binds the expected DTLS certificate</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 2 — DTLS Handshake</span><br><span class="line">    A&lt;&lt;-&gt;&gt;B: DTLS Handshake over ICE / UDP</span><br><span class="line">    Note over A,B: Key negotiation + UDP retransmission</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 3 — Key Material Derivation</span><br><span class="line">    A-&gt;&gt;A: Derive SRTP / SRTCP key material</span><br><span class="line">    B-&gt;&gt;B: Derive SRTP / SRTCP key material</span><br><span class="line"></span><br><span class="line">    Note over A,B: Step 4 — Media Encryption</span><br><span class="line">    A-&gt;&gt;A: RTP Packet → SRTP Protection</span><br><span class="line">    A-&gt;&gt;B: Encrypted SRTP Packet over UDP</span><br><span class="line">    B-&gt;&gt;B: SRTP Decryption → RTP Packet</span><br></pre></td></tr></table></figure>
+<pre><code class="highlight mermaid">sequenceDiagram
+    participant A as Client A
+    participant S as Signaling
+    participant B as Client B
+
+    Note over A,B: Step 1 — Fingerprint Exchange
+    A-&gt;&gt;S: SDP + SHA-256 Certificate Fingerprint
+    S-&gt;&gt;B: SDP + Certificate Fingerprint
+    Note over A,B: Fingerprint binds the expected DTLS certificate
+
+    Note over A,B: Step 2 — DTLS Handshake
+    A&lt;&lt;-&gt;&gt;B: DTLS Handshake over ICE / UDP
+    Note over A,B: Key negotiation + UDP retransmission
+
+    Note over A,B: Step 3 — Key Material Derivation
+    A-&gt;&gt;A: Derive SRTP / SRTCP key material
+    B-&gt;&gt;B: Derive SRTP / SRTCP key material
+
+    Note over A,B: Step 4 — Media Encryption
+    A-&gt;&gt;A: RTP Packet → SRTP Protection
+    A-&gt;&gt;B: Encrypted SRTP Packet over UDP
+    B-&gt;&gt;B: SRTP Decryption → RTP Packet</code></pre>
 <h4 id="Why-Not-Transmit-Audio-Video-Directly-over-DTLS-Records">Why Not Transmit Audio/Video Directly over DTLS Records?</h4>
 <ul>
 <li><strong>Excessive Protocol Overhead</strong>: DTLS record framing introduces heavy per-packet overhead and strict sequence validation unnecessary for loss-tolerant real-time media.</li>
@@ -560,7 +600,65 @@ Local and remote candidates are cross-paired into candidate pairs and sorted by 
 <hr>
 <h2 id="6-End-to-End-Lifecycle-Sequence-Diagram">6. End-to-End Lifecycle Sequence Diagram</h2>
 <p>The following sequence diagram consolidates the complete lifecycle of a call—from initial signaling to video rendering:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    autonumber</span><br><span class="line">    actor Alice as Participant Alice</span><br><span class="line">    participant WS as WebSocket Signaling</span><br><span class="line">    actor Bob as Participant Bob</span><br><span class="line">    participant STUN as STUN/TURN Server</span><br><span class="line">    participant Dec as JitterBuffer &amp; Decoder</span><br><span class="line"></span><br><span class="line">    rect rgb(245, 247, 250)</span><br><span class="line">    Note over Alice,Bob: Stage 1: Room Join &amp; Peer Discovery (Signaling)</span><br><span class="line">    Alice-&gt;&gt;WS: join-room &#123; roomId: 888 &#125;</span><br><span class="line">    Bob-&gt;&gt;WS: join-room &#123; roomId: 888 &#125;</span><br><span class="line">    WS--&gt;&gt;Bob: existing-peers: [Alice]</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(255, 250, 240)</span><br><span class="line">    Note over Alice,Bob: Stage 2: Media Capability Negotiation (SDP)</span><br><span class="line">    Bob-&gt;&gt;Bob: createOffer() -&gt; Store LocalDescription</span><br><span class="line">    Bob-&gt;&gt;WS: Send Offer (VP8/Opus, DTLS fingerprint)</span><br><span class="line">    WS-&gt;&gt;Alice: Forward Offer</span><br><span class="line">    Alice-&gt;&gt;Alice: Store RemoteDescription -&gt; createAnswer()</span><br><span class="line">    Alice-&gt;&gt;WS: Send Answer (Capability intersection)</span><br><span class="line">    WS-&gt;&gt;Bob: Forward Answer</span><br><span class="line">    Bob-&gt;&gt;Bob: Store RemoteDescription</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(240, 255, 240)</span><br><span class="line">    Note over Alice,Bob: Stage 3: NAT Traversal &amp; Hole Punching (ICE)</span><br><span class="line">    par Candidate Discovery</span><br><span class="line">        Alice-&gt;&gt;STUN: Discover public mapped address</span><br><span class="line">        Bob-&gt;&gt;STUN: Discover public mapped address</span><br><span class="line">    end</span><br><span class="line">    Alice-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)</span><br><span class="line">    Bob-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)</span><br><span class="line">    Alice&lt;&lt;-&gt;&gt;Bob: STUN Binding Ping/Pong connectivity checks</span><br><span class="line">    Note over Alice,Bob: Nominate highest-priority viable pair</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(255, 245, 245)</span><br><span class="line">    Note over Alice,Bob: Stage 4: Cryptographic Handshake (DTLS-SRTP)</span><br><span class="line">    Alice&lt;&lt;-&gt;&gt;Bob: Execute DTLS handshake over UDP transport</span><br><span class="line">    Note over Alice,Bob: Verify SDP fingerprints, derive symmetric SRTP keys</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    rect rgb(245, 245, 255)</span><br><span class="line">    Note over Alice,Bob: Stage 5: Media Flow, QoS Feedback &amp; Rendering</span><br><span class="line">    loop Encrypted Media Transfer (SRTP)</span><br><span class="line">        Bob-&gt;&gt;Alice: Transmit RTP packets (SeqNum, Timestamp, Marker)</span><br><span class="line">        Alice-&gt;&gt;Dec: Ingest into JitterBuffer (Absorbs jitter &amp; reorders)</span><br><span class="line">        Dec-&gt;&gt;Alice: Assemble frames -&gt; Decode -&gt; Render to canvas/video</span><br><span class="line">    end</span><br><span class="line">    loop Telemetry Feedback Loop (RTCP)</span><br><span class="line">        Bob-&gt;&gt;Alice: Send RTCP SR (Synchronize physical NTP and RTP clocks)</span><br><span class="line">        Alice-&gt;&gt;Bob: Return RTCP RR (Report RTT, packet loss, and jitter)</span><br><span class="line">        opt Reference Frame Loss Detected</span><br><span class="line">            Alice-&gt;&gt;Bob: Send RTCP PLI/FIR (Request immediate keyframe refresh)</span><br><span class="line">        end</span><br><span class="line">    end</span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+<pre><code class="highlight mermaid">sequenceDiagram
+    autonumber
+    actor Alice as Participant Alice
+    participant WS as WebSocket Signaling
+    actor Bob as Participant Bob
+    participant STUN as STUN/TURN Server
+    participant Dec as JitterBuffer &amp; Decoder
+
+    rect rgb(245, 247, 250)
+    Note over Alice,Bob: Stage 1: Room Join &amp; Peer Discovery (Signaling)
+    Alice-&gt;&gt;WS: join-room &#123; roomId: 888 &#125;
+    Bob-&gt;&gt;WS: join-room &#123; roomId: 888 &#125;
+    WS--&gt;&gt;Bob: existing-peers: [Alice]
+    end
+
+    rect rgb(255, 250, 240)
+    Note over Alice,Bob: Stage 2: Media Capability Negotiation (SDP)
+    Bob-&gt;&gt;Bob: createOffer() -&gt; Store LocalDescription
+    Bob-&gt;&gt;WS: Send Offer (VP8/Opus, DTLS fingerprint)
+    WS-&gt;&gt;Alice: Forward Offer
+    Alice-&gt;&gt;Alice: Store RemoteDescription -&gt; createAnswer()
+    Alice-&gt;&gt;WS: Send Answer (Capability intersection)
+    WS-&gt;&gt;Bob: Forward Answer
+    Bob-&gt;&gt;Bob: Store RemoteDescription
+    end
+
+    rect rgb(240, 255, 240)
+    Note over Alice,Bob: Stage 3: NAT Traversal &amp; Hole Punching (ICE)
+    par Candidate Discovery
+        Alice-&gt;&gt;STUN: Discover public mapped address
+        Bob-&gt;&gt;STUN: Discover public mapped address
+    end
+    Alice-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)
+    Bob-&gt;&gt;WS: Trickle ICE Candidate (Host, srflx)
+    Alice&lt;&lt;-&gt;&gt;Bob: STUN Binding Ping/Pong connectivity checks
+    Note over Alice,Bob: Nominate highest-priority viable pair
+    end
+
+    rect rgb(255, 245, 245)
+    Note over Alice,Bob: Stage 4: Cryptographic Handshake (DTLS-SRTP)
+    Alice&lt;&lt;-&gt;&gt;Bob: Execute DTLS handshake over UDP transport
+    Note over Alice,Bob: Verify SDP fingerprints, derive symmetric SRTP keys
+    end
+
+    rect rgb(245, 245, 255)
+    Note over Alice,Bob: Stage 5: Media Flow, QoS Feedback &amp; Rendering
+    loop Encrypted Media Transfer (SRTP)
+        Bob-&gt;&gt;Alice: Transmit RTP packets (SeqNum, Timestamp, Marker)
+        Alice-&gt;&gt;Dec: Ingest into JitterBuffer (Absorbs jitter &amp; reorders)
+        Dec-&gt;&gt;Alice: Assemble frames -&gt; Decode -&gt; Render to canvas/video
+    end
+    loop Telemetry Feedback Loop (RTCP)
+        Bob-&gt;&gt;Alice: Send RTCP SR (Synchronize physical NTP and RTP clocks)
+        Alice-&gt;&gt;Bob: Return RTCP RR (Report RTT, packet loss, and jitter)
+        opt Reference Frame Loss Detected
+            Alice-&gt;&gt;Bob: Send RTCP PLI/FIR (Request immediate keyframe refresh)
+        end
+    end
+    end</code></pre>
 <hr>
 <h3 id="Conclusion">Conclusion</h3>
 <p>The essence of WebRTC lies not merely in calling browser APIs, but in the tight, closed-loop coordination across <strong>network discovery (ICE), applied cryptography (DTLS-SRTP), real-time flow control (RTP/RTCP), and adaptive recovery (JitterBuffer/TCC/PLI)</strong>. We hope this comprehensive analysis—spanning business realities, protocol mechanics, and traffic inspection—provides you with a robust mental model for diagnosing latency, eliminating media stalls, and architecting resilient enterprise video systems.</p>
@@ -661,6 +759,8 @@ Local and remote candidates are cross-paired into candidate pairs and sorted by 
 <script src="/js/third-party/search/local-search.js"></script>
 
 
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js","integrity":"sha256-YbM1pG3wWnzhyYN49g5fPnen+2CKEFaZfopkkwSpNtY="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
 
 
 
